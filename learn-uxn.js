@@ -35,6 +35,9 @@ let loadRom = (rom) => {
 let loadTal = () => {
     let urlParams = new URLSearchParams(window.location.search);
     let rom = urlParams.get('rom');
+    if (!rom || rom.length == 0) {
+        rom = "piano";
+    }
     let contents = "\n" + FS.readFile(`/roms/${rom}.tal`, {encoding: 'utf8'})
 
     let el = document.getElementById('tal-contents')
