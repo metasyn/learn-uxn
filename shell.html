@@ -7,6 +7,17 @@
     <style>
       /** base elements **/
 
+      :root {
+        --color-0: #585858;
+        --color-1: #ab4642;
+        --color-2: #dc9656;
+        --color-3: #f7ca88;
+        --color-4: #a1b56c;
+        --color-5: #86c1b9;
+        --color-6: #7cafc2;
+        --color-7: #ba8baf;
+      }
+
       button {
         margin: 2px;
         background-color: black;
@@ -21,6 +32,7 @@
 
       a {
         text-decoration: none;
+        color: black;
       }
 
       /** Classes **/
@@ -109,23 +121,35 @@
       }
 
       .comment {
-        color: #a8e6cf;
+        color: var(--color-0);
       }
 
       .stack-opcode {
-        color: #dcedc1;
+        color: var(--color-1);
       }
 
       .logic-opcode {
-        color: #ffd3b6;
+        color: var(--color-2);
       }
 
       .memory-opcode {
-        color: #ffaaa5;
+        color: var(--color-3);
       }
 
       .arithmetic-opcode {
-        color: #ff8b94;
+        color: var(--color-4);
+      }
+
+      .rune-label {
+        color: var(--color-7);
+      }
+
+      .rune-sublabel {
+        color: var(--color-6);
+      }
+
+      .rune-hexliteral {
+        color: var(--color-5);
       }
 
 
@@ -264,18 +288,31 @@
     </div>
 
     <nav class="nav">
-      <h2>roms</h2>
-      <button data-rom="automata">automata</button>
-      <button data-rom="darena">darena</button>
-      <button data-rom="drum-rack">drum-rack</button>
-      <button data-rom="font">font</button>
-      <button data-rom="life">life</button>
-      <button data-rom="move">move</button>
-      <button data-rom="musictracker">musictracker</button>
-      <button data-rom="neralie">neralie</button>
-      <button data-rom="piano">piano</button>
-      <button data-rom="polycat">polycat</button>
-      <button data-rom="theme">theme</button>
+      <div>
+        <h2>roms</h2>
+        <button data-rom="automata">automata</button>
+        <button data-rom="darena">darena</button>
+        <button data-rom="drum-rack">drum-rack</button>
+        <button data-rom="font">font</button>
+        <button data-rom="life">life</button>
+        <button data-rom="move">move</button>
+        <button data-rom="musictracker">musictracker</button>
+        <button data-rom="neralie">neralie</button>
+        <button data-rom="piano">piano</button>
+        <button data-rom="polycat">polycat</button>
+        <button data-rom="theme">theme</button>
+      </div>
+
+      <div>
+        <h2>links</h2>
+        <ul>
+          <li><a href="https://wiki.xxiivv.com/site/uxn.html">uxn</a></li>
+          <li><a href="https://wiki.xxiivv.com/site/uxntal.html">unxtal</a></li>
+          <li><a href="https://wiki.xxiivv.com/site/varvara.html">varvara</a></li>
+          <li>uxn is created by <a href="https://100r.co">hundred rabbits</a></li>
+          <li>learn-uxn site made by <a href="https://metasyn.pw">metasyn</a></li>
+        </ul>
+      </div>
     </nav>
 
 

@@ -16,10 +16,6 @@ let loadNav = () => {
   hamburger.navToggle.addEventListener("click", function (e) {
     hamburger.doToggle(e);
   });
-
-  hamburger.nav.addEventListener("click", function (e) {
-    hamburger.doToggle(e);
-  });
 };
 
 let loadRom = (rom) => {
@@ -42,8 +38,17 @@ let loadTal = () => {
 
     let el = document.getElementById('tal-contents')
 
-    commentRegex = /\((.*?)\)/gms
+    commentRegex = /\((.+?)\)/gms
     parsed = contents.replace(commentRegex, '<span class="comment">($1)</span>');
+
+    let labelRegex = /(@.+?)(\s)/g
+    parsed = parsed.replace(labelRegex, '<span class="rune-label">$1</span>$2');
+
+    let sublabelRegex = /(&.+?)(\s)/g
+    parsed = parsed.replace(sublabelRegex, '<span class="rune-sublabel">$1</span>$2');
+
+    let hexLiteral = /(#.+?)(\s)/g
+    parsed = parsed.replace(hexLiteral, '<span class="rune-hexliteral">$1</span>$2');
 
     let makeOpCodeRegex = (ops) => {
         let regex = "("
@@ -123,6 +128,8 @@ let loadRomButtons = () => {
     })
   );
 };
+
+
 
 ///////////
 // MAIN //
