@@ -212,14 +212,13 @@
       .nav.expanded { left: 0; }
 
       .nav ul {
-        position: absolute;
         top: 50%;
         -webkit-transform: translateY(-50%);
         -ms-transform: translateY(-50%);
-        transform: translateY(-50%);
         list-style: none;
         margin: 0;
         padding: 0;
+        display: contents;
       }
 
       .nav-toggle {
@@ -290,6 +289,7 @@
     <nav class="nav">
       <div>
         <h2>roms</h2>
+        <br/>
         <button data-rom="automata">automata</button>
         <button data-rom="darena">darena</button>
         <button data-rom="drum-rack">drum-rack</button>
