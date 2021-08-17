@@ -3,14 +3,48 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>UXN Playground</title>
+    <title>LEARN UXN</title>
     <style>
+      /** base elements **/
 
-      .emscripten { padding-right: 0; margin-left: auto; margin-right: auto; display: block; }
+      button {
+        margin: 2px;
+        background-color: black;
+        border: none;
+        color: white;
+        padding: 15px 32px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+      }
+
+      a {
+        text-decoration: none;
+      }
+
+      /** Classes **/
+
+      .emscripten {
+        padding-right: 0;
+        margin-left: auto;
+        margin-right: auto;
+        display: block;
+      }
 
       .hidden {
         display: none;
       }
+
+      .flex {
+        display: flex;
+        width: 100%;
+        height: 75vh;
+      }
+
+
+      /** Specific classes on element types **/
+
 
       div.emscripten {
         text-align: center;
@@ -19,9 +53,8 @@
       div.emscripten_border  {
         border: 1px solid white;;
         border-color: white;
-        width: min(100%, 1000px);
-        margin-left: auto;
-        margin-right: auto;
+        flex: 1;
+        height: max-content;
       }
 
       /* the canvas *must not* have any border or padding, or mouse coords will be wrong */
@@ -43,17 +76,60 @@
         color: #72dec2;
       }
 
+      /** ID **/
 
       #status {
         background-color: #444;
         color: #72dec2;
         padding: 10px;
       }
+
       #spinner {
         position: absolute;
         overflow: hidden;
+        right: 10px;
       }
 
+      #textarea {
+        float: left;
+        border: 1px solid white;
+        width: 50%;
+        overflow: scroll;
+      }
+
+      #tal-contents {
+        margin: 40px;
+        color: white;
+        font-size: 18px;
+        white-space: pre;
+      }
+
+      #textarea pre {
+        margin: 20px;
+      }
+
+      .comment {
+        color: #a8e6cf;
+      }
+
+      .stack-opcode {
+        color: #dcedc1;
+      }
+
+      .logic-opcode {
+        color: #ffd3b6;
+      }
+
+      .memory-opcode {
+        color: #ffaaa5;
+      }
+
+      .arithmetic-opcode {
+        color: #ff8b94;
+      }
+
+
+      /** Stuff from emscripten **/
       .spinner {
         display: block;
         height: 50px;
@@ -87,33 +163,136 @@
         to {transform: rotate(360deg);}
       }
 
+
+      /** Stupid navigation thing **/
+
+      .nav {
+        -webkit-transition: left 0.5s ease;
+        -moz-transition: left 0.5s ease;
+        -ms-transition: left 0.5s ease;
+        -o-transition: left 0.5s ease;
+        transition: left 0.5s ease;
+        background: #76dec2;
+        color: white;
+        cursor: pointer;
+        font-size: 2rem;
+        height: 100vh;
+        left: -40rem;
+        padding: 6rem 2rem 2rem 2rem;
+        position: fixed;
+        top: 0;
+        width: 20rem;
+        z-index: 1;
+      }
+
+      .nav.expanded { left: 0; }
+
+      .nav ul {
+        position: absolute;
+        top: 50%;
+        -webkit-transform: translateY(-50%);
+        -ms-transform: translateY(-50%);
+        transform: translateY(-50%);
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+
+      .nav-toggle {
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        user-select: none;
+        cursor: pointer;
+        height: 2rem;
+        left: 2rem;
+        position: fixed;
+        top: 2rem;
+        width: 3.6rem;
+        z-index: 2;
+      }
+
+      .nav-toggle:hover { opacity: 0.8; }
+
+      .nav-toggle .nav-toggle-bar,  .nav-toggle .nav-toggle-bar::after,  .nav-toggle .nav-toggle-bar::before {
+        position: absolute;
+        top: 50%;
+        -webkit-transform: translateY(-50%);
+        -ms-transform: translateY(-50%);
+        transform: translateY(-50%);
+        -webkit-transition: all 0.5s ease;
+        -moz-transition: all 0.5s ease;
+        -ms-transition: all 0.5s ease;
+        -o-transition: all 0.5s ease;
+        transition: all 0.5s ease;
+        background: white;
+        content: '';
+        height: 0.4rem;
+        width: 100%;
+      }
+
+      .nav-toggle .nav-toggle-bar { margin-top: 0; }
+
+      .nav-toggle .nav-toggle-bar::after { margin-top: 0.8rem; }
+
+      .nav-toggle .nav-toggle-bar::before { margin-top: -0.8rem; }
+
+      .nav-toggle.expanded .nav-toggle-bar { background: transparent; }
+
+      .nav-toggle.expanded .nav-toggle-bar::after, .nav-toggle.expanded .nav-toggle-bar::before {
+        background: white;
+        margin-top: 0;
+      }
+
+      .nav-toggle.expanded .nav-toggle-bar::after {
+        -ms-transform: rotate(45deg);
+        -webkit-transform: rotate(45deg);
+        transform: rotate(45deg);
+      }
+
+      .nav-toggle.expanded .nav-toggle-bar::before {
+        -ms-transform: rotate(-45deg);
+        -webkit-transform: rotate(-45deg);
+        transform: rotate(-45deg);
+      }
+
     </style>
   </head>
   <body>
+
+    <div class="nav-toggle">
+    <div class="nav-toggle-bar"></div>
+    </div>
+
+    <nav class="nav">
+      <h2>roms</h2>
+      <button data-rom="automata">automata</button>
+      <button data-rom="darena">darena</button>
+      <button data-rom="drum-rack">drum-rack</button>
+      <button data-rom="font">font</button>
+      <button data-rom="life">life</button>
+      <button data-rom="move">move</button>
+      <button data-rom="musictracker">musictracker</button>
+      <button data-rom="neralie">neralie</button>
+      <button data-rom="piano">piano</button>
+      <button data-rom="polycat">polycat</button>
+      <button data-rom="theme">theme</button>
+    </nav>
+
 
     <figure id="spinner"><div class="spinner"></div></figure>
 
     <div class='title'>
       <pre>
 
-                                   ███    █▄  ▀████    ▐████▀ ███▄▄▄▄
-                                   ███    ███   ███▌   ████▀  ███▀▀▀██▄
-                                   ███    ███    ███  ▐███    ███   ███
-                                   ███    ███    ▀███▄███▀    ███   ███
-                                   ███    ███    ████▀██▄     ███   ███
-                                   ███    ███   ▐███  ▀███    ███   ███
-                                   ███    ███  ▄███     ███▄  ███   ███
-                                   ████████▀  ████       ███▄  ▀█   █▀
-
-   ▄███████▄  ▄█          ▄████████ ▄██   ▄      ▄██████▄     ▄████████  ▄██████▄  ███    █▄  ███▄▄▄▄   ████████▄
-  ███    ███ ███         ███    ███ ███   ██▄   ███    ███   ███    ███ ███    ███ ███    ███ ███▀▀▀██▄ ███   ▀███
-  ███    ███ ███         ███    ███ ███▄▄▄███   ███    █▀    ███    ███ ███    ███ ███    ███ ███   ███ ███    ███
-  ███    ███ ███         ███    ███ ▀▀▀▀▀▀███  ▄███         ▄███▄▄▄▄██▀ ███    ███ ███    ███ ███   ███ ███    ███
-▀█████████▀  ███       ▀███████████ ▄██   ███ ▀▀███ ████▄  ▀▀███▀▀▀▀▀   ███    ███ ███    ███ ███   ███ ███    ███
-  ███        ███         ███    ███ ███   ███   ███    ███ ▀███████████ ███    ███ ███    ███ ███   ███ ███    ███
-  ███        ███▌    ▄   ███    ███ ███   ███   ███    ███   ███    ███ ███    ███ ███    ███ ███   ███ ███   ▄███
- ▄████▀      █████▄▄██   ███    █▀   ▀█████▀    ████████▀    ███    ███  ▀██████▀  ████████▀   ▀█   █▀  ████████▀
-             ▀                                               ███    ███
+ ▄█          ▄████████    ▄████████    ▄████████ ███▄▄▄▄        ███    █▄  ▀████    ▐████▀ ███▄▄▄▄
+███         ███    ███   ███    ███   ███    ███ ███▀▀▀██▄      ███    ███   ███▌   ████▀  ███▀▀▀██▄
+███         ███    █▀    ███    ███   ███    ███ ███   ███      ███    ███    ███  ▐███    ███   ███
+███        ▄███▄▄▄       ███    ███  ▄███▄▄▄▄██▀ ███   ███      ███    ███    ▀███▄███▀    ███   ███
+███       ▀▀███▀▀▀     ▀███████████ ▀▀███▀▀▀▀▀   ███   ███      ███    ███    ████▀██▄     ███   ███
+███         ███    █▄    ███    ███ ▀███████████ ███   ███      ███    ███   ▐███  ▀███    ███   ███
+███▌    ▄   ███    ███   ███    ███   ███    ███ ███   ███      ███    ███  ▄███     ███▄  ███   ███
+█████▄▄██   ██████████   ███    █▀    ███    ███  ▀█   █▀       ████████▀  ████       ███▄  ▀█   █▀
+▀                                     ███    ███
 
       </pre>
     </div>
@@ -123,89 +302,21 @@
       <progress value="0" max="100" id="progress" hidden=1></progress>
     </div>
 
-    <div class="emscripten_border">
-      <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" tabindex=-1></canvas>
+    <div class='flex'>
+      <div id='textarea'>
+        <pre>
+          <code id='tal-contents'>
+          </code>
+        </pre>
+      </div>
+
+      <div class="emscripten_border">
+        <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" tabindex=-1></canvas>
+      </div>
     </div>
 
-    <script type='text/javascript'>
-      var statusElement = document.getElementById('status');
-      var progressElement = document.getElementById('progress');
-      var spinnerElement = document.getElementById('spinner');
 
-      var Module = {
-        preRun: [],
-        postRun: [],
-        print: (function() {
-          var element = document.getElementById('output');
-          if (element) element.value = ''; // clear browser cache
-          return function(text) {
-            if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ');
-            // These replacements are necessary if you render to raw HTML
-            //text = text.replace(/&/g, "&amp;");
-            //text = text.replace(/</g, "&lt;");
-            //text = text.replace(/>/g, "&gt;");
-            //text = text.replace('\n', '<br>', 'g');
-            console.log(text);
-            if (element) {
-              element.value += text + "\n";
-              element.scrollTop = element.scrollHeight; // focus on bottom
-            }
-          };
-        })(),
-        printErr: function(text) {
-          if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ');
-          console.error(text);
-        },
-        canvas: (function() {
-          var canvas = document.getElementById('canvas');
-
-          // As a default initial behavior, pop up an alert when webgl context is lost. To make your
-          // application robust, you may want to override this behavior before shipping!
-          // See http://www.khronos.org/registry/webgl/specs/latest/1.0/#5.15.2
-          canvas.addEventListener("webglcontextlost", function(e) { alert('WebGL context lost. You will need to reload the page.'); e.preventDefault(); }, false);
-
-          return canvas;
-        })(),
-        setStatus: function(text) {
-          if (!Module.setStatus.last) Module.setStatus.last = { time: Date.now(), text: '' };
-          if (text === Module.setStatus.last.text) return;
-          var m = text.match(/([^(]+)\((\d+(\.\d+)?)\/(\d+)\)/);
-          var now = Date.now();
-          if (m && now - Module.setStatus.last.time < 30) return; // if this is a progress update, skip it if too soon
-          Module.setStatus.last.time = now;
-          Module.setStatus.last.text = text;
-          if (m) {
-            text = m[1];
-            progressElement.value = parseInt(m[2])*100;
-            progressElement.max = parseInt(m[4])*100;
-            progressElement.hidden = false;
-            spinnerElement.hidden = false;
-            statusElement.classList.remove("hidden");
-          } else {
-            progressElement.value = null;
-            progressElement.max = null;
-            progressElement.hidden = true;
-            if (!text) spinnerElement.hidden = true;
-            if (!text) statusElement.classList.add("hidden");
-          }
-          statusElement.innerHTML = text;
-        },
-        totalDependencies: 0,
-        monitorRunDependencies: function(left) {
-          this.totalDependencies = Math.max(this.totalDependencies, left);
-          Module.setStatus(left ? 'Preparing... (' + (this.totalDependencies-left) + '/' + this.totalDependencies + ')' : 'All downloads complete.');
-        }
-      };
-      Module.setStatus('Downloading...');
-      window.onerror = function() {
-        Module.setStatus('Exception thrown, see JavaScript console');
-        spinnerElement.style.display = 'none';
-        statusElement.classList.remove("hidden");
-        Module.setStatus = function(text) {
-          if (text) Module.printErr('[post-exception status] ' + text);
-        };
-      };
-    </script>
-    {{{ SCRIPT }}}
+    <script type='text/javascript' src='learn-uxn.js'></script>
+      {{{ SCRIPT }}}
   </body>
 </html>
