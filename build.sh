@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -e
 
 end="\033[0m"
 green="\033[0;32m"
@@ -82,24 +83,40 @@ function build_uxn_emscripten() {
 
 
     blue "Building UXN for emscripten..."
+        # -s EXPORT_NAME=uxnemu \
+        # -s MODULARIZE=1 \
     EMCC_DEBUG=1 emcc \
+        -s WASM=1 \
+        -s ASSERTIONS=1 \
+        -s ENVIRONMENT=web \
+        -s ASYNCIFY \
         -s USE_SDL=2 \
         -s USE_SDL_MIXER=2 \
-        -s WASM=1 \
-        -s ASYNCIFY \
-        -s ENVIRONMENT=web \
-        -s EXPORTED_FUNCTIONS='["_main"]' \
-        -s EXPORTED_RUNTIME_METHODS='["cwrap"]'\
+        -s FORCE_FILESYSTEM=1 \
+        -s EXPORTED_FUNCTIONS='["_main", "_quit"]' \
+        -s EXPORTED_RUNTIME_METHODS='["ccall", "callMain", "FS"]' \
+        -s EXIT_RUNTIME=1 \
+        --shell-file=shell.html \
+        --extern-pre-js=pre.js \
         -O3 \
-        --extern-pre-js pre.js \
         --preload-file roms \
-        --shell-file shell.html \
-        -o build/index.html \
+        -o site/uxnemu.html \
             uxn/src/uxn.c \
             uxn/src/devices/ppu.c \
             uxn/src/devices/apu.c \
             uxn/src/uxnemu.c \
             uxnemscripten.c
+
+    EMCC_DEBUG=1 emcc \
+        -s WASM=1 \
+        -s ASSERTIONS=1 \
+        -s ENVIRONMENT=web \
+        -s MODULARIZE=1 \
+        -s FORCE_FILESYSTEM=1 \
+        -s EXPORT_NAME=uxnasm \
+        -s EXPORTED_RUNTIME_METHODS='["callMain", "FS"]' \
+        -o site/uxnasm.js \
+            uxn/src/uxnasm.c
 }
 
 

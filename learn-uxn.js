@@ -130,6 +130,22 @@ let loadRomButtons = () => {
 };
 
 
+let assemble = (inputText) => {
+    return uxnasm().then((x) => {
+        // read from the "main" module
+        x.FS.writeFile("/input", inputText)
+
+        // call the assembler main
+        x.callMain(["/input", "/output"])
+
+        // read from the assembler file system
+        output = x.FS.readFile("/output") 
+
+        return output;
+    })
+}
+
+
 
 ///////////
 // MAIN //
@@ -140,7 +156,9 @@ var progressElement = document.getElementById("progress");
 var spinnerElement = document.getElementById("spinner");
 
 var Module = {
-  preRun: [],
+  preRun: [
+      // function() {}
+  ],
   postRun: [],
   print: (function () {
     var element = document.getElementById("output");

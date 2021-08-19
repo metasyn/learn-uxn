@@ -3,6 +3,7 @@
 %RTN { JMP2r }
 %2// { #01 SFT2 }
 %4// { #02 SFT2 }
+%!~ { NEQk NIP }
 
 ( devices )
 
@@ -28,7 +29,7 @@
 
 	( find center )
 	.Screen/width DEI2 2// #0008 SUB2 .cat/x STZ2
-	.Screen/height DEI2 4// #0003 MUL2 #0018 SUB2 .cat/y STZ2
+	.Screen/height DEI2 4// DUP2k ADD2 ADD2 #0018 SUB2 .cat/y STZ2
 
 	( vectors )
 	;on-mouse .Mouse/vector DEO2
@@ -43,21 +44,21 @@ BRK
 	
 	;draw-cursor JSR2
 
-	.Mouse/x DEI2 .cat/x LDZ2 GTH2 #20 MUL
-	.Mouse/y DEI2 .cat/y LDZ2 GTH2 #40 MUL
+	.Mouse/x DEI2 .cat/x LDZ2 GTH2 #50 SFT
+	.Mouse/y DEI2 .cat/y LDZ2 GTH2 #60 SFT
 		ADD #00 SWP ;draw-eye JSR2
 
 BRK
 
 @on-frame ( -> )
 
-	.cat/timer LDZ #01 ADD [ DUP ] .cat/timer STZ
+	.cat/timer LDZ INC [ DUP ] .cat/timer STZ
 		DUP ,&skip0 JCN #0000 ;draw-tail JSR2 &skip0
-		DUP #10 NEQ ,&skip1 JCN #0001 ;draw-tail JSR2 &skip1
-		DUP #20 NEQ ,&skip2 JCN #0002 ;draw-tail JSR2 &skip2
-		DUP #30 NEQ ,&skip3 JCN #0003 ;draw-tail JSR2 &skip3
-		DUP #40 NEQ ,&skip4 JCN #0002 ;draw-tail JSR2 &skip4
-		DUP #50 NEQ ,&skip5 JCN #0001 ;draw-tail JSR2 &skip5
+		[ #10 ] !~ ,&skip1 JCN #0001 ;draw-tail JSR2 &skip1
+		[ #20 ] !~ ,&skip2 JCN #0002 ;draw-tail JSR2 &skip2
+		[ #30 ] !~ ,&skip3 JCN #0003 ;draw-tail JSR2 &skip3
+		[ #40 ] !~ ,&skip4 JCN #0002 ;draw-tail JSR2 &skip4
+		[ #50 ] !~ ,&skip5 JCN #0001 ;draw-tail JSR2 &skip5
 	POP
 
 BRK
@@ -97,7 +98,7 @@ RTN
 	;body .Screen/addr DEO2
 	( draw ) #81 .Screen/sprite DEO
 	STH2r .Screen/x DEO2
-	#0010 MUL2 ;body #0010 ADD2 ADD2 .Screen/addr DEO2
+	#40 SFT2 ;body #0010 ADD2 ADD2 .Screen/addr DEO2
 	( draw ) #81 .Screen/sprite DEO
 
 RTN
@@ -125,13 +126,13 @@ RTN
 	.cat/x LDZ2 #0010 SUB2 .Screen/x DEO2
 	;ground .Screen/addr DEO2
 
-	#00 #10
+	#10 #00 
 	&loop
 		( draw ) #01 .Screen/sprite DEO
 		( sety ) .Screen/addr DEI2 #0008 ADD2 .Screen/addr DEO2
 		( setx ) .Screen/x DEI2 #0008 ADD2 .Screen/x DEO2
-		( incr ) SWP #01 ADD SWP
-		LTHk ,&loop JCN
+		( incr ) INC
+		GTHk ,&loop JCN
 	POP2
 
 RTN
@@ -175,8 +176,9 @@ RTN
 %2** { #10 SFT2 } %2// { #01 SFT2 }
 %4** { #20 SFT2 } %4// { #02 SFT2 }
 %8** { #30 SFT2 } %8// { #03 SFT2 }
+%10** { #40 SFT2 }
 
-%TOB { SWP POP } %TOS { #00 SWP }
+%TOB { NIP } %TOS { #00 SWP }
 %RTN { JMP2r }
 %MOD { DUP2 / * - }
 %LTS2  { #8000 ++ SWP2 #8000 ++ >> } %GTS2  { #8000 ++ SWP2 #8000 ++ << }
@@ -302,13 +304,13 @@ RTN
 	&draw-pads
 		( load sample )
 		OVR TOS #0019 ** ;pad-path ++ .File/name DEO2
-		OVR #04 / #10 * .Audio0/length + DEI2 .File/length DEO2
+		OVR #04 / #40 SFT .Audio0/length + DEI2 .File/length DEO2
 		OVR TOS 2** ;pad-addr ++ LDA2 .File/load DEO2
 		( draw pad )
 		OVR #01 ;draw-pad JSR2
 		( draw mixer )
 		OVR #04 / ;draw-mixer JSR2
-		( incr ) SWP #01 + SWP
+		( incr ) SWP INC SWP
 		LTHk ,&draw-pads JCN
 	POP2
 
@@ -318,7 +320,7 @@ BRK
 
 @on-message ( -> )
 	
-	.Console/read DEI #10 MOD ;play-pad JSR2
+	.Console/read DEI #0f AND ;play-pad JSR2
 
 BRK
 
@@ -330,9 +332,9 @@ BRK
 		OVR STH
 		( x ) .mix-view/x1 LDZ2 #0074 ++
 		( y ) .mix-view/y1 LDZ2 PAD-HEIGHT STHkr TOS ** ++ #0002 ++
-		( output ) .Audio0/output STHr #10 * + DEI 
+		( output ) .Audio0/output STHr #40 SFT + DEI 
 		;draw-monitor JSR2
-		( incr ) SWP #01 + SWP
+		( incr ) SWP INC SWP
 		LTHk ,&loop JCN
 	POP2
 
@@ -344,15 +346,15 @@ BRK
 
 	.Mouse/state DEI #00 ! #01 JCN [ BRK ]
 
-	.Mouse/x DEI2 DUP2 .pad-view/x1 LDZ2 >> ROT ROT .pad-view/x2 LDZ2 #0001 ++ << #0101 ==
+	.Mouse/x DEI2 DUP2 .pad-view/x1 LDZ2 >> ROT ROT .pad-view/x2 LDZ2 INC2 << #0101 ==
 	.Mouse/y DEI2 DUP2 .pad-view/y1 LDZ2 >> ROT ROT .pad-view/y2 LDZ2 << #0101 ==
 	#0101 == ;on-touch-pad JCN2
 
-	.Mouse/x DEI2 DUP2 .mix-view/x1 LDZ2 >> ROT ROT .mix-view/x2 LDZ2 #0001 ++ << #0101 ==
+	.Mouse/x DEI2 DUP2 .mix-view/x1 LDZ2 >> ROT ROT .mix-view/x2 LDZ2 INC2 << #0101 ==
 	.Mouse/y DEI2 DUP2 .mix-view/y1 LDZ2 >> ROT ROT .mix-view/y2 LDZ2 << #0101 ==
 	#0101 == ;on-touch-mix JCN2
 
-	.Mouse/x DEI2 DUP2 .oct-view/x1 LDZ2 >> ROT ROT .oct-view/x2 LDZ2 #0001 ++ << #0101 ==
+	.Mouse/x DEI2 DUP2 .oct-view/x1 LDZ2 >> ROT ROT .oct-view/x2 LDZ2 INC2 << #0101 ==
 	.Mouse/y DEI2 DUP2 .oct-view/y1 LDZ2 >> ROT ROT .oct-view/y2 LDZ2 << #0101 ==
 	#0101 == ;on-touch-oct JCN2
 
@@ -386,7 +388,7 @@ BRK
 @on-touch-pad ( -> )
 	
 	( x ) .Mouse/x DEI2 .pad-view/x1 LDZ2 -- PAD-WIDTH // TOB
-	( y ) .Mouse/y DEI2 .pad-view/y1 LDZ2 -- PAD-HEIGHT // TOB #04 * +
+	( y ) .Mouse/y DEI2 .pad-view/y1 LDZ2 -- PAD-HEIGHT // TOB #20 SFT +
 	
 	DUP SWP ;play-pad JSR2
 
@@ -402,21 +404,21 @@ BRK
 	( knob ) .Mouse/x DEI2 .mix-view/x1 LDZ2 -- #0010 // TOB
 	( adsr )
 	DUP #00 ! ,&no-a JCN
-		.Audio0/adsr [ STHkr #10 * + ] DEI
+		.Audio0/adsr [ STHkr #40 SFT + ] DEI
 		#10 .Mouse/state DEI #10 = #e0 * + +
-		.Audio0/adsr [ STHkr #10 * + ] DEO &no-a
+		.Audio0/adsr [ STHkr #40 SFT + ] DEO &no-a
 	DUP #01 ! ,&no-d JCN
-		.Audio0/adsr [ STHkr #10 * + ] DEI
+		.Audio0/adsr [ STHkr #40 SFT + ] DEI
 		DUP #f0 AND STH #01 .Mouse/state DEI #10 = #0e * + + #0f AND STHr +
-		.Audio0/adsr [ STHkr #10 * + ] DEO &no-d
+		.Audio0/adsr [ STHkr #40 SFT + ] DEO &no-d
 	DUP #02 ! ,&no-s JCN
-		.Audio0/adsr [ STHkr #10 * + ] #01 + DEI
+		.Audio0/adsr [ STHkr #40 SFT + ] INC DEI
 		#10 .Mouse/state DEI #10 = #e0 * + +
-		.Audio0/adsr [ STHkr #10 * + ] #01 + DEO &no-s
+		.Audio0/adsr [ STHkr #40 SFT + ] INC DEO &no-s
 	DUP #03 ! ,&no-r JCN
-		.Audio0/adsr [ STHkr #10 * + ] #01 + DEI
+		.Audio0/adsr [ STHkr #40 SFT + ] INC DEI
 		DUP #f0 AND STH #01 .Mouse/state DEI #10 = #0e * + + #0f AND STHr +
-		.Audio0/adsr [ STHkr #10 * + ] #01 + DEO &no-r
+		.Audio0/adsr [ STHkr #40 SFT + ] INC DEO &no-r
 	( modes )
 	DUP #04 ! ,&no-repeat JCN
 		.modes [ STHkr + ] LDZ 
@@ -424,13 +426,13 @@ BRK
 		.modes [ STHkr + ] STZ &no-repeat
 	( volume )
 	DUP #05 ! ,&no-left JCN
-		.Audio0/volume [ STHkr #10 * + ] DEI 
+		.Audio0/volume [ STHkr #40 SFT + ] DEI 
 		#10 .Mouse/state DEI #10 = #e0 * + +
-		.Audio0/volume [ STHkr #10 * + ] DEO &no-left
+		.Audio0/volume [ STHkr #40 SFT + ] DEO &no-left
 	DUP #06 ! ,&no-right JCN
-		.Audio0/volume [ STHkr #10 * + ] DEI
+		.Audio0/volume [ STHkr #40 SFT + ] DEI
 		DUP #f0 AND STH #01 .Mouse/state DEI #10 = #0e * + + #0f AND STHr +
-		.Audio0/volume [ STHkr #10 * + ] DEO &no-right
+		.Audio0/volume [ STHkr #40 SFT + ] DEO &no-right
 	POP
 
 	( release ) #00 .Mouse/state DEO
@@ -446,7 +448,7 @@ BRK
 	.Mouse/x DEI2 .oct-view/x1 LDZ2 -- 8// TOB #08 ! ,&no-mod JCN
 		.Mouse/y DEI2 .oct-view/y1 LDZ2 -- 8// TOB 
 		DUP #00 ! ,&no-incr JCN
-			.piano/octave LDZ #01 + .piano/octave STZ &no-incr
+			.piano/octave LDZ INC .piano/octave STZ &no-incr
 		DUP #02 ! ,&no-decr JCN
 			.piano/octave LDZ #01 - .piano/octave STZ &no-decr
 		POP
@@ -478,11 +480,11 @@ BRK
 	DUP #02 ;draw-pad JSR2
 	( addr )
 	DUP TOS 2** ;pad-addr ++ LDA2 STH2
-	DUP #04 / #10 * .Audio0/addr + STH2r ROT DEO2
+	DUP #04 / #40 SFT .Audio0/addr + STH2r ROT DEO2
 	( pitch )
 	DUP TOS ;pad-pitch ++ LDA STH 
-	DUP #04 / .modes + LDZ #00 = #80 * STH ADDr
-	DUP #04 / #10 * .Audio0/pitch + STHr SWP DEO
+	DUP #04 / .modes + LDZ #00 = #70 SFT STH ADDr
+	DUP #04 / #40 SFT .Audio0/pitch + STHr SWP DEO
 	#04 / ;draw-mixer JSR2
 
 RTN
@@ -490,7 +492,7 @@ RTN
 @draw-waveform ( pad -- )
 	
 	( stash address )
-	#02 * #00 SWP ;pad-addr ++ LDA2 STH2
+	DUP ADD #00 SWP ;pad-addr ++ LDA2 STH2
 
 	( clear )
 	.wav-view/x1 LDZ2 #0002 ++
@@ -509,12 +511,12 @@ RTN
 			.wav-view/y1 LDZ2 #0010 ++ .Screen/y DEO2
 			#01 .Screen/pixel DEO
 		&no-dot
-		OVR TOS #0010 ** [ DUP2r STH2r ] ++ LDA 
+		OVR TOS 10** [ DUP2r STH2r ] ++ LDA 
 		#02 /
 		TOS 4// .wav-view/y1 LDZ2 ++ .Screen/y DEO2
-		.Screen/x DEI2 #0001 ++ .Screen/x DEO2
+		.Screen/x DEI2 INC2 .Screen/x DEO2
 		( draw ) #02 .Screen/pixel DEO
-		( incr ) SWP #01 + SWP
+		( incr ) SWP INC SWP
 		LTHk ,&loop JCN
 	POP2
 	POP2r
@@ -527,21 +529,21 @@ RTN
 
 	( adsr )
 	DUP2 .mix-view/x1 LDZ2 SWP2
-		.Audio0/adsr [ STHkr #10 * + ] DEI #04 SFT ;draw-knob JSR2
+		.Audio0/adsr [ STHkr #40 SFT + ] DEI #04 SFT ;draw-knob JSR2
 	DUP2 .mix-view/x1 LDZ2 #0010 ++ SWP2
-		.Audio0/adsr [ STHkr #10 * + ] DEI #0f AND ;draw-knob JSR2
+		.Audio0/adsr [ STHkr #40 SFT + ] DEI #0f AND ;draw-knob JSR2
 	DUP2 .mix-view/x1 LDZ2 #0020 ++ SWP2
-		.Audio0/adsr [ STHkr #10 * + ] #01 + DEI #04 SFT ;draw-knob JSR2
+		.Audio0/adsr [ STHkr #40 SFT + ] INC DEI #04 SFT ;draw-knob JSR2
 	DUP2 .mix-view/x1 LDZ2 #0030 ++ SWP2
-		.Audio0/adsr [ STHkr #10 * + ] #01 + DEI #0f AND ;draw-knob JSR2
+		.Audio0/adsr [ STHkr #40 SFT + ] INC DEI #0f AND ;draw-knob JSR2
 	( once/repeat )
 	DUP2 .mix-view/x1 LDZ2 #0040 ++ SWP2
 		.modes [ STHkr + ] LDZ ;draw-switch JSR2
 	( volume )
 	DUP2 .mix-view/x1 LDZ2 #0050 ++ SWP2
-		.Audio0/volume [ STHkr #10 * + ] DEI #04 SFT ;draw-knob JSR2
+		.Audio0/volume [ STHkr #40 SFT + ] DEI #04 SFT ;draw-knob JSR2
 	DUP2 .mix-view/x1 LDZ2 #0060 ++ SWP2
-		.Audio0/volume [ STHkr #10 * + ] DEI #0f AND ;draw-knob JSR2
+		.Audio0/volume [ STHkr #40 SFT + ] DEI #0f AND ;draw-knob JSR2
 	POP2
 	POPr
 
@@ -553,7 +555,7 @@ RTN
 
 	STHkr 
 
-	DUP #04 / SWP #04 MOD TOS PAD-WIDTH ** ( center ) .pad-view/x1 LDZ2 ++ 
+	DUP #04 / SWP #03 AND TOS PAD-WIDTH ** ( center ) .pad-view/x1 LDZ2 ++ 
 	ROT TOS PAD-HEIGHT ** ( center ) .pad-view/y1 LDZ2 ++ 
 
 	( draw outline )
@@ -626,12 +628,12 @@ RTN
 
 	#00 #0f
 	&loop
-		OVR #10 SWP - STHkr #0f AND < #01 + .Screen/pixel DEO
+		OVR #10 SWP - STHkr #0f AND < INC .Screen/pixel DEO
 		.Screen/x DEI2 #0002 ++ .Screen/x DEO2
-		OVR #10 SWP - STHkr #04 SFT < #01 + .Screen/pixel DEO
+		OVR #10 SWP - STHkr #04 SFT < INC .Screen/pixel DEO
 		.Screen/x DEI2 #0002 -- .Screen/x DEO2
 		.Screen/y DEI2 #0002 ++ .Screen/y DEO2
-		( incr ) SWP #01 + SWP
+		( incr ) SWP INC SWP
 		LTHk ,&loop JCN
 	POP2
 
@@ -687,7 +689,7 @@ RTN
 	( draw ) #01 .Screen/sprite DEO
 	.Screen/x DEI2 #0004 ++ .Screen/x DEO2
 	.Screen/y DEI2 #0008 ++ .Screen/y DEO2
-	;font-hex #00 STHkr #08 * ++ .Screen/addr DEO2
+	;font-hex #00 STHkr #30 SFT ++ .Screen/addr DEO2
 	( draw ) #01 .Screen/sprite DEO
 	.Screen/x DEI2 #0004 -- #00 #00 STHkr ;knob-offsetx ++ LDA ++ .Screen/x DEO2
 	.Screen/y DEI2 #0010 -- #00 #00 STHr ;knob-offsety ++ LDA ++ .Screen/y DEO2
@@ -699,7 +701,7 @@ RTN
 @draw-switch ( x* y* value -- )
 	
 	STH .Screen/y DEO2 .Screen/x DEO2
-	STHkr #20 * #00 SWP ;switch-icns ++
+	STHkr #50 SFT #00 SWP ;switch-icns ++
 	DUP2 .Screen/addr DEO2
 	( draw ) #01 STHkr + .Screen/sprite DEO
 	.Screen/x DEI2 #0008 ++ .Screen/x DEO2
@@ -718,21 +720,21 @@ RTN
 @line-rect ( x1* y1* x2* y2* color -- )
 
 	( load ) .color STZ DUP2 STH2 .rect/y2 STZ2 .rect/x2 STZ2 DUP2 STH2 .rect/y1 STZ2 .rect/x1 STZ2
-	STH2r #0001 ++ STH2r
+	STH2r INC2 STH2r
 	&ver
 		( save ) OVR2 .Screen/y DEO2
 		( draw ) .rect/x1 LDZ2 .Screen/x DEO2 .color LDZ DUP .Screen/pixel DEO
 		( draw ) .rect/x2 LDZ2 .Screen/x DEO2 .Screen/pixel DEO
-		( incr ) SWP2 #0001 ++ SWP2
+		( incr ) SWP2 INC2 SWP2
 		OVR2 OVR2 LTS2 ,&ver JCN
 	POP2 POP2
-	.rect/x1 LDZ2 #0001 ++ .rect/x2 LDZ2 #0001 --
+	.rect/x1 LDZ2 INC2 .rect/x2 LDZ2 #0001 --
 	&hor
 		( save ) OVR2 .Screen/x DEO2
 		( draw ) .rect/y1 LDZ2 .Screen/y DEO2 .color LDZ DUP .Screen/pixel DEO
 		( draw ) .rect/y2 LDZ2 .Screen/y DEO2 .Screen/pixel DEO
-		( incr ) SWP2 #0001 ++ SWP2
-		OVR2 OVR2 #0001 ++ LTS2 ,&hor JCN
+		( incr ) SWP2 INC2 SWP2
+		OVR2 OVR2 INC2 LTS2 ,&hor JCN
 	POP2 POP2
 
 RTN
@@ -742,11 +744,11 @@ RTN
 	( load ) STH STH2 .Screen/y DEO2 .Screen/x DEO2
 	STH2r
 	&loop
-		DUP2 LDA #00 SWP #0030 -- 8** ;font-num-uc ++ .Screen/addr DEO2 
+		LDAk #00 SWP #0030 -- 8** ;font-num-uc ++ .Screen/addr DEO2 
 		( draw ) STHkr .Screen/sprite DEO
-		( incr ) #0001 ++
+		( incr ) INC2
 		( incr ) .Screen/x DEI2 #0008 ++ .Screen/x DEO2
-		DUP2 LDA #00 ! ,&loop JCN
+		LDAk #00 ! ,&loop JCN
 	POP2
 	POPr
 
@@ -762,10 +764,10 @@ RTN
 		&hor
 			( save ) OVR2 .Screen/x DEO2
 			( draw ) .color LDZ .Screen/pixel DEO
-			( incr ) SWP2 #0001 ++ SWP2
+			( incr ) SWP2 INC2 SWP2
 			OVR2 OVR2 LTS2 ,&hor JCN
 		POP2 POP2 STH2r STH2r
-		( incr ) SWP2 #0001 ++ SWP2
+		( incr ) SWP2 INC2 SWP2
 		OVR2 OVR2 LTS2 ,&ver JCN
 	POP2 POP2 POP2 POP2
 
@@ -890,19 +892,19 @@ RTN
 	0041 4141 4122 1408 0049 4949 4949 4976 
 	0041 2214 0814 2241 0041 4141 3f01 413e 
 	007f 0101 3e40 407f ]
-!¯7!ÿ
-7!_7!; 7"6?(7$6?*7!÷,7A/
-  
- !÷,7‚	 	 @/‚ğ	*6! 9*7!ÿ,7	*6! 8*7!,7	(6! 9(7!,7	(6! 8(7!,7A/!,7 / <~ÿÛÿç~<$fçÛÿÿ~<<~ÿÿÛçf$<~ïï~<<~÷øø÷~<  <<  !:7!Ú
-7!ª7!< 7!R7"6?1$6?1!!.!‰. ¶ 	 ¶ !‰. !Ä.– )$! 8!.!‰. – 0! 90! H9´
-!#.0! 80! H9´
-$!#.0! 90! 9µ
-!#.0! 80! 9µ
-$!#.0! 90! 8¶
-!#.0! 80! 8¶
-$!#.l1
-1 $ 0?
-08(7 0?08*7Ï !84?! <0?!8 8,7/‹¢#Cl,7!  $6&*7!  "6&(7/%! 8%«í##%! 8%«×##l!ü,70(70*7@/’6$1(7”6$1*7A– 	/l€Ààğøà {o$’sçsÏ[ÉyÏIïrI{ï{É @€€@  @@€€€àãã( 
+ ¯€7 ÿ€
+7 _€7 ;€ 7€"6€?€(7€$6€?€*7 ÷€,7€A€/€
+€  €
+€  ÷€,7€‚€€	€€€ €	€€€ €@€/€‚€ğ€€€	€€*6  9€*7 ÿ€,7€€€	€€*6  8€*7 €,7€€€	€€(6  9€(7 €,7€€€	€€(6  8€(7 €,7€A€/ €,7€ €/ <~ÿÛÿç~<$fçÛÿÿ~<<~ÿÿÛçf$<~ïï~<<~÷øø÷~<  <<   :€7 Ú€
+7 ª€7 <€ 7 R€7€"6€?€1€$6€?€1  . ‰. €¶€ 	€ €¶€  ‰.  Ã.€–€ €)€€€#€ €€@€ 8 . ‰.€ €– €0  9€0  H9€´€
+ #.€0  8€0  H9€´€
+# #.€0  9€0  9€µ€
+ #.€0  8€0  9€µ€
+# #.€0  9€0  8€¶€
+ #.€0  8€0  8€¶€
+# #.l€1€
+1€ €€#€ €0?€
+08€(7€€ €0?€08€*7Ï€  84€?  <€0? 8€€@€ 8€,7€€/€‹€£"Bl€,7   €$6&€*7   €"6&€(7€€/%  8%«€í""%  8%«€×""l û€,7€0€(7€0€*7€@€/€’6#€1€(7€”6#€1€*7€A€–€ 	€/l€Ààğøà {o$’sçsÏ[ÉyÏIïrI{ï{É @€€@  @@€€€àãã( 
 	Bifurcan
 	Every second, the Labyrinth reorganize itself to display the time. 
 )
@@ -969,7 +971,7 @@ BRK
 
 	.Mouse/state DEI #00 EQU ,&no-touch JCN
 		( incr ) .style LDZ #01 ADD #03 MOD .style STZ
-		( bg ) ;tiles .style LDZ #10 MUL TOS ADD2 ;cover-pattern JSR2
+		( bg ) ;tiles .style LDZ #40 SFT TOS ADD2 ;cover-pattern JSR2
 		( fg ) ;redraw JSR2
 		( release ) #00 .Mouse/state DEO
 	&no-touch
@@ -1012,10 +1014,10 @@ RTN
 	&loop
 		( save-x ) OVR #03 MOD TOS 8** .anchor/x LDZ2 ADD2 .Screen/x DEO2
 		( save-y ) OVR #03 DIV TOS 8** .anchor/y LDZ2 ADD2 .Screen/y DEO2
-		( get digit* ) OVR STHkr #02 MUL TOS ;digits ADD2 LDA2 
+		( get digit* ) OVR STHkr DUP ADD TOS ;digits ADD2 LDA2 
 		( get bit ) ROT #0e SWP SUB SFT2 #0001 AND2 
 		( set tile ) 8** ;tiles ADD2 
-		( set style ) .style LDZ #10 MUL TOS ADD2
+		( set style ) .style LDZ #40 SFT TOS ADD2
 		.Screen/addr DEO2
 		( draw ) #01 .Screen/sprite DEO
 		( incr ) SWP #01 ADD SWP 
@@ -1074,29 +1076,29 @@ RTN
 	0101 0102 0204 18e0
 	0808 0810 e304 0808
 	0808 0804 e310 0808 ]
-!å7!Å
-7!%7!È€7!)7!õ 7!ç7İ>!87! :7ÎN!4H7! J7ì^!X7! Z7în!,h7! j7<	"6? 1$6?1 0! 0! :9! 910! P91 0! 0! :8! 810!   ?8! (8101010! ! 0:810! !  :810! 81010! z810!10#1!0! 8%1#0! P8'1%0! 8)1'0+1!0! 8-10/1-0!  8110! 90!  90! 9!0! 9!ß.+0!  9-0! 9/0! 910! 8!ß.  ! :!r8¨7:6ª7 ?!@84¬7!A.!‰.‹¼#!	. $!«.  0! t80!  Ï :8! 84O!	ö.‹Ò# !
-x.– 	 ’6$0*0! 8+!(”6$0*0+!(!(!§-’6$0*0! 8+!(”6$0*!0+!(!(!Õ-’6$#0*'0! 8+!(”6$%0*)0+!(!(!- ƒ 	 ƒ1	 !«.2	!«.3	!«.4	!«.q	!«.w	!«.e	!«.r	!«.a	!«.s		!«.d	
-!«.f	!«.z	!«.x	!«.c	!«.v	!«. ’609! 0;”609!  ;!«.!. – ”609!  ;’609! ; 	8Ï–à8Ï	'8Ïğ–O8Ï	#8Ï–à8Ï	-8Ïğ–O8Ï	<Ï <Ï	>Ï–à>Ï	'>Ïğ–O>Ï –Ï!‰.C ’6#09?	7”6%09? 								 –!	. ’6#09?
-<’6#09?$!8
-	 !b8
-!«. –!	. 
-!A.
-!A. ?!@84/<o7 !b8< €X?O!‰.l !@84/+0! 8-0/0! 910 !¦.+0! 8(7 è-0! 8*7. ! :do8 ?-08*7(6! 8(7.‹¶#cl !  :08! 8$0%8Ï!
-°.$0! 8%8Ï!
-°.$0!  8%8Ï!
-°.$0! 08%8Ï!
-°.$0! @8%<Ï!m.$0! P8%>Ï!
-°.$0! `8%>Ï!
-°.#ClÏ$ ! 0:08 !  :08&&&! 0! 98&!  ! 98FO!ß.&! 8&! 8!ğÏ ! :8 FO!m.&! 8(7$! 8*7Ï !b8 0?!X8,7/&! 8(7$! 8*7Ï !b8$ 0?!ø8,7/##CCl#0%0&&! !
-K.&! 8&!0!
-K.&! 8&!H!
-K.&! 8&!!
-K.&!  8&!0!
-K.&! (8&!0!
-K.%! 08%!H!
-K.#0! @8(7!`,7%0*7/!`! 8,7%0! 8*7/!X	 0?8,7%0! 8*7/l*7(7 Ï.(6! 8(7Ï.(6! 9(7*6! 8*7‹¹#Cl,7%(7$! 8&*7Ï/,6! 8,7%! 8%«ä##Cl!,70(70*7@/’6$1(7”6$1*7C– 	/l*7(7!°,7/(6! 8(7!°! 8,7/*6! 8*7!°! 8,7/(6! 9(7!°! 8,7/(6! 8(7*6! 8*7!X Ï8,7/(6! 9  Ï!Ø88(7*6! 9  O!è88*7!°!  8,7/l*7(7Ï  !p8$,7Ï/(6! 8(7$! 8,7Ï/*6! 8*7(6! 9(7$! 8,7Ï/(6! 8(7! 8,7O/l3$/:181$/6141o! 8o&*740(73.80(7.%! 8%&&!€ 8%!€ 8*Ñ##40! 880! 9&(760*73.:0*7.%! 8%&&! 8!€ 8%!€ 8*Í##l/*7(7o$ ! 090?!Ø8,7Ï/! 8(6! 8(7$ 	Ó#Cl3'%&*7//&&&(73.%! 8%&&!€ 8%!€ 8*á##oo%! 8%&&!€ 8%!€ 8*À####lPAD1 SYN1 SYN2 CYM1 HHAT OHAT CHAT RIDE SID1 SNR1 SNR2 SID2 BDR1 KCK1 KCK2 SUB1 ` d h l p x € ˆ  ˜   ¨ ° À Ğ à   0000000000000000projects/sounds/pad1.pcm projects/sounds/syn1.pcm projects/sounds/syn2.pcm projects/sounds/pad2.pcm projects/sounds/hhat.pcm projects/sounds/ohat.pcm projects/sounds/chat.pcm projects/sounds/ride.pcm projects/sounds/sid1.pcm projects/sounds/snr1.pcm projects/sounds/snr2.pcm projects/sounds/sid2.pcm projects/sounds/bdr1.pcm projects/sounds/kck1.pcm projects/sounds/kck2.pcm projects/sounds/sub1.pcm <>@ACEGHJLMOQS€Ààğøà ||||||||||||||~> >> ?>  8|ş  ş|8  @@@@@ ø@O__O  òúúòø   O__O@ øòúúò@@@@@  ø    @@ À0@@   0À   <<           >A@@@A>@®A @@A> ~AAAAA~@®AAAA~ >A@|@A> ?@@~@@@@¯@ ~@@@ >A@_AA>@®A _AA> >AAAAA@®AAAA ~AA~AA~ |‚‚‚‚‚| 0 |‚|€€ş |‚‚| $D„ş ş€€|‚| |‚€ü‚‚| |‚ |‚‚|‚‚| |‚‚~‚| |‚~‚‚~ ü‚‚ü‚‚ü |‚€€€‚| ü‚‚‚‚‚ü |‚€ğ€‚| |‚€ğ€€€ >AAAAA>  >A>@@ >AA> !A @@~A> >A@~AA> >A >AA>AA> >AA?                                      >A?AA? ~AA~AA~ >A@@@A> ~AAAAA~ @@~@@ @@~@@@ >A@^AA> AAAAAA  A> ABDxDBA @@@@@@? vIIIIII ^aAAAAA >AAAAA> ~AA~@@@ >AAAEB= ~AA~AAA >A@>A>  AAAAAC= AAAA" IIIIIIv A""A AAA?A> >@@!*¬7!&›
-7!77!¬. ÿ !5.!W.!Š.‹ç# *7 ÿ $(7! 8.‹ç#lş ! 8 ! 8	 !  8‹Ó#l ÿ !  8 ! 8‹ä#l¶ !  1!â©1ş!Ş. ! 8‹æ#l  $:008$18@ l( darena.tal )
+ å€7 Å€
+7 %€7 ¸€€7 "€7 ğ€ 7 å€7€İ€> €87  €:7€Î€N 4€H7  €J7€ì€^ €X7  €Z7€î€n ,€h7  €j7€€<€€	€"6€?€ 1€$6€?€1€ 0  0  :9  9€1€0  P9€1€ 0  0  :8  8€1€0   € ?8  (8€1€0€1€0€1€0    0:8€1€0     :8€1€0  8€1€0€1€0  z8€1€0€!1€0€#1€!0  8€%1€#0  P8€'1€%0  8€)1€'0€+1€!0  8€-1€0€/1€-0   8€11€0  9€0   9€0  9€!0  9€ ©.€+0   9€-0  9€/0  9€10  8€ ©.€ €€   : "8€¨7€€@€:6€ª7€ €? ğ84€¬7€ .€ `.‹€¾" Ó. €€ ‰. € €€0  t8€0   Ï€ :8  8€4O€@ 	Æ.‹€Ô"  
+B.€–€ 	€ €’6#€0*€0!+ (€”6#€0*€0+ ( ( —-€’6#€0*€0!+ (€”6#€0*€!0+ ( ( Ã-€’6#€#0*€'0!+ (€”6#€%0*€)0+ ( ( ÷- €ƒ€ 	€ €ƒ€1	€€  ‰.€2	€€ ‰.€3	€€ ‰.€4	€€ ‰.€q	€€ ‰.€w	€€ ‰.€e	€€ ‰.€r	€€ ‰.€a	€€ ‰.€s	€€	 ‰.€d	€€
+ ‰.€f	€€ ‰.€z	€€ ‰.€x	€€ ‰.€c	€€ ‰.€v	€€ ‰. €’6€09  0;€”6€09   ;€  ‰. æ.€ €– €”6€09   ;€’6€09  ;€ 	€€8Ï€@€€–€€à€8Ï€@€	€'€8Ï€@€ğ€€–€€€O€8Ï€@€	€€8Ï€@€€–€€à€8Ï€@€	€)€8Ï€@€ğ€€–€€€O€8Ï€@€	€€<Ï€ €<Ï€	€€>Ï€@€€–€€à€>Ï€@€	€'€>Ï€@€ğ€€–€€€O€>Ï€@€ €–Ï `.B €’6€#09€?€	€4€”6€%09€?€ 	€€	€	€	€	€	€€	€ €– Ó. €’6€#09€?€
+€;€’6€#09€?# ²8€
+€	€€€  8€€
+ ‰.€ €– Ó. €
+€ .€
+€ .€ €? ğ84/€€@€<o7€  8€€<€ €pX€€@€?O€ `.l€  ğ84/€+0  8€-0€/0  9€10€  \.€+0  8€(7€ €è€€€-0  8€*7€€.€ €@?co8€€ €?€-08€*7€(6!€(7€€.‹€¼"bl€    :€08  8#€0%€8Ï€@€ 
+z.#€0  8%€8Ï€@€ 
+z.#€0   8%€8Ï€@€ 
+z.#€0  08%€8Ï€@€ 
+z.#€0  @8%€<Ï 7.#€0  P8%€>Ï€@€ 
+z.#€0  `8%€>Ï€@€ 
+z."BlÏ€€€   0:€08€    :€08&&&  0  98&     98FO ©.&  8&  8  Ï€   :8€ FO (.&  8€(7#  8€*7Ï€  8€€ €0? 8€,7€€/&  8€(7#  8€*7Ï€  8€#€ €0? ¨8€,7€€/""BBl€#0€%0&& È€€€  
+.&  8& à€€€ 
+.&  8& ø€€€ 
+.&  8& È€€€ 
+.&   8& à€€€ 
+.&  (8& à€€€ 
+.%  08% ø€€€ 
+.€#0  @8€(7 €,7€%0€*7€€/   8€,7€%0  8€*7€€/ €	€€ €0?8€,7€%0  8€*7€€/l€*7€(7€ €€Ï€€.€(6  8€(7€Ï€€.€(6  9€(7€*6  8€*7‹€¿"Bl€,7%€(7#  8&€*7Ï€/€,6  8€,7%  8%«€ä""Bl À€,7€0€(7€0€*7€@€/€’6#€1€(7€”6#€1€*7€C€–€ 	€/l€*7€(7 `€,7€€/€(6  8€(7 `  8€,7€€/€*6  8€*7 `  8€,7€€/€(6  9€(7 `  8€,7€€/€(6  8€(7€*6  8€*7 € Ï€08€,7€€/€(6  9€ € Ï ˆ88€(7€*6  9€ € O ˜88€*7 `   8€,7€€/l€*7€(7Ï€P€   8#€,7€Ï€/€(6  8€(7#  8€,7€Ï€/€*6  8€*7€(6  9€(7#  8€,7€Ï€/€(6  8€(7  8€,7€O€/l€3#/€:1€81#/€61€41o!o&€*7€40€(7€3€.€80€(7€.%!%&& € 8% € 8*€Ô""€40!€80  9&€(7€60€*7€3€.€:0€*7€.%!%&&! € 8% € 8*€Ó""l/€*7€(7o”€   09€0? ˆ8€,7Ï€/!€(6  8€(7”€ 	€Ø"Bl€3'%&€*7//&&&€(7€3€.%!%&& € 8% € 8*€ä""oo%!%&& € 8% € 8*€Æ""""lPAD1 SYN1 SYN2 CYM1 HHAT OHAT CHAT RIDE SID1 SNR1 SNR2 SID2 BDR1 KCK1 KCK2 SUB1 ` d h l p x € ˆ  ˜   ¨ ° À Ğ à   0000000000000000projects/sounds/pad1.pcm projects/sounds/syn1.pcm projects/sounds/syn2.pcm projects/sounds/pad2.pcm projects/sounds/hhat.pcm projects/sounds/ohat.pcm projects/sounds/chat.pcm projects/sounds/ride.pcm projects/sounds/sid1.pcm projects/sounds/snr1.pcm projects/sounds/snr2.pcm projects/sounds/sid2.pcm projects/sounds/bdr1.pcm projects/sounds/kck1.pcm projects/sounds/kck2.pcm projects/sounds/sub1.pcm <>@ACEGHJLMOQS€Ààğøà ||||||||||||||~> >> ?>  8|ş  ş|8  @@@@@ ø@O__O  òúúòø   O__O@ øòúúò@@@@@  ø    @@ À0@@   0À   <<           >A@@@A>@®A @@A> ~AAAAA~@®AAAA~ >A@|@A> ?@@~@@@@¯@ ~@@@ >A@_AA>@®A _AA> >AAAAA@®AAAA ~AA~AA~ |‚‚‚‚‚| 0 |‚|€€ş |‚‚| $D„ş ş€€|‚| |‚€ü‚‚| |‚ |‚‚|‚‚| |‚‚~‚| |‚~‚‚~ ü‚‚ü‚‚ü |‚€€€‚| ü‚‚‚‚‚ü |‚€ğ€‚| |‚€ğ€€€ >AAAAA>  >A>@@ >AA> !A @@~A> >A@~AA> >A >AA>AA> >AA?                                      >A?AA? ~AA~AA~ >A@@@A> ~AAAAA~ @@~@@ @@~@@@ >A@^AA> AAAAAA  A> ABDxDBA @@@@@@? vIIIIII ^aAAAAA >AAAAA> ~AA~@@@ >AAAEB= ~AA~AAA >A@>A>  AAAAAC= AAAA" IIIIIIv A""A AAA?A> >@@ *¬€7 &›€
+7 7€7 ¬.€ €ÿ€  5. W. Š.€‹€ç" €*7€ €ÿ€ #€(7  8€.€‹€ç"l€€ş€€   8€€   8	€    8€‹€Ó"l€ €ÿ€    8€   8€‹€ä"l€¶€    €1 â©€1€€ş Ş.€€   8€‹€æ"l€ € #:€0€08#€18€€@€ l( darena.tal )
 ( an open-ended game of rocks and sand )
 ( contributed by and cc0 sejo 12021 )
 
@@ -1359,7 +1361,7 @@ JMP2r
 		#ff
 		JMP2r
 	&found
-		SWP POP ( remove loop limit )
+		NIP ( remove loop limit )
 		DUP ;&src_i LDA NEQ ,&end JCN ( check if result is the same as index )
 		POP #ff
 		JMP2r
@@ -1534,7 +1536,7 @@ JMP2r
 JMP2r
 
 @draw_c ( draw character  )
-	#00 ;c_state LDA get_nibble_h #08 MUL
+	#00 ;c_state LDA get_nibble_h #30 SFT
 	;c_sprite LDA2 ADD2 .Screen/addr DEO2
 	;c_pos/x out_screen_x
 	;c_pos/y out_screen_y
@@ -1779,10 +1781,10 @@ RTN
 	
 	;clear-notes JSR2
 	( get note )
-	#0e .Mouse/y DEI2 .trkframe/y1 LDZ2 SUB2 SWP POP #08 DIV SUB
+	#0e .Mouse/y DEI2 .trkframe/y1 LDZ2 SUB2 NIP #08 DIV SUB
 	.Mouse/state DEI #10 NEQ ,&no-erase JCN POP #00 &no-erase
 	( edit note )
-	TRACK #00 .Mouse/x DEI2 .trkframe/x1 LDZ2 SUB2 SWP POP #08 DIV ADD2 STA
+	TRACK #00 .Mouse/x DEI2 .trkframe/x1 LDZ2 SUB2 NIP #08 DIV ADD2 STA
 	( release ) #00 .Mouse/state DEO
 	;draw-notes JSR2
 
@@ -1791,7 +1793,7 @@ BRK
 @touch-chn ( -- )
 	
 	;clear-notes JSR2
-	( save ) .Mouse/y DEI2 .chnframe/y1 LDZ2 SUB2 SWP POP #08 DIV #01 SUB .track/active STZ
+	( save ) .Mouse/y DEI2 .chnframe/y1 LDZ2 SUB2 NIP #08 DIV #01 SUB .track/active STZ
 	( release ) #00 .Mouse/state DEO
 	;draw-channels JSR2
 	;draw-notes JSR2
@@ -1801,31 +1803,31 @@ BRK
 
 @touch-ctl ( -- )
 	
-	.Mouse/x DEI2 .ctlframe/x1 LDZ2 SUB2 8-- 8// SWP POP #02 DIV
+	.Mouse/x DEI2 .ctlframe/x1 LDZ2 SUB2 8-- 8// NIP #02 DIV
 	DUP ,&no-a JCN
-		.Audio0/adsr .track/active LDZ #10 MUL ADD DEI
+		.Audio0/adsr .track/active LDZ #40 SFT ADD DEI
 		#10 .Mouse/state DEI #10 EQU #e0 MUL ADD ADD
-		.Audio0/adsr .track/active LDZ #10 MUL ADD DEO &no-a
+		.Audio0/adsr .track/active LDZ #40 SFT ADD DEO &no-a
 	DUP #01 NEQ ,&no-d JCN
-		.Audio0/adsr .track/active LDZ #10 MUL ADD DEI
+		.Audio0/adsr .track/active LDZ #40 SFT ADD DEI
 		DUP #f0 AND STH #01 .Mouse/state DEI #10 EQU #0e MUL ADD ADD #0f AND STHr ADD
-		.Audio0/adsr .track/active LDZ #10 MUL ADD DEO &no-d
+		.Audio0/adsr .track/active LDZ #40 SFT ADD DEO &no-d
 	DUP #02 NEQ ,&no-s JCN
-		.Audio0/adsr .track/active LDZ #10 MUL ADD #01 ADD DEI
+		.Audio0/adsr .track/active LDZ #40 SFT ADD #01 ADD DEI
 		#10 .Mouse/state DEI #10 EQU #e0 MUL ADD ADD
-		.Audio0/adsr .track/active LDZ #10 MUL ADD #01 ADD DEO &no-s
+		.Audio0/adsr .track/active LDZ #40 SFT ADD #01 ADD DEO &no-s
 	DUP #03 NEQ ,&no-r JCN
-		.Audio0/adsr .track/active LDZ #10 MUL ADD #01 ADD DEI
+		.Audio0/adsr .track/active LDZ #40 SFT ADD #01 ADD DEI
 		DUP #f0 AND STH #01 .Mouse/state DEI #10 EQU #0e MUL ADD ADD #0f AND STHr ADD
-		.Audio0/adsr .track/active LDZ #10 MUL ADD #01 ADD DEO &no-r
+		.Audio0/adsr .track/active LDZ #40 SFT ADD #01 ADD DEO &no-r
 	DUP #05 NEQ ,&no-left JCN
-		.Audio0/volume .track/active LDZ #10 MUL ADD DEI
+		.Audio0/volume .track/active LDZ #40 SFT ADD DEI
 		#10 .Mouse/state DEI #10 EQU #e0 MUL ADD ADD
-		.Audio0/volume .track/active LDZ #10 MUL ADD DEO &no-left
+		.Audio0/volume .track/active LDZ #40 SFT ADD DEO &no-left
 	DUP #06 NEQ ,&no-right JCN
-		.Audio0/volume .track/active LDZ #10 MUL ADD DEI
+		.Audio0/volume .track/active LDZ #40 SFT ADD DEI
 		DUP #f0 AND STH #01 .Mouse/state DEI #10 EQU #0e MUL ADD ADD #0f AND STHr ADD
-		.Audio0/volume .track/active LDZ #10 MUL ADD DEO &no-right
+		.Audio0/volume .track/active LDZ #40 SFT ADD DEO &no-right
 	POP
 	( release ) #00 .Mouse/state DEO
 	;draw-controls JSR2
@@ -1922,7 +1924,7 @@ RTN
 	;font_hex .Screen/addr DEO2
 	#0000 #0100
 	&loop
-		OVR2 SWP POP #02 DIV #0f AND ,&skip JCN
+		OVR2 NIP #02 DIV #0f AND ,&skip JCN
 			OVR2 .trkframe/x1 LDZ2 ADD2 .Screen/x DEO2
 			.trkframe/y1 LDZ2 #0010 SUB2 .Screen/y DEO2
 			#02 .Screen/sprite DEO
@@ -2005,7 +2007,7 @@ RTN
 	#05 .Screen/sprite DEO
 	.knob/x LDZ2 #0004 ADD2 .Screen/x DEO2
 	.knob/y LDZ2 #0010 ADD2 .Screen/y DEO2
-	;font_hex #00 .knob/value LDZ #08 MUL ADD2 .Screen/addr DEO2
+	;font_hex #00 .knob/value LDZ #30 SFT ADD2 .Screen/addr DEO2
 	#01 .Screen/sprite DEO
 
 RTN
@@ -2030,31 +2032,31 @@ RTN
 	( env )
 	.ctlframe/x1 LDZ2 8++ .ctlframe/y1 LDZ2 8++ #02 ;env_txt ;draw-label JSR2
 	.ctlframe/x1 LDZ2 8++ .ctlframe/y1 LDZ2 #0010 ADD2
-		.Audio0/adsr .track/active LDZ #10 MUL ADD DEI #04 SFT
+		.Audio0/adsr .track/active LDZ #40 SFT ADD DEI #04 SFT
 		;draw-knob JSR2
 	.ctlframe/x1 LDZ2 #0018 ADD2 .ctlframe/y1 LDZ2 #0010 ADD2
-		.Audio0/adsr .track/active LDZ #10 MUL ADD DEI #0f AND
+		.Audio0/adsr .track/active LDZ #40 SFT ADD DEI #0f AND
 		;draw-knob JSR2
 	.ctlframe/x1 LDZ2 #0028 ADD2 .ctlframe/y1 LDZ2 #0010 ADD2
-		.Audio0/adsr .track/active LDZ #10 MUL ADD #01 ADD DEI #04 SFT
+		.Audio0/adsr .track/active LDZ #40 SFT ADD #01 ADD DEI #04 SFT
 		;draw-knob JSR2
 	.ctlframe/x1 LDZ2 #0038 ADD2 .ctlframe/y1 LDZ2 #0010 ADD2
-		.Audio0/adsr .track/active LDZ #10 MUL ADD #01 ADD DEI #0f AND
+		.Audio0/adsr .track/active LDZ #40 SFT ADD #01 ADD DEI #0f AND
 		;draw-knob JSR2
 	( vol )
 	.ctlframe/x1 LDZ2 #0058 ADD2 .ctlframe/y1 LDZ2 8++ #02 ;vol_txt ;draw-label JSR2
 	.ctlframe/x1 LDZ2 #0058 ADD2 .ctlframe/y1 LDZ2 #0010 ADD2
-		.Audio0/volume .track/active LDZ #10 MUL ADD DEI #04 SFT
+		.Audio0/volume .track/active LDZ #40 SFT ADD DEI #04 SFT
 	;draw-knob/force JSR2
 	.ctlframe/x1 LDZ2 #0068 ADD2 .ctlframe/y1 LDZ2 #0010 ADD2
-		.Audio0/volume .track/active LDZ #10 MUL ADD DEI #0f AND
+		.Audio0/volume .track/active LDZ #40 SFT ADD DEI #0f AND
 	;draw-knob/force JSR2
 
 RTN
 
 @draw-vu ( -- )
 	.ctlframe/x1 LDZ2 #0088 ADD2 .ctlframe/y1 LDZ2 #0010 ADD2
-		.Audio0/output .track/active LDZ #10 MUL ADD DEI DUP STH #04 SFT
+		.Audio0/output .track/active LDZ #40 SFT ADD DEI DUP STH #04 SFT
 	;draw-knob/force JSR2
 	.ctlframe/x1 LDZ2 #0098 ADD2 .ctlframe/y1 LDZ2 #0010 ADD2
 		STHr #0f AND
@@ -2096,10 +2098,10 @@ RTN
 	( load ) .label/addr STZ2 .label/color STZ .Screen/y DEO2 .Screen/x DEO2
 	.label/addr LDZ2
 	&loop
-		( draw ) DUP2 LDA #00 SWP 8** ;font ADD2 .Screen/addr DEO2 .label/color LDZ .Screen/sprite DEO
+		( draw ) LDAk #00 SWP 8** ;font ADD2 .Screen/addr DEO2 .label/color LDZ .Screen/sprite DEO
 		( incr ) ++
 		( incr ) .Screen/x DEI2 8++ .Screen/x DEO2
-		DUP2 LDA ,&loop JCN
+		LDAk ,&loop JCN
 	POP2
 
 RTN
@@ -2280,46 +2282,52 @@ RTN
 	&end
 
 @noise-wave-end
-!7!ç
-7!Ä7!Ÿ7! °1! P1"6?0?91$6?0?91&*.'+/
-(	,0)-1"6?1$6?1!¾.!m.!». !¸.– ”6093?$! )6’60! `8+(’60! œ8*’609! `9?! & 8$!  )6’60! `8+(’60! œ8*’609! `9?! * 8$! 0)6’60! `8+(’60! œ8*’609! `9?! . 8$! @)6’60! P8+(’60! Œ8*’609! P93??! ;#!¾.!¸.!m.!». &@
-*@
-.@ğ'
-ğ+
-ğ/	(@	,@0@	ğ)	ğ-ğ1l!  (70*7!  "6.%! 8$(7%«í##0(7!  *7!  $6.%! 8$*7%«í##!ÿ,7! *7  ! 8(7.‹å! *7  ! 8(7.‹â!  *7  ! 8(7 /‹â! (*7  ! 8(7/‹â! 0*7  ! 8(7€/‹â! 8*7  ! 8(7ˆ/‹âl008100810000!m.0000!¡.0! 90! 90! 80! 8!¡.0! 80! 8!À!.0! 88(76!M.0! 80!  8!Ä!.0! 88(7
-6!M.0! 80! 08!Ê!.0! 88(76!M.0! `80! 80! 8 ! & ?!ó.0! `80!  80! 8 ! * ?!ó.0! `80! 080! 8 ! . ?!ó.0! P8(70! @8*7!	  0?8,7/0! `8(70! @8*7!	 0?8,7/0! p8(70! @8*7!	 0?8,7/0! €8(70! @8*7!	 0?8,7/l!Ï,70(70*7@/’6$1(7”6$1*7C– 	/l $1"1 110(7 0*7!×,7!ß,7/!ç,7(6! 8(7/(6"0! 8+ã(6! 8(7!ï,7/0$08(7!÷,7
-/l '%&*7//&&&(7 .%! 8%«ì##oo%! 8%«Ö####l 11$*71$(7
-1(6! 8(70*7 .0*7 .(60+Ô0*7
-0(7 .0(7 .*6! 8*7*60! 8+Ğl/*7(7o$ 0?!	Ÿ8,7Ï/! 8(6! 8(7$Ú#Cl 0?!	8,7Ï/ 0?!	8,7(6! 8(7Ï/ 0?!	8,7(6! 8(7Ï/ 0?!	8,7(6! 8(7O/lRed Green Blue €Ààğøà ªUªUªUªU?ÿÿÿÿ?ÿÿÿÿÿÿÿÿüşÿÿÿÿşü <~~~~< <fÛÛf<  <<  <BB<<B™½½™B< <FJRb<    <B<@~  <BB<  $D~  ~@|B<  <@|BB<  ~  <B<BB<  <BB><  <BB~BB  |B|BB|  <B@@B<  |BBBB|  ~@x@@~  ~@x@@@           $ ~<    $ <B    l||8  8||8  88|l8  8||8        ~BBBB~   $$   $BB$  :JH0  8Dl|  88  >"""ff   " "      8      (((( (  >JJ:
+ €7 ç€
+7 Ä€7 Ÿ€7  °€1  P€1€"6€?€0€?9€1€$6€?€0€?9€1€€&€€*€€.€€'€€+€€/€
+€(€	€,€€0€€)€€-€€1€"6€?€1€$6€?€1 º. i. ·.  ´.€–€ €”6€09€3?#  )€5€’6€0  `8+€'€’6€0  œ8*€€’6€09  `9€?  &€ €8#   )€5€’6€0  `8+€'€’6€0  œ8*€€’6€09  `9€?  *€ €8#  0)€5€’6€0  `8+€'€’6€0  œ8*€€’6€09  `9€?  .€ €8#  @)€5€’6€0  P8+€'€’6€0  Œ8*€€’6€09  P9€3?€?  ;€" º. ´. i. ·. €€€&€@€€
+€€*€@€
+€€€.€@€€€ğ€'€€
+€ğ€+€
+€€ğ€/€€	€€(€@€	€€€,€@€€€€0€@€€	€ğ€)€	€€ğ€-€€€ğ€1€l   €(7€0€*7   €"6€€.%  8#€(7%«€í""€0€(7   €*7   €$6€€.%  8#€*7%«€í"" ø€,7  €*7€ €€0€   8€(7€.€‹€å  €*7€ €€0€   8€(7€€.€‹€â   €*7€ €€0€   8€(7€ €/€‹€â  (€*7€ €€0€   8€(7€€/€‹€â  0€*7€ €€0€   8€(7€€€/€‹€â  8€*7€ €€0€   8€(7€ˆ€/€‹€âl€0€08€1€0€08€1€0€0€0€0€ h.€0€0€0€0€ œ.€0  9€0  9€0  8€0  8€ œ.€0  8€0  8 ¹€ .€0  88€(7€6€ F.€0  8€0   8 ½€ .€0  88€(7€
+6€ F.€0  8€0  08 Ã€ .€0  88€(7€6€ F.€0  `8€0  8€0  8€   &€€ ?€ î.€0  `8€0   8€0  8€   *€€ ?€ î.€0  `8€0  08€0  8€   .€€ ?€ î.€0  P8€(7€0  @8€*7 	€ €€ €0?8€,7€€/€0  `8€(7€0  @8€*7 	€ €€€0?8€,7€€/€0  p8€(7€0  @8€*7 	€ €€€0?8€,7€€/€0  €8€(7€0  @8€*7 	€ €€€0?8€,7€€/l È€,7€0€(7€0€*7€@€/€’6#€1€(7€”6#€1€*7€C€–€ 	€/l€ €$1€"1€ 1€1€0€(7€ 0€*7 Ğ€,7 Ø€,7€€/ à€,7€(6  8€(7€€/€(6€"0  8+€ã€(6  8€(7 è€,7€€/€0€$08€(7 ğ€,7€
+€/l€ '%&€*7//&&&€(7€ €.%  8%«€ì""oo%  8%«€Ö""""l€ €1€1#€*7€1#€(7€
+1€(6  8€(7€0€*7€ €.€0€*7€ €.€(6€0+€Ô€0€*7€
+0€(7€ €.€0€(7€ €.€*6  8€*7€*6€0  8+€Ğl/€*7€(7o”€ €0? 	˜8€,7Ï€/  8€(6  8€(7”€Ü"Bl€€ €0? 	8€,7Ï€/€€ €0? 	8€,7€(6  8€(7Ï€/€€ €0? 	8€,7€(6  8€(7Ï€/€€ €0? 	8€,7€(6  8€(7O€/lRed Green Blue €Ààğøà ªUªUªUªU?ÿÿÿÿ?ÿÿÿÿÿÿÿÿüşÿÿÿÿşü <~~~~< <fÛÛf<  <<  <BB<<B™½½™B< <FJRb<    <B<@~  <BB<  $D~  ~@|B<  <@|BB<  ~  <B<BB<  <BB><  <BB~BB  |B|BB|  <B@@B<  |BBBB|  ~@x@@~  ~@x@@@           $ ~<    $ <B    l||8  8||8  88|l8  8||8        ~BBBB~   $$   $BB$  :JH0  8Dl|  88  >"""ff   " "      8      (((( (  >JJ:
 
   0Fb0       ÿÿ 8 8 8 *  *   ~    ~    @@~      $f$    8|      |8                    $~$$~$  (
-< B B  0H2LD:             >   >          <               <FJRb<  (>  <B<@~  <BB<  (H~  ~@|B<  <@|BB<  ~  <B<BB<  <BB><                  > >      <B   <BZTB<  $B~BB  |B|BB|  <B@@B<  xDBBDx  ~@|@@~  >@@|@@  <B@NB<  BB~BBB  >>  BB<  DHpHDB  @@@@@~  BfZBBB  BbRJFB  <BBBB<  |BB|@@  <BBRJ<  |BB|DB  <@<B<  ş  BBBBB<  BBBB$  BBBZfB  B$$B  ‚D(  ~ ~    @     "          ~         "    <""<        ""   "<      ""   ,2""      H0  $(0($     hTTTT   XdDDD   8DDD8   xDDx@@  <DD<  ,0      8@8x  <   DDDD8   DD((   DTTT(   D((D   DDD<8  | |      00    2L   <B™¡¡™B<!ó–7!âc
-7!07!` 7P!  !  !  ! C! !è! 5 ! ! 	'! ('! ) ! *!Ğ. ! ! ! 	  !5.!D.!‘.!—.!.!Î. !°,7 !S 8 (7!r 8 *7@/$	Ó#!°.l! ( (7! ( *7!È,7/!À,7 !S 8 (7!r 8 *7!‘ 8A/$	È#!}.l !  ! ‚4‚D‚T‚d ! l! ! ! C! !(! 5lÿ! ! ! S! !(! 5l! ! ! C! !è! 5lÿ! ! ! C! !! 5ll       öôòñíé!S 8Õ!r 8ÉÃÂ»
-¸·°®­¤
-£¢™$	¦#ÿl!	ÿll     ! !  ï! ! ä! 	Ú!U-Ğñ!U-ÆÄÿ	!.ÿ	f! 	§!S Ÿ8›!r ’8‹‰„	!.ÿ	6!•!U-!•ñ!U-!•! !S !”8!’!   !“!ÿ-!“ñ!ÿ-!’!“ÿ	!.ÿ	n! 	!”!S !”8!•!r !”8!–!•!–!”	!.ÿ	4!–!ÿ-!–ñ!ÿ-!–! !r !”8!“! ll ! (! )ÿ!.ÿ	 ! *lÛ! *!‘ Ì8$/o! *l!  	@! l! l ! ! 48,7!   (7!  *7! /l!°,7!   (7!  *7@/l!¸,7$6!  /$o$*7"6!  /$o$(7/! 8$/*ëo##! 8$/*Ño##!°,7 ñ /$o$*7 ñ /$o$(7 /! 8$/*ëo##! 8$/*Ïo##l%0BPg˜è CCWZ¼¥åİ¢ ·›8è3Cc·ªÏ¼`H4V#eeeºé$"r‘"Å%0BPg˜è CCWZ¼                       2ˆ~ƒxà<NŸıùb<      $~ÿ      <~<~Z<Z<~~şØ<Z<~Z<Z<~Z<Z<~Z<Z<~Z<Z<~~şØ<Z<~~şØ<Z<~~şØ<Z<~~şØ<Z<züØ<züØ(<züØ8<züØ( Game Of Life
+< B B  0H2LD:             >   >          <               <FJRb<  (>  <B<@~  <BB<  (H~  ~@|B<  <@|BB<  ~  <B<BB<  <BB><                  > >      <B   <BZTB<  $B~BB  |B|BB|  <B@@B<  xDBBDx  ~@|@@~  >@@|@@  <B@NB<  BB~BBB  >>  BB<  DHpHDB  @@@@@~  BfZBBB  BbRJFB  <BBBB<  |BB|@@  <BBRJ<  |BB|DB  <@<B<  ş  BBBBB<  BBBB$  BBBZfB  B$$B  ‚D(  ~ ~    @     "          ~         "    <""<        ""   "<      ""   ,2""      H0  $(0($     hTTTT   XdDDD   8DDD8   xDDx@@  <DD<  ,0      8@8x  <   DDDD8   DD((   DTTT(   D((D   DDD<8  | |      00    2L   <B™¡¡™B< ó–€7 âc€
+7 0€7 `€ 7€P   €  €   €   €C   ç  5€   €  	€'  (€'  )€   * Ï.   €    	€ €  5. C. ‘. –.  . Î.  ¯€,7€€  R€ 8€ €(7 q€ 8€ €*7€@€/€#	€Ó" ¯.l  (€ €(7  (€ €*7 Ç€,7€€/ ¿€,7€€  R€ 8€ €(7 q€ 8€ €*7 € 8€A€/€#	€È" |.l€   €   €‚€€€€4€‚€€€€D€‚€€€€T€‚€€€€d€   l€  €    €C   '  5l€ÿ  €    €S   '  5l€  €    €C   ç  5l€ÿ  €    €C     5ll       €ö€ô€ò€ñ€í€é€€€ R€ 8€Õ q€ 8€É€Ã€Â€»
+€¸€·€°€®€­€¤
+€£€¢€™€€€€#	€¦"€ÿl 	€€ÿll          €ï    €ä€  	€Ú€ T-€Ğ€ñ T-€Æ€Ä€ÿ€	€ .€ÿ	€€f€  	€§ R€ €Ÿ8€› q€ €’8€€‹€‰€„€	€ .€ÿ	€6 ”€ T- ”€ñ T- ”   R€  “8 ‘   €  ’€ ş- ’€ñ ş- ‘ ’€ÿ€€	 .€ÿ	€€n€  	 “ R€  “8 ” q€  “8 • ” • “€€	 .€ÿ	€4 •€ ş- •€ñ ş- •   q€  “8 ’  ll   (  )€ÿ€€ .€ÿ	€€   *l€Û  *€ € €Ì8#/€o€  *l  € €€	€€€€€€@€  l€€€  l€   €€€0  48€,7   € €(7  € €*7  €/l ¯€,7   € €(7  € €*7€@€/l ·€,7€$6   /#o#€*7€"6   /#o#€(7€€/  8#/*€ëo""  8#/*€Ño"" ¯€,7€ €ñ€ €/#o#€*7€ €ñ€ €/#o#€(7€ €/  8#/*€ëo""  8#/*€Ïo""l%0BPg˜è CCWZ¼¥åİ¢ ·›8è3Cc·ªÏ¼`H4V#eeeºé$"r‘"Å%0BPg˜è CCWZ¼                       2ˆ~ƒxà<NŸıùb<      $~ÿ      <~<~Z<Z<~~şØ<Z<~Z<Z<~Z<Z<~Z<Z<~Z<Z<~~şØ<Z<~~şØ<Z<~~şØ<Z<~~şØ<Z<züØ<züØ(<züØ8<züØ( Game Of Life
 	Any live cell with fewer than two live neighbours dies, as if by underpopulation.
 	Any live cell with two or three live neighbours lives on to the next generation.
 	Any live cell with more than three live neighbours dies, as if by overpopulation.
 	Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction. )
 
-%+  { ADD } %-   { SUB }  %*  { MUL } %/   { DIV }
+%+  { ADD } %-   { SUB } 
 %<  { LTH } %>   { GTH }  %=  { EQU } %!   { NEQ }
-%++ { ADD2 } %-- { SUB2 } %** { MUL2 } %// { DIV2 }
+%++ { ADD2 } %-- { SUB2 } 
 %<< { LTH2 } %>> { GTH2 } %== { EQU2 } %!! { NEQ2 }
 
-%TOS  { #00 SWP } %TOB  { SWP POP }
-%RTN  { JMP2r }   %MOD  { DUP2 / * - }
-%MOD8 { #07 AND } %MOD2 { #01 AND }
-%SFL  { #40 SFT SFT }
+%2/  { #01 SFT }
+%8/  { #03 SFT }
 %2//  { #01 SFT2 } %8//  { #03 SFT2 }
 %2**  { #10 SFT2 } %8**  { #30 SFT2 }
+%40** { #60 SFT2 }
+%8MOD { #07 AND } %2MOD { #01 AND }
+
+%TOS  { #00 SWP } 
+%RTN  { JMP2r }   
+%SFL  { #40 SFT SFT }
 
 %WIDTH { #40 }   %HEIGHT { #40 }
+%WIDTH-MOD { #3f AND }   %HEIGHT-MOD { #3f AND }
+
 %BANK1 { #8000 } %BANK2 { #a000 }
 
-%GET-SIZE { WIDTH TOS 8// HEIGHT TOS ** }
-%GET-ITERATORS { SWP2k POP SWP POP }
-%GET-ITER { OVR2 SWP POP OVR SWP }
+%GET-SIZE { WIDTH TOS 8// 40** }
+%GET-ITERATORS { SWP2k POP NIP }
+%GET-ITER { OVR2 NIP OVR SWP }
 
 ( devices )
 
@@ -2370,7 +2378,7 @@ BRK
 	
 	.Mouse/state DEI #00 = #01 JCN [ BRK ]
 
-	( incr frame ) .world/frame LDZ #01 + [ DUP ] .world/frame STZ
+	( incr frame ) .world/frame LDZ INC [ DUP ] .world/frame STZ
 	( reset count ) #0000 .world/count STZ2
 
 	#03 AND #00 = #01 JCN [ BRK ] 
@@ -2392,10 +2400,10 @@ BRK
 			( neighbours ) DUP2 ;get-neighbours JSR2
 			( state ) ROT ROT ;get-cell JSR2
 			,run-cell JSR
-			SWP #01 + SWP
+			SWP INC SWP
 			LTHk ,&hor JCN
 		POP2
-		SWP #01 + SWP
+		SWP INC SWP
 		LTHk ,&ver JCN
 	POP2
 
@@ -2429,13 +2437,13 @@ RTN
 @save-cell ( x y -- )
 	
 	( get index )
-	HEIGHT MOD SWP WIDTH MOD SWP
-	WIDTH #08 / TOS ROT TOS ** ROT #08 / TOS ++ [ BANK2 ++ ]
+	HEIGHT-MOD SWP WIDTH-MOD SWP
+	TOS 8** ROT 8/ TOS ++ [ BANK2 ++ ]
 	( incr count )
-	.world/count LDZ2 #0001 ADD2 .world/count STZ2
+	.world/count LDZ2 INC2 .world/count STZ2
 	( save in buffer )
 	STH2
-	DUP2 POP MOD8 #01 SWP SFL 
+	DUP2 POP 8MOD #01 SWP SFL 
 	LDAkr STHr SWP ORA
 	STH2r STA
 
@@ -2458,12 +2466,12 @@ RTN
 
 	.Mouse/state DEI #00 ! #01 JCN [ BRK ]
 
-	.Mouse/x DEI2 DUP2 .anchor/x LDZ2 >> ROT ROT .anchor/x LDZ2 WIDTH #02 * TOS ++ #0001 ++ << #0101 ==
-	.Mouse/y DEI2 DUP2 .anchor/y LDZ2 >> ROT ROT .anchor/y LDZ2 HEIGHT #02 * TOS ++ << #0101 ==
+	.Mouse/x DEI2 DUP2 .anchor/x LDZ2 >> ROT ROT .anchor/x LDZ2 WIDTH DUP ADD TOS ++ INC2 << #0101 ==
+	.Mouse/y DEI2 DUP2 .anchor/y LDZ2 >> ROT ROT .anchor/y LDZ2 HEIGHT DUP ADD TOS ++ << #0101 ==
 	#0101 == #01 JCN [ BRK ]
 
-	.Mouse/x DEI2 .anchor/x LDZ2 SUB2 #02 / TOB
-	.Mouse/y DEI2 .anchor/y LDZ2 SUB2 #02 / TOB
+	.Mouse/x DEI2 .anchor/x LDZ2 SUB2 2/ NIP
+	.Mouse/y DEI2 .anchor/y LDZ2 SUB2 2/ NIP
 	;set-cell JSR2
 	
 	;draw-grid JSR2
@@ -2488,7 +2496,7 @@ BRK
 	
 	( draw cell count )
 	.anchor/x LDZ2 .Screen/x DEO2
-	.anchor/y LDZ2 HEIGHT #02 * TOS ++ .Screen/y DEO2
+	.anchor/y LDZ2 HEIGHT DUP ADD TOS ++ .Screen/y DEO2
 	.world/count LDZ2 #03 ;draw-short JSR2
 
 	HEIGHT #00
@@ -2497,25 +2505,25 @@ BRK
 		WIDTH #00
 		&hor
 			DUP TOS 2** .anchor/x LDZ2 ++ .Screen/x DEO2
-			GET-ITER ,get-cell JSR #01 + .Screen/pixel DEO
-			#01 + GTHk ,&hor JCN
+			GET-ITER ,get-cell JSR INC .Screen/pixel DEO
+			INC GTHk ,&hor JCN
 		POP2
-		#01 + GTHk ,&ver JCN
+		INC GTHk ,&ver JCN
 	POP2
 
 RTN
 
 @get-index ( x y -- index* )
 	
-	HEIGHT MOD SWP WIDTH MOD SWP
-	WIDTH #08 / TOS ROT TOS ** ROT #08 / TOS ++ [ BANK1 ++ ]
+	HEIGHT-MOD SWP WIDTH-MOD SWP
+	TOS 8** ROT 8/ TOS ++ [ BANK1 ++ ]
 
 RTN
 
 @set-cell ( x y -- )
 	
 	DUP2 ,get-index JSR STH2
-	POP MOD8 #01 SWP SFL 
+	POP 8MOD #01 SWP SFL 
 	LDAkr STHr SWP ORA
 	STH2r STA
 
@@ -2524,9 +2532,9 @@ RTN
 @get-cell ( x y -- cell )
 	
 	DUP2 ,get-index JSR LDA 
-	SWP POP SWP
-	MOD8
-	SFT MOD2
+	NIP SWP
+	8MOD
+	SFT 2MOD
 
 RTN 
 
@@ -2534,12 +2542,12 @@ RTN
 	
 	( -1,-1 ) DUP2 #01 - [ SWP #01 - SWP ] ,get-cell JSR STH
 	(  0,-1 ) DUP2 #01 -      ,get-cell JSR STH ADDr
-	( +1,-1 ) DUP2 #01 - [ SWP #01 + SWP ] ,get-cell JSR STH ADDr
+	( +1,-1 ) DUP2 #01 - [ SWP INC SWP ] ,get-cell JSR STH ADDr
 	( -1, 0 ) DUP2       [ SWP #01 - SWP ] ,get-cell JSR STH ADDr
-	( +1, 0 ) DUP2       [ SWP #01 + SWP ] ,get-cell JSR STH ADDr
-	( -1,+1 ) DUP2 #01 + [ SWP #01 - SWP ] ,get-cell JSR STH ADDr
-	(  0,+1 ) DUP2 #01 +      ,get-cell JSR STH ADDr
-	( +1,+1 )      #01 + [ SWP #01 + SWP ] ,get-cell JSR STH ADDr
+	( +1, 0 ) DUP2       [ SWP INC SWP ] ,get-cell JSR STH ADDr
+	( -1,+1 ) DUP2 INC [ SWP #01 - SWP ] ,get-cell JSR STH ADDr
+	(  0,+1 ) DUP2 INC      ,get-cell JSR STH ADDr
+	( +1,+1 )      INC [ SWP INC SWP ] ,get-cell JSR STH ADDr
 	STHr
 
 RTN
@@ -2662,26 +2670,27 @@ BRK
 @right_icn   [ 3c7e f7f8 f8f7 7e3c ]
 @slime_icn   [ 0000 183c 3c18 0000 ]
 
-!ı7!ó
-7!ò7!v 7 ! $1$	1$"6%9! 91$6%9100&&	0!3.0!3.	0! 90! 8&&0!>.0!>.!j. !ş.!´.!F.!.!ş. /!   $!3.!  ´:! À µ:8! ø ¶:8!q :  ;0?8!°!.%! :!è;! B ´:8! ^ µ:8!  ¶:8! 
-!.%! 
-!.%!  ´:8!  µ:81l"6?! 49(7$6! 9*7°6!Ö9! 
-!.!ã.!ã.¸6! !.V! 
-!.YVl"6?! 9(70!è!.;! d!.1! 
-!.'! !  l0?!I8,7
-0?!é8,7/(6! 8(7l00$1910	0$191! 0$!È.!­.! (70! 9*7¥$!ö.!P	0! 900!>.!PJ! *70! 9(7!ã.$M/"6! 	9(70! 9*7!ã.$\#$&#$L#l!è!./! 
-: O8olY0!—.#l$0810%910$080=+0!—.#l$0810%910$080$!¸!—.%! :8l*7((7*&&+%/! 8$do+#cl$7.ä¶	l¶  l&&;$/:9ol! !5! 5     ":  ":   !:  !:8l&8%&*ll|ÆÎÖæÆ| 8~ <f<`f~ <ff< <lÌş ~b`|f< <f`|ff< ~f <ff<ff< <ff>f< |ÆÎÖæÆ|     <ff~ff üff|ffü <fÀÀÀf< ølffflø şbhxhbş şbhxh`ğ <fÀÀÎf> fff~fff ~~ ÌÌx æflxlfæ ğ```bfş ÆîşşÖÆÆ ÆæöŞÎÆÆ 8lÆÆÆl8 üff|``ğ 8lÆÆÚÌv üff|lfæ <f`<f< ~Z< ffffff< fffff< ÆÆÆÖşîÆ Æl88lÆÆ fff<< şÆŒ2fş  ~  ( piano )
+ ı€7 ó€
+7 ò€7 v€ 7€€   #€1#€	1#€"6%9  9€1€$6%9€1€€€0€0&&€	0 2.€0 2.€	0  9€0  8&&€0 =.€0 =. i.€ € ş. ´.€€ F. . ş. €€/   € €# 2.€€€  € €´:  À€ €µ:8  ø€ €¶:8 q€ €:€ € ;€0?8 ° .%  : è;€  B€ €´:8  ^€ €µ:8  € €¶:8  
+ .%€  
+ .%€  € €´:8  € €µ:8€1l€"6€?  49€(7€$6  9€*7€°6 Ö9  
+ . ã. ã.€¸6   .€V  
+ .€Y€Vl€"6€?  9€(7€0 è .€;  d .€1  
+ .€'  €!€€ €€€ €€l€0? H8€,7€
+€0? è8€,7€€/€(6  8€(7l€0€0#€19€1€0€	0#€19€1  €0# Ç. ¬.  €(7€0  9€*7€¦# õ.€ O€	0  9€0€0 =.€ O€J  €*7€0  9€(7 ã.#€M€/€"6  	9€(7€0  9€*7 ã.#€\€"#€&€"#€L"l è ./  
+:€€ O8ol€Y€0 –.€"l#€08€1€0%9€1€0#€08€0€=€+€0 –.€"l#€08€1€0%9€1€0#€08€0€# ¸ –.%  :8l€*7€(€€€(7€*€&&+€%/  8#co+€"bl#€7€€.€ä€€€€¶€	l€¶€€€ € €l&&;#/:9ol  !5  5€ € € € € €":€ €€ €":€€ € € €!:€€ €€ €!:8l&8%&*€l€l|ÆÎÖæÆ| 8~ <f<`f~ <ff< <lÌş ~b`|f< <f`|ff< ~f <ff<ff< <ff>f< |ÆÎÖæÆ|     <ff~ff üff|ffü <fÀÀÀf< ølffflø şbhxhbş şbhxh`ğ <fÀÀÎf> fff~fff ~~ ÌÌx æflxlfæ ğ```bfş ÆîşşÖÆÆ ÆæöŞÎÆÆ 8lÆÆÆl8 üff|``ğ 8lÆÆÚÌv üff|lfæ <f`<f< ~Z< ffffff< fffff< ÆÆÆÖşîÆ Æl88lÆÆ fff<< şÆŒ2fş  ~  ( piano )
 
 %+  { ADD } %-   { SUB }  %*  { MUL } %/   { DIV }
 %<  { LTH } %>   { GTH }  %=  { EQU } %!   { NEQ }
 %++ { ADD2 } %-- { SUB2 } %** { MUL2 } %// { DIV2 }
 %<< { LTH2 } %>> { GTH2 } %== { EQU2 } %!! { NEQ2 }
+%!~ { NEQk NIP }
 
 %RTN  { JMP2r }
-%TOS  { #00 SWP } %TOB { SWP POP }
+%TOS  { #00 SWP }
 %MOD  { DUP2 / * - }
-%LTS2 { #8000 ++ SWP2 #8000 ++ >> }
 %GTS2 { #8000 ++ SWP2 #8000 ++ << }
+%2/  { #01 SFT }
 %2//  { #01 SFT2 }
 %4//  { #02 SFT2 }
 %8//  { #03 SFT2 }
@@ -2773,7 +2782,7 @@ BRK
 		.adsr-view/x2 LDZ2 #003a -- #0002 ++ .Screen/x DEO2
 		#10 OVR - .Audio0/output DEI #04 SFT < .Screen/pixel DEO
 		.Screen/y DEI2 #0002 ++ .Screen/y DEO2
-		#01 + GTHk ,&loop JCN
+		INC GTHk ,&loop JCN
 	POP2
 
 BRK
@@ -2786,21 +2795,21 @@ BRK
 	#40 .Screen/sprite DEO
 
 	.Controller/key DEI
-	DUP #61 ! ,&no-c JCN
+	[ LIT 'a ] !~ ,&no-c JCN
 		#30 .octave LDZ #0c * + ;play JSR2 &no-c
-	DUP #73 ! ,&no-d JCN
+	[ LIT 's ] !~ ,&no-d JCN
 		#32 .octave LDZ #0c * + ;play JSR2 &no-d
-	DUP #64 ! ,&no-e JCN
+	[ LIT 'd ] !~ ,&no-e JCN
 		#34 .octave LDZ #0c * + ;play JSR2 &no-e
-	DUP #66 ! ,&no-f JCN
+	[ LIT 'f ] !~ ,&no-f JCN
 		#35 .octave LDZ #0c * + ;play JSR2 &no-f
-	DUP #67 ! ,&no-g JCN
+	[ LIT 'g ] !~ ,&no-g JCN
 		#37 .octave LDZ #0c * + ;play JSR2 &no-g
-	DUP #68 ! ,&no-a JCN
+	[ LIT 'h ] !~ ,&no-a JCN
 		#39 .octave LDZ #0c * + ;play JSR2 &no-a
-	DUP #6a ! ,&no-b JCN
+	[ LIT 'j ] !~ ,&no-b JCN
 		#3b .octave LDZ #0c * + ;play JSR2 &no-b
-	DUP #6b ! ,&no-c2 JCN
+	[ LIT 'k ] !~ ,&no-c2 JCN
 		#3c .octave LDZ #0c * + ;play JSR2 &no-c2
 	POP
 
@@ -2811,7 +2820,7 @@ BRK
 	DUP #04 SFT #01 AND #01 ! ,&no-up JCN
 		( move ) .Audio0/addr DEI2 #0001 -- .Audio0/addr DEO2 &no-up
 	DUP #05 SFT #01 AND #01 ! ,&no-down JCN
-		( move ) .Audio0/addr DEI2 #0001 ++ .Audio0/addr DEO2 &no-down
+		( move ) .Audio0/addr DEI2 INC2 .Audio0/addr DEO2 &no-down
 	DUP #06 SFT #01 AND #01 ! ,&no-left JCN
 		( move ) .Audio0/addr DEI2 #0010 -- .Audio0/addr DEO2 &no-left
 	DUP #07 SFT #01 AND #01 ! ,&no-right JCN
@@ -2855,12 +2864,12 @@ BRK
 
 @on-touch-octave-view ( -> )
 
-	.Mouse/x DEI2 .octave-view/x1 LDZ2 -- 8// TOB #09 ! ,&no-mod JCN
-		.Mouse/y DEI2 .octave-view/y1 LDZ2 -- 8// TOB 
-		DUP #00 ! ,&no-incr JCN
+	.Mouse/x DEI2 .octave-view/x1 LDZ2 -- 8// NIP #09 ! ,&no-mod JCN
+		.Mouse/y DEI2 .octave-view/y1 LDZ2 -- 8// NIP 
+		[ #00 ] !~ ,&no-incr JCN
 			.octave LDZ #03 = ,&no-incr JCN
-			.octave LDZ #01 + .octave STZ &no-incr
-		DUP #02 ! ,&no-decr JCN
+			.octave LDZ INC .octave STZ &no-incr
+		[ #02 ] !~ ,&no-decr JCN
 			.octave LDZ #ff = ,&no-decr JCN
 			.octave LDZ #01 - .octave STZ &no-decr
 		POP
@@ -2869,7 +2878,7 @@ BRK
 		BRK
 	&no-mod
 
-	.Mouse/x DEI2 .octave-view/x1 LDZ2 -- 8// TOB #06 > ,&no-key JCN
+	.Mouse/x DEI2 .octave-view/x1 LDZ2 -- 8// NIP #06 > ,&no-key JCN
 		.Mouse/x DEI2 .octave-view/x1 LDZ2 -- 8// ;notes ++ LDA .octave LDZ #0c * + ;play JSR2
 		( release ) #00 .Mouse/state DEO
 		;draw-octave JSR2
@@ -2879,28 +2888,28 @@ BRK
 
 @on-touch-adsr-view ( -> )
 
-	.Mouse/x DEI2 .adsr-view/x1 LDZ2 -- 8// TOB #03 /
-	DUP #00 ! ,&no-a JCN
+	.Mouse/x DEI2 .adsr-view/x1 LDZ2 -- 8// NIP #03 /
+	[ #00 ] !~ ,&no-a JCN
 		.Audio0/adsr DEI
 		#10 .Mouse/state DEI #10 = #e0 * + +
 		.Audio0/adsr DEO &no-a
-	DUP #01 ! ,&no-d JCN
+	[ #01 ] !~ ,&no-d JCN
 		.Audio0/adsr DEI
 		DUP #f0 AND STH #01 .Mouse/state DEI #10 = #0e * + + #0f AND STHr +
 		.Audio0/adsr DEO &no-d
-	DUP #02 ! ,&no-s JCN
-		.Audio0/adsr #01 + DEI
+	[ #02 ] !~ ,&no-s JCN
+		.Audio0/adsr INC DEI
 		#10 .Mouse/state DEI #10 = #e0 * + +
-		.Audio0/adsr #01 + DEO &no-s
-	DUP #03 ! ,&no-r JCN
-		.Audio0/adsr #01 + DEI
+		.Audio0/adsr INC DEO &no-s
+	[ #03 ] !~ ,&no-r JCN
+		.Audio0/adsr INC DEI
 		DUP #f0 AND STH #01 .Mouse/state DEI #10 = #0e * + + #0f AND STHr +
-		.Audio0/adsr #01 + DEO &no-r
-	DUP #05 ! ,&no-left JCN
+		.Audio0/adsr INC DEO &no-r
+	[ #05 ] !~ ,&no-left JCN
 		.Audio0/volume DEI 
 		#10 .Mouse/state DEI #10 = #e0 * + +
 		.Audio0/volume DEO &no-left
-	DUP #06 ! ,&no-right JCN
+	[ #06 ] !~ ,&no-right JCN
 		.Audio0/volume DEI
 		DUP #f0 AND STH #01 .Mouse/state DEI #10 = #0e * + + #0f AND STHr +
 		.Audio0/volume DEO &no-right
@@ -2938,13 +2947,13 @@ RTN
 	
 	.octave-view/x1 LDZ2 .octave-view/y1 LDZ2
 
-	OVR2 OVR2 ;keys-left-icns #01 .last-note LDZ #00 = + ;draw-key JSR2
-	OVR2 #0008 ++ OVR2 ;keys-middle-icns #01 .last-note LDZ #02 = + ;draw-key JSR2
-	OVR2 #0010 ++ OVR2 ;keys-right-icns #01 .last-note LDZ #04 = + ;draw-key JSR2
-	OVR2 #0018 ++ OVR2 ;keys-left-icns #01 .last-note LDZ #05 = + ;draw-key JSR2
-	OVR2 #0020 ++ OVR2 ;keys-middle-icns #01 .last-note LDZ #07 = + ;draw-key JSR2
-	OVR2 #0028 ++ OVR2 ;keys-middle-icns #01 .last-note LDZ #09 = + ;draw-key JSR2
-	SWP2 #0030 ++ SWP2 ;keys-right-icns #01 .last-note LDZ #0b = + ;draw-key JSR2
+	OVR2 OVR2 ;keys-left-icns .last-note LDZ #00 = INC ;draw-key JSR2
+	OVR2 #0008 ++ OVR2 ;keys-middle-icns .last-note LDZ #02 = INC ;draw-key JSR2
+	OVR2 #0010 ++ OVR2 ;keys-right-icns .last-note LDZ #04 = INC ;draw-key JSR2
+	OVR2 #0018 ++ OVR2 ;keys-left-icns .last-note LDZ #05 = INC ;draw-key JSR2
+	OVR2 #0020 ++ OVR2 ;keys-middle-icns .last-note LDZ #07 = INC ;draw-key JSR2
+	OVR2 #0028 ++ OVR2 ;keys-middle-icns .last-note LDZ #09 = INC ;draw-key JSR2
+	SWP2 #0030 ++ SWP2 ;keys-right-icns .last-note LDZ #0b = INC ;draw-key JSR2
 
 	.octave-view/x1 LDZ2 #0048 ++ .Screen/x DEO2
 
@@ -2988,10 +2997,10 @@ RTN
 		.Audio0/adsr DEI #0f AND
 		;draw-knob JSR2
 	.adsr-view/x1 LDZ2 #0030 ++ .adsr-view/y1 LDZ2
-		.Audio0/adsr #01 + DEI #04 SFT
+		.Audio0/adsr INC DEI #04 SFT
 		;draw-knob JSR2
 	.adsr-view/x1 LDZ2 #0048 ++ .adsr-view/y1 LDZ2
-		.Audio0/adsr #01 + DEI #0f AND
+		.Audio0/adsr INC DEI #0f AND
 		;draw-knob JSR2
 	( volume )
 	.adsr-view/x2 LDZ2 #0028 -- .adsr-view/y1 LDZ2
@@ -3008,7 +3017,7 @@ RTN
 	( clear )
 	.wave-view/x1 LDZ2
 	.wave-view/y1 LDZ2
-	.wave-view/x2 LDZ2 #0001 ++
+	.wave-view/x2 LDZ2 INC2
 	.wave-view/y2 LDZ2
 	#00 ;fill-rect JSR2
 
@@ -3025,13 +3034,13 @@ RTN
 			#03 .Screen/pixel DEO
 		&no-dot
 		DUP TOS .Audio0/addr DEI2 ++ LDA 
-		#02 /
+		2/
 		TOS 4// .wave-view/y1 LDZ2 ++ .Screen/y DEO2
-		.Screen/x DEI2 #0001 ++ .Screen/x DEO2
+		.Screen/x DEI2 INC2 .Screen/x DEO2
 		( draw ) DUP 
-			.Audio0/length DEI2 TOB > 
-			.Audio0/length DEI2 #0100 !! #0101 == #02 * #01 + .Screen/pixel DEO
-		#01 + GTHk ,&loop JCN
+			.Audio0/length DEI2 NIP > 
+			.Audio0/length DEI2 #0100 !! #0101 == DUP ADD INC .Screen/pixel DEO
+		INC GTHk ,&loop JCN
 	POP2
 
 	( range )
@@ -3051,7 +3060,7 @@ RTN
 	&loop
 		DUP2 .Screen/y DEO2
 		( draw ) STHkr .Screen/pixel DEO
-		#0001 ++ GTH2k ,&loop JCN
+		INC2 GTH2k ,&loop JCN
 	POP2 POP2
 	POPr
 
@@ -3073,7 +3082,7 @@ RTN
 		( draw ) #01 .Screen/sprite DEO
 	.Screen/x DEI2 #0004 ++ .Screen/x DEO2
 	.Screen/y DEI2 #0008 ++ .Screen/y DEO2
-	;font-hex #00 STHkr #08 * ++ .Screen/addr DEO2
+	;font-hex #00 STHkr #30 SFT ++ .Screen/addr DEO2
 		( draw ) #01 .Screen/sprite DEO
 	.Screen/x DEI2 #0004 -- #00 #00 STHkr ;knob-offsetx ++ LDA ++ .Screen/x DEO2
 	.Screen/y DEI2 #0010 -- #00 #00 STHr ;knob-offsety ++ LDA ++ .Screen/y DEO2
@@ -3109,10 +3118,10 @@ RTN
 		&hor
 			( save ) DUP2 .Screen/x DEO2
 			( draw ) ,&color LDR .Screen/pixel DEO
-			( incr ) #0001 ++
+			( incr ) INC2
 			OVR2 OVR2 GTS2 ,&hor JCN
 		POP2 POP2 STH2r STH2r
-		( incr ) #0001 ++
+		( incr ) INC2
 		OVR2 OVR2 GTS2 ,&ver JCN
 	POP2 POP2 POP2 POP2
 
@@ -3401,7 +3410,7 @@ RTN
 	.lines/x2 LDZ2 .lines/x1 LDZ2 DUP2 .neralie/x STZ2 SUB2 .neralie/w STZ2
 	.lines/y2 LDZ2 .lines/y1 LDZ2 DUP2 .neralie/y STZ2 SUB2 .neralie/h STZ2
 
-	;neralie/n4 SWP POP .neralie/n0123 LDZ2
+	;neralie/n4 NIP .neralie/n0123 LDZ2
 	DUP2 ;&h JSR2
 	;&next JSR2 #0001 .Screen/x DEO2 .neralie/y LDZ2 #0003 SUB2 .Screen/y DEO2 ,digit JSR
 	DUP2 ;&v JSR2
@@ -3544,28 +3553,25 @@ RTN
 	6666 663c 1818 3c00 fec6 8c18 3266 fe00 0018 187e 1818 0000
 ]
 
-!å7!Å
-7!%7!İ 7!2€7!d7!X7"6?1$6?	10! €91	0! 810! P810! 8!10!  91	0! 810!  810! 810! €91	0!  910! 810!  81ÿ !87İ>!¼<7! :7!q.!.!. 0!  9*7 0! :9(74.0! :9! 8(74.*6! 8*7Š»# 0(70*7@/ƒa	0!+.s	2!+.d	4!+.f	5!+.g	7!+.h	9!+.j	;!+.k	<!+. ƒ‚ğ	
-<6! 9<7	
-<6! 8<7	
-<6! 9<7	
-<6! 8<7!q.!. !+.!q. !9.– 	 ’6”6!	Y.!£-’6”6!	Y.!G-’6”6!	Y.!¶- ’609:7!.!9. ’609?		I”609? 			ÿ	 –!q. ’609?
-#’609?!	¤8!+. –!q. ’609? 	8–à8	8ğ–O8	8–à8	#8ğ–O8	>–à>	>ğ–O> –!.!9. $ ?l!	Œ,70(70*7@/’6$1(7”6$1*7A– 	/l00&&!	¬  !d.&! 8&!	Ä !d.&! 8&!	Ü !d.&! 8&!	¬ !d.&!  8&!	Ä !d.&! (8&!	Ä 	!d.%! 08%!	Ü !d.0! H8(7!	”,70*7/!	”! 8,70! 8*7/!
-< 0?8,70! 8*7/l,7%(7$! 8%$*7Ï/,6! 8,7! 8ªæ##Cl008!â.0! 808!â.0! 0808!â.0! H808!â.0! (90>!â.0! 90>!â.l000! 80 !	.!º.0(7ÿ 0! 8*7. <68 ?08*7(6! 8(7:6
-:6! )!(.Š¥#0(70! 9*7<6!Ÿ.0!  9(7:6!Ÿ.l0:68(70$!  8%$*7Ï.! 8ªğ##Cl*7(7!	ô,7/(6! 8(7!	ô! 8,7/*6! 8*7!	ô! 8,7/(6! 9(7!	ô! 8,7/(6! 8(7*6! 8*7!
-< Ï8,7/(6! 9  Ï!
-88(7*6! 9  O!
-,88*7!	ô!  8,7/l 0?!
-<8,7Ï/ 0?!
-<8,7(6! 8(7Ï/ 0?!
-<8,7(6! 8(7Ï/ 0?!
-<8,7(6! 8(7O/lC'$*7//&&%$(72.! 8&&!€ 8%!€ 8+ã##oo! 8&&!€ 8%!€ 8+Ã####l $Ï0+"$Ï0*%$Ï0+$Ï0*##Cl##C l€Ààğøà  8|ş  ş|8024579;<||||||||||||||~> >> ?>    @@ À0@@   0À   <<           |‚‚‚‚‚| 0 |‚|€€ş |‚‚| $D„ş ş€€|‚| |‚€ü‚‚| |‚ |‚‚|‚‚| |‚‚~‚| |‚~‚‚~ ü‚‚ü‚‚ü |‚€€€‚| ü‚‚‚‚‚ü |‚€ğ€‚| |‚€ğ€€€‚…ˆ‘•›¡¦ª­²µ¸½ÁÇËĞÕÙİáååääáÜ×ÑËÅ¿¸²¬¦¢œ—’ˆ„€|ywutsrrrrssrpmid`[VPMIFCCBBDEHJMPRUVWXUTQPLJGDB?=<:8854100/1369>DINTZ`fkqu{‚‰˜¦«±¶º½¾¿¿¾»¹¶³°®ª¨¦£¡œš™—––—˜›¡¤¦©©¬­­­®®¯°°±±³³´´´³³±°­««©©¨¨§¥¡˜‘‹„~wrnkkkloqtwwvsple^VNHB?=<;::988899:<>AFJPW[`dhjnprtvwz}†”› £§¬±µ¼ÂÇÊÌÎÏĞÑÓÕØÛŞáãåæååãßÜ×ĞÈÂ»²©Ÿ–Œ„|tng_XQKC>:531.,+(&$"!"#'-4<DLW_hpu{€„‡‡‰ŠŒ“—™œ ¢¢¢ œ—”‘‘ˆ‚zrj`XPGB??@BEGHIIGFEEJOXcq‹š¦±¸¾ÁÁ¿½ºµ±¯¬¬®±·¼ÂÉÏÓÕÔÓÓÑÎËÆÀº³«£š…{rlgdb`_^][XUPMIHHIIJMPRUX[^adhlptvwyyz{{zywtsonkiikoruvutqke]UNGB??@EKRZbkt€ƒ†‰Œ’•˜›¡¤§ª­°³¶¹»¾ÁÃÆÉËÎĞÒÕ×ÙÛŞàâäæçéëìîğñòôõö÷øùúûûüıışşşşşÿşşşşşııüûûúùø÷öõôòñğîìëéçæäâàŞÛÙ×ÕÒĞÎËÉÆÃÁ¾»¹¶³°­ª§¤¡›˜•’Œ‰†ƒ€}zwtqnkheb_\YVSPMJGEB?=:7520.+)'%" 
+ å€7 Å€
+7 %€7 İ€ 7 0€€7 _€7 S€7€"6€?€1€$6€?€	1€0  €9€1€	0  8€1€0  P8€1€0  8€!1€0   9€1€	0  8€1€0   8€1€0  8€1€0  €9€1€	0   9€1€0  8€1€0   8€1€ÿ€  €87€İ€> ‚€<7  €:7 ^. o. æ. €0   9€*7€€ €0  :9€(7€€4€€.€0  :9  8€(7€€4€€.€*6  8€*7Š€½" €0€(7€0€*7€@€/€ƒ€a‰€€0€€ .€s‰€€2€€ .€d‰€€4€€ .€f‰€€5€€ .€g‰€€7€€ .€h‰€€9€€ .€j‰€€;€€ .€k‰€€<€€ .€ €ƒ€‚€ğ€€€	€
+€<6  9€<7€€€	€€<6!€<7€€€	€
+€<6  9€<7€€€	€
+€<6  8€<7 ^. æ. € . ^.  &.€–€ 	€ €’6€”6€ 	. -€’6€”6€ 	. =-€’6€”6€ 	. ±- €’6€09€:7 æ. &. €’6€09€?€		€F€”6€09€?€ ‰€€€€€€€‰€€€ÿ€	€€€€ €– ^. €’6€09€?€
+€#€’6€09€? 	j8€€ .€ €– ^. €’6€09€?€€ ‰€€8€€–€€à€8€‰€€8€ğ€€–€€€O€8€‰€€8€€–€€à€8€‰€€8€ğ€€–€€€O€8€‰€€>€€–€€à€>€‰€€>€ğ€€–€€€O€>€ €– o. &. €#€ €?l 	R€,7€0€(7€0€*7€@€/€’6#€1€(7€”6#€1€*7€A€–€ 	€/l€0€0&& 	r€ €  C.&  8& 	Š€ € C.&  8& 	¢€ € C.&  8& 	r€ € C.&   8& 	Š€ € C.&  (8& 	Š€ €	 C.%  08% 	¢€ € C.€0  H8€(7 	Z€,7€0€*7€€/ 	Z  8€,7€0  8€*7€€/ 
+€€€ €0?8€,7€0  8€*7€€/l€,7%€(7#  8%#€*7Ï€/€,6  8€,7  8ª€æ""Bl€0€0€8€ ®.€0  8€0€8€ ®.€0  08€0€8€ ®.€0  H8€0€8€ ®.€0  (9€0€>€ ®.€0  9€0€>€ ®.l€0€0€0!€0€  Ş.€ ‰.€0€(7€ÿ€ €€€0  8€*7€€.€ €<68€€ €?€08€*7€(6!€(7€:6
+€:6  ) (€.Š€®"€0€(7€0  9€*7€<6€ k.€0   9€(7€:6€ k.l€0€:68€(7€0#   8%#€*7Ï€.!ª€ó""Bl€*7€(7 	º€,7€€/€(6  8€(7 	º  8€,7€€/€*6  8€*7 	º  8€,7€€/€(6  9€(7 	º  8€,7€€/€(6  8€(7€*6  8€*7 
+€ Ï€08€,7€€/€(6  9€ € Ï 	â88€(7€*6  9€ € O 	ò88€*7 	º   8€,7€€/l€€ €0? 
+8€,7Ï€/€€ €0? 
+8€,7€(6  8€(7Ï€/€€ €0? 
+8€,7€(6  8€(7Ï€/€€ €0? 
+8€,7€(6  8€(7O€/l€='#€*7//&&%#€(7€,€.!&& € 8% € 8+€æ""oo!&& € 8% € 8+€É""""l #Ï€0+€"#Ï€0*€%#Ï0+€#Ï€0*€""B€l""B€ l€Ààğøà  8|ş  ş|8024579;<||||||||||||||~> >> ?>    @@ À0@@   0À   <<           |‚‚‚‚‚| 0 |‚|€€ş |‚‚| $D„ş ş€€|‚| |‚€ü‚‚| |‚ |‚‚|‚‚| |‚‚~‚| |‚~‚‚~ ü‚‚ü‚‚ü |‚€€€‚| ü‚‚‚‚‚ü |‚€ğ€‚| |‚€ğ€€€‚…ˆ‘•›¡¦ª­²µ¸½ÁÇËĞÕÙİáååääáÜ×ÑËÅ¿¸²¬¦¢œ—’ˆ„€|ywutsrrrrssrpmid`[VPMIFCCBBDEHJMPRUVWXUTQPLJGDB?=<:8854100/1369>DINTZ`fkqu{‚‰˜¦«±¶º½¾¿¿¾»¹¶³°®ª¨¦£¡œš™—––—˜›¡¤¦©©¬­­­®®¯°°±±³³´´´³³±°­««©©¨¨§¥¡˜‘‹„~wrnkkkloqtwwvsple^VNHB?=<;::988899:<>AFJPW[`dhjnprtvwz}†”› £§¬±µ¼ÂÇÊÌÎÏĞÑÓÕØÛŞáãåæååãßÜ×ĞÈÂ»²©Ÿ–Œ„|tng_XQKC>:531.,+(&$"!"#'-4<DLW_hpu{€„‡‡‰ŠŒ“—™œ ¢¢¢ œ—”‘‘ˆ‚zrj`XPGB??@BEGHIIGFEEJOXcq‹š¦±¸¾ÁÁ¿½ºµ±¯¬¬®±·¼ÂÉÏÓÕÔÓÓÑÎËÆÀº³«£š…{rlgdb`_^][XUPMIHHIIJMPRUX[^adhlptvwyyz{{zywtsonkiikoruvutqke]UNGB??@EKRZbkt€ƒ†‰Œ’•˜›¡¤§ª­°³¶¹»¾ÁÃÆÉËÎĞÒÕ×ÙÛŞàâäæçéëìîğñòôõö÷øùúûûüıışşşşşÿşşşşşııüûûúùø÷öõôòñğîìëéçæäâàŞÛÙ×ÕÒĞÎËÉÆÃÁ¾»¹¶³°­ª§¤¡›˜•’Œ‰†ƒ€}zwtqnkheb_\YVSPMJGEB?=:7520.+)'%" 
 		
- "%')+.0257:=?BEGJMPSVY\_behknqtwz}€‚„†ˆŠŒ’”–˜šœ ¢¤¦¨ª¬®°²´¶¸º¼¾ÀÂÄÆÈÊÌÎĞÒÔÖØÚÜŞàâäæèêìîğòôöøúüşÿıûù÷õóñïíëéçåãáßİÛÙ×ÕÓÑÏÍËÉÇÅÃÁ¿½»¹·µ³±¯­«©§¥£¡Ÿ›™—•“‘‹‰‡…ƒ}{ywusqomkigeca_][YWUSQOMKIGECA?=;97531/-+)'%#!		!#%')+-/13579;=?ACEGIKMOQSUWY[]_acegikmoqsuwy{}‚‚ƒƒ„†…ˆˆˆ‰Š‹ŒŒ’‘“””•––™˜™›šœœœ ¡ ¢¢£¥¤¦§§©¨©ªª¬­­®®°°±³²´µµ¶·¹¸¹»º¼½¼½¾¿Á¿ÁÃÁÄÅÅÆÆÇÉÇËÊËÌÍÍÏÏÒĞÒÒÒÕÔÕÖ×ØØÙÜÙßÚßÜáİåÜæÜëË!!# %!'#)%)()*++.-/0/212434568699:;;=>=?@@BBBDDFFGHGJJKMLNNOPPRRRUTUWWYYY[[\]]_^`a`bdceefhgiijllmmnpopqqttuuvwwyzz|{|~}!Ï7!ÿ
-7!O7!l 7!7!#€7!Ô.!Ô.!Ô.!Ô.!Ô."6?@ 91$6?@ 91  –    !  1  !  ¯@ ?@ :8o$!  %5! 8ªò## @ @¥$$!û.!ë.?‹ä#‹Ö#!  $@ ?@ :8%$´%!  95! 8ªğ##!K.  
-l#l#lll@$@$@  : 8!  80! 81/$@ÔOol!Î,70(7	0*7@/’6$1(7”6$	1*7B– 	/– 	 ’6$0*0@ 8! 8+!(”6$0*0@ 8+!(!( ’609”609!Ô.!K. ƒ 	 ƒ 	!l 6!k(#!k 7 0(70@ 8*70![.@  ?08*7@  ?08(7&V.Šİ#ŠÃ#l@$@$@  : 8!€ 8l$Ô/@ÔOol$½l$ä$ÜX$ÎX$ÃX$¸X$ªX$¡X”XOl 0?!Ö8,7Ï/ 0?!Ö8,7(6! 8(7Ï/ 0?!Ö8,7(6! 8(7Ï/ 0?!Ö8,7(6! 8(7O/l€Ààğøà  |‚‚‚‚‚| 0 |‚|€€ş |‚‚| $D„ş ş€€|‚| |‚€ü‚‚| |‚ |‚‚|‚‚| |‚‚~‚| |‚~‚‚~ ü‚‚ü‚‚ü |‚€€€‚| ü‚‚‚‚‚ü |‚€ğ€‚| |‚€ğ€€€!
-?7!ß
-7!¯7"6?! 9 1$6?! :! 91!E7!f 7!Ã.!§. !o.’6 0* ”60*@ !ÿ. !  !6.	! !6. 	! !6.0	! !6.@	! !6.P	! !6. 0*7 0¯! 9(7!ñ,7/o(7!ñ! 8,7/!  !  8l0! 8*7 0¯! 9(7$!8,7/o(7!! 88,7/l0! 8*7 0¯! 9(7!‘,7/o(7! :!‘! 88,7/l!é,70(70*7@/’6$1(7”6$1*7A– 	/l0! 8*7 0! 9(7!,7 /,6! 8,7(6! 8(7‹Ş#l€Ààğøà >>ÿÿ>>ÿü<>~~ÿÿ<>~~ÿÿÿÿÿÿ?÷ïÏçğ|?ÿÿÿÿÿşüğ‡ÃÁƒüğÿÿÿÿÿ?ğáÁàğ|?ÿÿÿÿÿşüğ÷ûùóüğÿÿÿÿÿ?ğçÏï÷|?ÿÿÿÿÿşüğƒÁÃ‡üğÿÿÿÿÿ?ğàÁáğ|?ÿÿÿÿÿşüğóùû÷üğ    àğğàà€€ Àòùùşø° àğğàà€€ Àòùùşø° àğğàà€€ Àòúùşø° àğğàà€€ Àñúùşø°     ààààà€€ òùùş¸„„ ¿ \ïo€€€tÿ ş ı <@@@@(( Dev/Screen )
+ "%')+.0257:=?BEGJMPSVY\_behknqtwz}€‚„†ˆŠŒ’”–˜šœ ¢¤¦¨ª¬®°²´¶¸º¼¾ÀÂÄÆÈÊÌÎĞÒÔÖØÚÜŞàâäæèêìîğòôöøúüşÿıûù÷õóñïíëéçåãáßİÛÙ×ÕÓÑÏÍËÉÇÅÃÁ¿½»¹·µ³±¯­«©§¥£¡Ÿ›™—•“‘‹‰‡…ƒ}{ywusqomkigeca_][YWUSQOMKIGECA?=;97531/-+)'%#!		!#%')+-/13579;=?ACEGIKMOQSUWY[]_acegikmoqsuwy{}‚‚ƒƒ„†…ˆˆˆ‰Š‹ŒŒ’‘“””•––™˜™›šœœœ ¡ ¢¢£¥¤¦§§©¨©ªª¬­­®®°°±³²´µµ¶·¹¸¹»º¼½¼½¾¿Á¿ÁÃÁÄÅÅÆÆÇÉÇËÊËÌÍÍÏÏÒĞÒÒÒÕÔÕÖ×ØØÙÜÙßÚßÜáİåÜæÜëË!!# %!'#)%)()*++.-/0/212434568699:;;=>=?@@BBBDDFFGHGJJKMLNNOPPRRRUTUWWYYY[[\]]_^`a`bdceefhgiijllmmnpopqqttuuvwwyzz|{|~} Ï€7 ÿ€
+7 O€7 l€ 7 b€7 ÿ€€7€€ ›.€€ ›.€€ ›.€€ ›.€€ ›.€"6€?€@€ 9€1€$6€?€@€ 9€1  €–€ € € €    €1€€ €    ¯€@€ €?€`?8o#   %5  8ª€ò""€ €@€ €@¥## Á. ².€8‹€ç"‹€Û"   #€@€ €?€`?8%#´%   95  8ª€ğ"" '. € €€€€
+€€l"l€€"l€ll€?€?€ €0?€€ 8   8€0!€1/#€€€@ÔOol ˆ€,7€0€(7€	0€*7€@€/€’6#€1€(7€”6#€	1€*7€B€–€ 	€/€–€ 	€ €’6#€0*€0€@€ 8!+ (€”6#€0*€0€@€ 8+ ( (€ €’6€09€€”6€09€ ›. '. €ƒ€ 	€ €ƒ€ 	€ l€ 6 k(€" k€ 7 €0€(7€0€@€ 8€*7€0€ .€@€ € €?€08€*7€@€ € €?€08€(7&€C€.Š€â"Š€Ê"l€?€?€ €0?€€ 8 € 8l#€á/€€€@ÔOol#€Ê€€l#€€€å#€€İX#€€ÑX#€€ÆX#€½X#€€±X#€ªX€¡XOl€€ €0? 8€,7Ï€/€€ €0? 8€,7€(6  8€(7Ï€/€€ €0? 8€,7€(6  8€(7Ï€/€€ €0? 8€,7€(6  8€(7O€/l€Ààğøà  |‚‚‚‚‚| 0 |‚|€€ş |‚‚| $D„ş ş€€|‚| |‚€ü‚‚| |‚ |‚‚|‚‚| |‚‚~‚| |‚~‚‚~ ü‚‚ü‚‚ü |‚€€€‚| ü‚‚‚‚‚ü |‚€ğ€‚| |‚€ğ€€€ 
+?€7 ß€
+7 ¯€7€"6€?  9€ 1€$6€?£88  9€1 D€7 e€ 7 À. £.  k.€’6€ 0*€P€”6€0*€`€  ü. €€€    3.€‰€   3.€ ‰€   3.€0‰€   3.€@‰€   3.€P‰€   3. €0€*7€ 0¯  9€(7 é€,7€€/o€(7 é  8€,7€€/   €   €8l€0  8€*7€ 0¯  9€(7# 	8€,7€€/o€(7 	  88€,7€€/l€0  8€*7€ 0¯  9€(7 ‰€,7€€/o€(7€@? ‰  88€,7€€/l á€,7€0€(7€0€*7€@€/€’6#€1€(7€”6#€1€*7€A€–€ 	€/l€0  8€*7€ 0  9€(7 ù€,7€€ €€/€,6  8€,7€(6  8€(7Š€â"l€Ààğøà >>ÿÿ>>ÿü<>~~ÿÿ<>~~ÿÿÿÿÿÿ?÷ïÏçğ|?ÿÿÿÿÿşüğ‡ÃÁƒüğÿÿÿÿÿ?ğáÁàğ|?ÿÿÿÿÿşüğ÷ûùóüğÿÿÿÿÿ?ğçÏï÷|?ÿÿÿÿÿşüğƒÁÃ‡üğÿÿÿÿÿ?ğàÁáğ|?ÿÿÿÿÿşüğóùû÷üğ    àğğàà€€ Àòùùşø° àğğàà€€ Àòùùşø° àğğàà€€ Àòúùşø° àğğàà€€ Àñúùşø°     ààààà€€ òùùş¸„„ ¿ \ïo€€€tÿ ş ı <@@@@(( Dev/Screen )
 
 %RTN { JMP2r }
 %++  { #0001 ADD2 }
@@ -3646,22 +3652,22 @@ BRK
 	DUP2 #0010 NEQ2 ,&no-touch-red JCN
 		.Mouse/x DEI2 .window/x1 LDZ2 #0060 ADD2 LTH2 ,&no-touch-red JCN
 		.Mouse/x DEI2 .window/x1 LDZ2 #009c ADD2 GTH2 ,&no-touch-red JCN
-		( get new value ) .Mouse/x DEI2 .window/x1 LDZ2 SUB2 #0060 SUB2 4// SWP POP ;theme/r1 #00 .selection LDZ ADD2 STA
+		( get new value ) .Mouse/x DEI2 .window/x1 LDZ2 SUB2 #0060 SUB2 4// NIP ;theme/r1 #00 .selection LDZ ADD2 STA
 	&no-touch-red
 	DUP2 #0020 NEQ2 ,&no-touch-green JCN
 		.Mouse/x DEI2 .window/x1 LDZ2 #0060 ADD2 LTH2 ,&no-touch-green JCN
 		.Mouse/x DEI2 .window/x1 LDZ2 #009c ADD2 GTH2 ,&no-touch-green JCN
-		( get new value ) .Mouse/x DEI2 .window/x1 LDZ2 SUB2 #0060 SUB2 4// SWP POP ;theme/g1 #00 .selection LDZ ADD2 STA
+		( get new value ) .Mouse/x DEI2 .window/x1 LDZ2 SUB2 #0060 SUB2 4// NIP ;theme/g1 #00 .selection LDZ ADD2 STA
 	&no-touch-green
 	DUP2 #0030 NEQ2 ,&no-touch-blue JCN
 		.Mouse/x DEI2 .window/x1 LDZ2 #0060 ADD2 LTH2 ,&no-touch-blue JCN
 		.Mouse/x DEI2 .window/x1 LDZ2 #009c ADD2 GTH2 ,&no-touch-blue JCN
-		( get new value ) .Mouse/x DEI2 .window/x1 LDZ2 SUB2 #0060 SUB2 4// SWP POP ;theme/b1 #00 .selection LDZ ADD2 STA
+		( get new value ) .Mouse/x DEI2 .window/x1 LDZ2 SUB2 #0060 SUB2 4// NIP ;theme/b1 #00 .selection LDZ ADD2 STA
 	&no-touch-blue
 	DUP2 #0040 NEQ2 ,&no-touch-radio JCN
 		.Mouse/x DEI2 .window/x1 LDZ2 #0050 ADD2 LTH2 ,&no-touch-radio JCN
 		.Mouse/x DEI2 .window/x1 LDZ2 #008c ADD2 GTH2 ,&no-touch-radio JCN
-		.Mouse/x DEI2 .window/x1 LDZ2 SUB2 #0050 SUB2 STEP8 2// #0008 DIV2 SWP POP .selection STZ
+		.Mouse/x DEI2 .window/x1 LDZ2 SUB2 #0050 SUB2 STEP8 2// #0008 DIV2 NIP .selection STZ
 	&no-touch-radio
 	POP2
 
@@ -3714,7 +3720,7 @@ RTN
 	#0010 .Screen/y DEO2
 	#00 #08
 	&draw-pixel1
-		( move ) OVR #08 MUL #00 SWP #0010 ADD2 .Screen/x DEO2
+		( move ) OVR #30 SFT #00 SWP #0010 ADD2 .Screen/x DEO2
 		( draw ) OVR .Screen/pixel DEO
 		( incr ) SWP #01 ADD SWP
 		LTHk ,&draw-pixel1 JCN
@@ -3722,7 +3728,7 @@ RTN
 	#0018 .Screen/y DEO2
 	#00 #08
 	&draw-pixel2
-		( move ) OVR #08 MUL #00 SWP #0010 ADD2 .Screen/x DEO2
+		( move ) OVR #30 SFT #00 SWP #0010 ADD2 .Screen/x DEO2
 		( draw ) OVR #08 ADD .Screen/pixel DEO
 		( incr ) SWP #01 ADD SWP
 		LTHk ,&draw-pixel2 JCN
@@ -3730,7 +3736,7 @@ RTN
 	#0020 .Screen/y DEO2
 	#00 #08
 	&draw-icn1
-		( move ) OVR #08 MUL #00 SWP #0010 ADD2 .Screen/x DEO2
+		( move ) OVR #30 SFT #00 SWP #0010 ADD2 .Screen/x DEO2
 		( draw ) OVR #00 ADD .Screen/sprite DEO
 		( incr ) SWP #01 ADD SWP
 		LTHk ,&draw-icn1 JCN
@@ -3738,7 +3744,7 @@ RTN
 	#0028 .Screen/y DEO2
 	#00 #08
 	&draw-icn2
-		( move ) OVR #08 MUL #00 SWP #0010 ADD2 .Screen/x DEO2
+		( move ) OVR #30 SFT #00 SWP #0010 ADD2 .Screen/x DEO2
 		( draw ) OVR #08 ADD .Screen/sprite DEO
 		( incr ) SWP #01 ADD SWP
 		LTHk ,&draw-icn2 JCN
@@ -3746,7 +3752,7 @@ RTN
 	#0030 .Screen/y DEO2
 	#00 #08
 	&draw-chr1
-		( move ) OVR #08 MUL #00 SWP #0010 ADD2 .Screen/x DEO2
+		( move ) OVR #30 SFT #00 SWP #0010 ADD2 .Screen/x DEO2
 		( draw ) OVR #80 ADD .Screen/sprite DEO
 		( incr ) SWP #01 ADD SWP
 		LTHk ,&draw-chr1 JCN
@@ -3754,7 +3760,7 @@ RTN
 	#0038 .Screen/y DEO2
 	#00 #08
 	&draw-chr2
-		( move ) OVR #08 MUL #00 SWP #0010 ADD2 .Screen/x DEO2
+		( move ) OVR #30 SFT #00 SWP #0010 ADD2 .Screen/x DEO2
 		( draw ) OVR #88 ADD .Screen/sprite DEO
 		( incr ) SWP #01 ADD SWP
 		LTHk ,&draw-chr2 JCN
@@ -3820,7 +3826,7 @@ RTN
 	.Mouse/x DEI2 DUP2 .pointer/x STZ2 .Screen/x DEO2 
 	.Mouse/y DEI2 DUP2 .pointer/y STZ2 .Screen/y DEO2
 
-	#43 .Mouse/state DEI #00 NEQ #02 MUL SUB .Screen/sprite DEO
+	#43 .Mouse/state DEI #00 NEQ DUP ADD SUB .Screen/sprite DEO
 
 RTN
 
@@ -3894,12 +3900,12 @@ RTN
 	.Screen/x DEO2 
 	STH2r
 	&loop
-		DUP2 LDA #00 SWP 8**
+		LDAk #00 SWP 8**
 		;font ADD2 .Screen/addr DEO2 
 		( draw ) STHkr .Screen/sprite DEO
 		( incr ) ++
 		( incr ) .Screen/x DEI2 8+ .Screen/x DEO2
-		DUP2 LDA ,&loop JCN
+		LDAk ,&loop JCN
 	POP2 POPr
 
 RTN
@@ -4046,7 +4052,7 @@ BRK
 			( move down ) STH OVR2 .Screen/x DEO2 STHr
 			( incr y ) .Screen/y DEI2 #0010 ++ .Screen/y DEO2 
 			POP ,&continue JMP &no-linebreak
-		( get addr ) STHk TOS #0008 ** ;font-data #0100 ++ ++ .Screen/addr DEO2
+		( get addr ) STHk TOS #30 SFT2 ;font-data #0100 ++ ++ .Screen/addr DEO2
 		( get width ) STHr TOS ;font-data ++ LDA TOS
 		( draw ) STHkr .Screen/sprite DEO
 		( use width ) .Screen/x DEI2 ++ .Screen/x DEO2
@@ -4077,7 +4083,7 @@ RTN
 
 	&sprite ( char color -- )
 		STH
-		( get addr ) STHk TOS #0020 ** ;font-data #0100 ++ ++ .Screen/addr DEO2
+		( get addr ) STHk TOS #50 SFT2 ;font-data #0100 ++ ++ .Screen/addr DEO2
 		( get width ) STHkr TOS ;font-data ++ LDA TOS
 		SWPr
 			( left-top ) STHkr .Screen/sprite DEO
@@ -4120,7 +4126,7 @@ RTN
 
 	&sprite ( char color -- )
 		STH 
-		( get addr ) DUP TOS #0048 ** ;font-data #0100 ++ ++ .Screen/addr DEO2
+		( get addr ) DUP TOS #30 SFT2 #30 SFT2k ROT POP ADD2 ;font-data #0100 ++ ++ .Screen/addr DEO2
 		( get width ) TOS ;font-data ++ LDA TOS
 		#00 #03
 		&ver
@@ -4172,21 +4178,21 @@ RTN
 @font-path-small  
 	"projects/fonts/atari8.uf1 $1
 
-@font-data!àú7!0ú
-7!0ú7! 7!7!À€7"6?$! €91! €81$6?$! 89! 91! 88! 9101010! 0810! 08101010!10#1!Œ87ˆ>!H7ˆN!&®X7ˆ^!  h7ˆn!û<7!ı!û9:7!ıL7!ı!ı9J7!ı\7!N!ı9Z7! l7!N! 9j7!..!	c.!
-œ. !›.!
-d.1!ÿ. – !»-’60*’60+!(”60*”60+!(!(!]-’60*’60+!(”60! 8*”60! 9+!(!(!¢-’60*’6!0+!(”60! 8*”6#0! 9+!(!(!Ê-!3. ƒa	!µ!Y.s	!µ! 8!Y.d	!µ! 8!Y.f	!µ! 8!Y.g	!µ! 8!Y.h	!µ! 8!Y.j	!µ! 8!Y.k	!µ! 8!Y. ?l!÷.”609–	 ! 3 2P?8 ’6098 –!F. !÷.”6092 –!
-œ.!F.!	c. ’609! 9?!82–à82	+82ğ–O82	'82–à82	182ğ–O82	!>2–à>2	+>2ğ–O>2 –!	c. ! 3 18ÿ	 !µ8?! S 18ÿ	 !µ8O! s 18ÿ	 !µ8_! “ 18ÿ	 !µ8€ol0! 9*70 18(7!­,7 /110 18(7!­,7! 3 2P?8 18 	/l   ! 3 2P?88 0?08*7 0?08(7O  /$·#l   ! 3 2P?88 0?08*7 0?08(7!¥,7O /$±#!Ÿ.l0000!÷.0! 9*7!{,7!  ! &6&08(70! 9*7/,6! 8,7&080! 80!®.&0800!®.%! 8%&&+¡##000! 9! @8!Ô.l*7(7!ë,7*6*6! 88&*7/,6! 8,7(6! 8(7/,6! 8,7(6! 9(7%! 8%&&+¾##l0! 9$0!@.0! 88!@.0! (9(70! 08*7!{!  8,7/0! 09(7!{! `8,7/0! (9(70! h8*7!{! 8,7/0! 09(7!{! `8,7/l!Ÿ.!›.l2!	-0.1,1,0(7.0*7!Ã,7/,0! 8(7!Ã! 8,7/.0! 8*7!Ã! 8,7/,0(7!Ã! 8,7/,0  0![88(7.0  0!k88*7!Ã!  8,7/,0! 8(7.0! 8*7!{ 08,7/l0.1,1,0(7.0*7 /,0! 8(7 /.0! 8*7 /,0(7 /,0! 8(7.0! 8*7 /l00!0#0!÷.0! 80! 8!…!u.0! 80! 882!7.0! 80! 882!7.0! (80! 882!7.0! 880! 882!7.0! X80! 8!!u.0! X80! 8>2!A.0! h80! 8>2!A.l0! ˆ80! 842!A.0! ˜80! 8O!A.l0000!÷.0! 80! 82 !q!u.0! 80! 82!v!u.0! 80! 82!{!u.0! 80!  82!€!u.l!•,7 0(70*7@/’6 1”61!,7 0(70*7B– 	/l*1)*7(7*0$ 0?!û8,7)/! 8(6! 8(7$Ø#l/%(7o&*7.%! 8$*7%&&+ê##l*7&(7.%! 8$(7%&&+ê##l1	1$*71$(71(6! 8(70*7.0*7.(6	0+Ô0*70(7.	0(7.*6! 8*7*60! 8+ĞlSQR  TRI  SINE DRUM Envelope Volume         €Ààğøà   >>>  ~< <>@ACEGHJLMOQS   @@ À0@@   0À   <<  ÿ   şşÿşÿü ÿşü şşÿşÿü ÿşü şşÿşÿü ÿşü   ÿ ÿü ÿ   şşÿşÿü ÿşü şşÿşÿü ÿşü   ÿ ÿü          |‚‚‚‚‚| 0 |‚|€€ş |‚‚| $D„ş ş€€|‚| |‚€ü‚‚| |‚ |‚‚|‚‚| |‚‚~‚| |‚~‚‚~ ü‚‚ü‚‚ü |‚€€€‚| ü‚‚‚‚‚ü |‚€ğ€‚| |‚€ğ€€€          $ ~<    $ <B    l||8  8||8  88|l8  8||8        ~BBBB~   $$   $BB$  :JH0  8Dl|  88  >"""ff   " "      8      (((( (  >JJ:
+@font-data àú€7 0ú€
+7 0ú€7 € 7 €7 À€€7€"6€?#  €9€1  €8€1€$6€?#  89  9€1  88  9€1€0€1€0€1€0  08€1€0  08€1€0€1€0€1€0€!1€0€#1 Œ€87€ˆ€> €H7€ˆ€N &®€X7€ˆ€^   €h7€ˆ€n ô€<7 ö ô9€:7 ö€L7 ö ö9€J7 ö€\7 G ö9€Z7  €l7 G  9€j7 ). 	^. 
+—.  —. 
+_.€1€€ û. €–€  »-€’6€0*€’6€0+ (€”6€0*€”6€0+ ( ( ]-€’6€0*€’6€0+ (€”6€0  8*€”6€0  9+ ( (  -€’6€0*€’6€!0+ (€”6€0  8*€”6€#0  9+ ( ( Ç- .. €ƒ€a	€ ® Y.€s	€ ®  8 Y.€d	€ ®  8 Y.€f	€ ®  8 Y.€g	€ ®  8 Y.€h	€ ®  8 Y.€j	€ ®  8 Y.€k	€ ®  8 Y. €?l ó.€€”6€09€€–€	€€   3€ €2€P?8€ €’6€09€8€ €– B.  ó.€”6€09€€€2€ €– 
+—. B. 	^. €’6€09  9€?€€!€8€2€@€€–€€à€8€2€@€	€+€8€2€@€ğ€€–€€€O€8€2€@€	€'€8€2€@€€€–€€à€8€2€@€€	€1€8€2€@€€ğ€€–€€€O€8€2€@€€	€!€>€2€@€€–€€à€>€2€@€	€+€>€2€@€ğ€€–€€€O€>€2€@€ €– 	^.   3€ €1€8€€ÿ	€€€  ®8€?  S€ €1€8€€ÿ	€€€  ®8€O  s€ €1€8€€ÿ	€€€  ®8€_  “€ €1€8€€ÿ	€€€  ®8€€€ol€0  9€*7€0€ €18€(7 ¦€,7€ €/€1€€1€0€ €18€(7 ¦€,7€  3€ €2€P?8€ €1€8€ 	€/l€ € €   3€ €2€P?88€ €€0?€08€*7€ €0?€08€(7O€ €€ €/€#€·"l€ € €   3€ €2€P?88€ €€0?€08€*7€ €0?€08€(7 €,7O€ €€€/€#€±" ›.l€0€0€0€0€ ğ.€0  9€*7 t€,7     &€€€6&€08€(7€0  9€*7€€/€,6  8€,7&€08€0  8€0€ §.&€08€0€0€ §.%  8%&&+€¢""€0€0€0  9  @8€ Í.l€*7€(7 ä€,7€*6€*6  88&€*7€€/€,6  8€,7€(6  8€(7€€/€,6  8€,7€(6  9€(7%  8%&&+€¾""l€0  9#€0 ;.€0  88 ;.€0  (9€(7€0  08€*7 t   8€,7€€/€0  09€(7 t  `8€,7€€/€0  (9€(7€0  h8€*7 t  8€,7€€/€0  09€(7 t  `8€,7€€/l ›. –.l€2€ 	-€0€.1€,1€,0€(7€.0€*7 ¼€,7€€/€,0  8€(7 ¼  8€,7€€/€.0  8€*7 ¼  8€,7€€/€,0€(7 ¼  8€,7€€/€,0€ € €0 T88€(7€.0€ € €0 d88€*7 ¼   8€,7€€/€,0  8€(7€.0  8€*7 t€ €0€08€,7€€/l€0€.1€,1€,0€(7€.0€*7€ €/€,0  8€(7€ €/€.0  8€*7€ €/€,0€(7€ €/€,0  8€(7€.0  8€*7€ €/l€0€0€!0€#0€ ğ.€0  8€0  8€ ~ p.€0  8€0  8€8€2€@€ 2.€0  8€0  8€8€2€@€ 2.€0  (8€0  8€8€2€@€€ 2.€0  88€0  8€8€2€@€€ 2.€0  X8€0  8€ ‡ p.€0  X8€0  8€>€2€@€ <.€0  h8€0  8€>€2€@€ <.l€0  ˆ8€0  8€4€2€@€ <.€0  ˜8€0  8O€ <.l€0€0€0€0€ ğ.€0  8€0  8€€2€ € j p.€0  8€0  8€€2€€ o p.€0  8€0  8€€2€€ t p.€0  8€0   8€€2€€ y p.l €,7€ 0€(7€0€*7€@€/€’6€ 1€”6€1 –€,7€ 0€(7€0€*7€B€–€ 	€/l€*1€)€*7€(7€*0”€ €0? ô8€,7€)€/  8€(6  8€(7”€Ú"l€/%€(7o&€*7€€.%  8#€*7%&&+€ê""l€€*7&€(7€€.%  8#€(7%&&+€ê""l€€1€	1#€*7€1#€(7€1€(6  8€(7€0€*7€€.€0€*7€€.€(6€	0+€Ô€0€*7€0€(7€€.€	0€(7€€.€*6  8€*7€*6€0  8+€ĞlSQR  TRI  SINE DRUM Envelope Volume         €Ààğøà   >>>  ~< <>@ACEGHJLMOQS   @@ À0@@   0À   <<  ÿ   şşÿşÿü ÿşü şşÿşÿü ÿşü şşÿşÿü ÿşü   ÿ ÿü ÿ   şşÿşÿü ÿşü şşÿşÿü ÿşü   ÿ ÿü          |‚‚‚‚‚| 0 |‚|€€ş |‚‚| $D„ş ş€€|‚| |‚€ü‚‚| |‚ |‚‚|‚‚| |‚‚~‚| |‚~‚‚~ ü‚‚ü‚‚ü |‚€€€‚| ü‚‚‚‚‚ü |‚€ğ€‚| |‚€ğ€€€          $ ~<    $ <B    l||8  8||8  88|l8  8||8        ~BBBB~   $$   $BB$  :JH0  8Dl|  88  >"""ff   " "      8      (((( (  >JJ:
 
   0Fb0       ÿÿ 8 8 8 *  *   ~    ~    @@~      $f$    8|      |8                    $~$$~$  (
 < B B  0H2LD:             >   >          <               <FJRb<  (>  <B<@~  <BB<  (H~  ~@|B<  <@|BB<  ~  <B<BB<  <BB><                  > >      <B   <BZTB<  $B~BB  |B|BB|  <B@@B<  xDBBDx  ~@|@@~  >@@|@@  <B@NB<  BB~BBB  >>  BB<  DHpHDB  @@@@@~  BfZBBB  BbRJFB  <BBBB<  |BB|@@  <BBRJ<  |BB|DB  <@<B<  ş  BBBBB<  BBBB$  BBBZfB  B$$B  ‚D(  ~ ~    @     "          ~         "    <""<        ""   "<      ""   ,2""      H0  $(0($     hTTTT   XdDDD   8DDD8   xDDx@@  <DD<  ,0      8@8x  <   DDDD8   DD((   DTTT(   D((D   DDD<8  | |      00    2L   <B™¡¡™B<(Ø€‚„†ˆŠŒ’”–˜šœ ¢¤¦¨ª¬®°²´¶¸º¼¾ÀÁÃÅÇÉËÍÏÑÓÕ×ÙÛİßáãåçéëíïñóõ÷ùûıÿıûù÷õóñïíëéçåãáßİÛÙ×ÕÓÑÏÍËÉÇÅÃÁÀ¾¼º¸¶´²°®¬ª¨¦¤¢ œš˜–”’ŒŠˆ†„‚€~|zxvtrpnljhfdb`^\ZXVTRPNLJHFDBA?=;97531/-+)'%#!		!#%')+-/13579;=?ABDFHJLNPRTVXZ\^`bdfhjlnprtvxz|~€„‰’—œ ¥©®²¶»¿ÃÇËÎÒÖÙÜàãåèëíğòôö÷ùúûüışşşşşşşıüûúùøöôòğîëéæãàİÚ×ÓÏÌÈÄÀ¼¸³¯ª¦¡˜”Š…|wrnid`[WRNJEA=951.*'# 
 	
-!$(+/26:>BFKOSX\afjotx}‚‡‹•™£§¬°´¹½ÁÅÉÍĞÔ×ÛŞáäçêìîñóõöøùûüıışşşşşşııüûúø÷õóñïíêèåâßÜØÕÑÎÊÆÂ¾ºµ±­¨¤Ÿ›–‘ˆƒ~zupkgb^YUPLGC?;730,(%"		#&)-148<@DIMQVZ_chmqv{!§7!§
-7!§7!I ª7!K¨7!¬7!  !  !R!¢.!! ª7!g¨7!¬7!  ! H!_!Ó.!	 ª7!ƒ¨7!¬7! 0! ¸!9!v. %*7%$(7%”
-	&(7O*6! 8*7* ! :!! 88,7O !8 Ï/(68(7! 8”²##Cl%*7%$(7%”
-	&(7O*6! 8*7Ï! 8”Ø##Cl !  :!! 88,7Ï !8 EÏ/*6! 8*7,6! 8,7Ï/(6! 8(7*6! 9*7
-0,6! 9,7Ï/,6! 8,7*6! 8*7Ï/*6! 9*7E(68! 9(7CCll%*7%$(7%”
-	&(7*6! 8*7Ï! 8”Ú##Cl ! H:!! 88,7 !8   Ï/(6! 8(7,6! 8,7‹ß#*6! 8*7(6! 9(7‹½#*6! 9*7(68(7CllThe Fog Horn I'll make a sound that's so alone 
+!$(+/26:>BFKOSX\afjotx}‚‡‹•™£§¬°´¹½ÁÅÉÍĞÔ×ÛŞáäçêìîñóõöøùûüıışşşşşşııüûúø÷õóñïíêèåâßÜØÕÑÎÊÆÂ¾ºµ±­¨¤Ÿ›–‘ˆƒ~zupkgb^YUPLGC?;730,(%"		#&)-148<@DIMQVZ_chmqv{ §€7 §€
+7 §€7 I €ª7 N€¨7  €¬7       U€  . ! €ª7 j€¨7  €¬7     H b€ Ò. 	 €ª7 †€¨7  €¬7  0  ¸ <€ v. %€*7%#€(7%”€
+	€&€(7O€*6  8€*7€)€ €0?    88€,7O€   8€ Ï€/€(68€(7  8”€³""Bl%€*7%#€(7%”€
+	€&€(7O€*6  8€*7€Ï€  8”€Ø""Bl€ €P?    88€,7Ï€   8€ EÏ€/€*6  8€*7€,6  8€,7Ï€/€(6  8€(7€*6  9€*7€
+€0€,6  9€,7Ï€/€,6  8€,7€*6  8€*7Ï€/€*6  9€*7E€(68  9€(7BBll%€*7%#€(7%”€
+	€&€(7€*6  8€*7€Ï€  8”€Ú""Bl€ €0?€0¿8    88€,7€   8€ € €€ €Ï€/€(6  8€(7€,6  8€,7€‹€ß"€*6  8€*7€(6  9€(7€‹€½"€*6  9€*7€(68€(7BllThe Fog Horn I'll make a sound that's so alone 
 that no one can miss it, that whoever 
 hears it will weep in their souls, 
 and hearths will seem warmer, 

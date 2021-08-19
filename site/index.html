@@ -1,0 +1,272 @@
+
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  </head>
+  <style>
+
+    :root {
+      --color-0: #585858;
+      --color-1: #ab4642;
+      --color-2: #dc9656;
+      --color-3: #f7ca88;
+      --color-4: #a1b56c;
+      --color-5: #86c1b9;
+      --color-6: #7cafc2;
+      --color-7: #ba8baf;
+
+      --uxn-max-width: 1000px;
+      --uxn-max-height: 640px;
+
+      --border: #444
+    }
+
+    body {
+      background-color: black;
+    }
+
+    button {
+      margin: 2px;
+      background-color: black;
+      border: none;
+      color: white;
+      padding: 15px 32px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+    }
+
+    a {
+      text-decoration: none;
+      color: black;
+    }
+
+    #title {
+      margin-left: auto;
+      margin-right: auto;
+      width: max-content;
+      color: #72dec2;
+    }
+
+    #uxnemu {
+      width: min(100%, var(--uxn-max-width));
+      height: min(100%, var(--uxn-max-height));
+      border: 1px solid var(--border);
+    }
+
+    #uxnemu-iframe {
+      width: min(100%, var(--uxn-max-width));
+      height: min(100%, var(--uxn-max-height));
+    }
+
+    #textarea {
+      float: left;
+      border: 1px solid var(--border);
+      width: 50%;
+      overflow: scroll;
+    }
+
+    #tal-contents {
+      margin: 40px;
+      color: white;
+      font-size: 18px;
+      white-space: pre;
+    }
+
+    #textarea pre {
+      margin: 20px;
+    }
+
+    .flex {
+      display: flex;
+      width: 100%;
+      height: 75vh;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .comment {
+      color: var(--color-0);
+    }
+
+    .stack-opcode {
+      color: var(--color-1);
+    }
+
+    .logic-opcode {
+      color: var(--color-2);
+    }
+
+    .memory-opcode {
+      color: var(--color-3);
+    }
+
+    .arithmetic-opcode {
+      color: var(--color-4);
+    }
+
+    .rune-label {
+      color: var(--color-7);
+    }
+
+    .rune-sublabel {
+      color: var(--color-6);
+    }
+
+    .rune-hexliteral {
+      color: var(--color-5);
+    }
+
+    /** Stupid navigation thing **/
+
+    .nav {
+      -webkit-transition: left 0.5s ease;
+      -moz-transition: left 0.5s ease;
+      -ms-transition: left 0.5s ease;
+      -o-transition: left 0.5s ease;
+      transition: left 0.5s ease;
+      background: #76dec2;
+      color: white;
+      cursor: pointer;
+      font-size: 2rem;
+      height: 100vh;
+      left: -40rem;
+      padding: 6rem 2rem 2rem 2rem;
+      position: fixed;
+      top: 0;
+      width: 20rem;
+      z-index: 1;
+    }
+
+    .nav.expanded { left: 0; }
+
+    .nav ul {
+      top: 50%;
+      -webkit-transform: translateY(-50%);
+      -ms-transform: translateY(-50%);
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: contents;
+    }
+
+    .nav-toggle {
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      user-select: none;
+      cursor: pointer;
+      height: 2rem;
+      left: 2rem;
+      position: fixed;
+      top: 2rem;
+      width: 3.6rem;
+      z-index: 2;
+    }
+
+    .nav-toggle:hover { opacity: 0.8; }
+
+    .nav-toggle .nav-toggle-bar,  .nav-toggle .nav-toggle-bar::after,  .nav-toggle .nav-toggle-bar::before {
+      position: absolute;
+      top: 50%;
+      -webkit-transform: translateY(-50%);
+      -ms-transform: translateY(-50%);
+      transform: translateY(-50%);
+      -webkit-transition: all 0.5s ease;
+      -moz-transition: all 0.5s ease;
+      -ms-transition: all 0.5s ease;
+      -o-transition: all 0.5s ease;
+      transition: all 0.5s ease;
+      background: white;
+      content: '';
+      height: 0.4rem;
+      width: 100%;
+    }
+
+    .nav-toggle .nav-toggle-bar { margin-top: 0; }
+
+    .nav-toggle .nav-toggle-bar::after { margin-top: 0.8rem; }
+
+    .nav-toggle .nav-toggle-bar::before { margin-top: -0.8rem; }
+
+    .nav-toggle.expanded .nav-toggle-bar { background: transparent; }
+
+    .nav-toggle.expanded .nav-toggle-bar::after, .nav-toggle.expanded .nav-toggle-bar::before {
+      background: white;
+      margin-top: 0;
+    }
+
+    .nav-toggle.expanded .nav-toggle-bar::after {
+      -ms-transform: rotate(45deg);
+      -webkit-transform: rotate(45deg);
+      transform: rotate(45deg);
+    }
+
+    .nav-toggle.expanded .nav-toggle-bar::before {
+      -ms-transform: rotate(-45deg);
+      -webkit-transform: rotate(-45deg);
+      transform: rotate(-45deg);
+    }
+
+
+  </style>
+  <body>
+
+    <div class="nav-toggle">
+      <div class="nav-toggle-bar"></div>
+    </div>
+
+    <nav class="nav">
+      <div>
+        <h2>roms</h2>
+        <br/>
+        <button data-rom="automata">automata</button>
+        <button data-rom="darena">darena</button>
+        <button data-rom="drum-rack">drum-rack</button>
+        <button data-rom="font">font</button>
+        <button data-rom="life">life</button>
+        <button data-rom="move">move</button>
+        <button data-rom="musictracker">musictracker</button>
+        <button data-rom="neralie">neralie</button>
+        <button data-rom="piano">piano</button>
+        <button data-rom="polycat">polycat</button>
+        <button data-rom="theme">theme</button>
+      </div>
+
+      <div>
+        <h2>links</h2>
+        <ul>
+          <li><a href="https://wiki.xxiivv.com/site/uxn.html">uxn</a></li>
+          <li><a href="https://wiki.xxiivv.com/site/uxntal.html">unxtal</a></li>
+          <li><a href="https://wiki.xxiivv.com/site/varvara.html">varvara</a></li>
+          <li>uxn is created by <a href="https://100r.co">hundred rabbits</a></li>
+          <li>learn-uxn site made by <a href="https://metasyn.pw">metasyn</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <div class='flex'>
+
+      <div id='textarea'>
+        <pre>
+          <code id='tal-contents'>
+          </code>
+        </pre>
+      </div>
+
+      <div id='uxnemu'>
+        <iframe id='uxnemu-iframe' src='uxnemu.html'></iframe>
+      </div>
+
+    </div>
+
+  </body>
+
+  <script type='text/javascript' src='uxnasm.js'></script>
+  <script type="text/javascript" src="lean.js"></script>
+
+  </script>
+</html>

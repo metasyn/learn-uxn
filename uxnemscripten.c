@@ -1,11 +1,17 @@
 #include <emscripten.h>
 #include "uxn/src/uxnemu.h"
+#include <SDL.h>
+
+void
+quit() {
+    SDL_Quit();
+    emscripten_force_exit(0);
+}
 
 int
 main(int argc, char **argv)
 {
-	Uxn u;
-
+    Uxn u;
     int err = validate(&u, argc, argv);
 
     if  (err != 0) {
