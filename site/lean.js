@@ -27,16 +27,10 @@ let loadNav = () => {
 /**
  * Loads the tal source using the ?rom= query param
  */
-let loadTal = (someWindow, el) => {
-    let urlParams = new URLSearchParams(someWindow.location.search);
+let loadTal = (rom) => {
 
-    let rom = urlParams.get('rom');
-    if (!rom || rom.length == 0) {
-        rom = "piano";
-    }
-
-    let iframe = gebi('uxnemu-iframe');
-    let contents = "\n" + someWindow.FS.readFile(`/roms/${rom}.tal`, {encoding: 'utf8'})
+    let el = gebi("tal-contents");
+    let contents = "\n" + readFileEmu(`/roms/${rom}.tal`);
 
     commentRegex = /\((.+?)\)/gms
     parsed = contents.replace(commentRegex, '<span class="comment">($1)</span>');
@@ -125,6 +119,7 @@ let loadRomButtons = () => {
     button.addEventListener("click", (e) => {
       let rom = button.getAttribute("data-rom");
       loadRom(rom);
+      loadTal(rom);
     })
   );
 };
@@ -157,43 +152,47 @@ let initUxnEmu = (uxnemu) => {
 }
 
 
-let loadRom = (uxnWindow, rom) => {
-  let original = uxnWindow.location.href.split("?")[0];
+let loadRom = (rom) => {
+  let original = window.uxn.location.href.split("?")[0];
   let url = original + "?rom=" + rom;
-  uxnWindow.location.replace(url);
+  window.uxn.location.replace(url);
 }
 
-let readFileEmu = (uxnWindow, path) => {
-  let fs = uxnWindow.Module.FS;
+
+// emulator IO
+let readFileEmu = (path) => {
+  let fs = window.uxn.Module.FS;
   let contents = fs.readFile(path, { encoding: 'utf8' });
   return contents;
 }
 
-let writeFileEmu = (uxnWindow, path, data) => {
-  let fs = uxnWindow.Module.FS;
+let writeFileEmu = (path, data) => {
+  let fs = window.uxn.Module.FS;
   return fs.writeFile(path, data);
 }
 
-let readFileAsm = async (asm, path) => {
-  return asm.FS.readFile(path, { encoding: 'utf8' });
+// asembler IO
+let readFileAsm = async (path) => {
+  return window.asm.FS.readFile(path, { encoding: 'utf8' });
 }
 
-let writeFileAsm = async (asm, path, data) => {
-  return asm.FS.writeFile(path, data);
+let writeFileAsm = async (path, data) => {
+  return window.asm.FS.writeFile(path, data);
 }
 
-let assemble = async (asm, data) => {
-    let written = await writeFileAsm(asm, "temp.tal", data)
+
+// util
+let assemble = async (data) => {
+    let written = await writeFileAsm("temp.tal", data)
     console.log(written);
-    asm.callMain(["temp.tal", "output.rom"]);
+    window.asm.callMain(["temp.tal", "output.rom"]);
     return readFileAsm(asm, "output.rom");
 }
 
-let assembleAndLoad = async (uxnWindow, asm, data) => {
-    let rom = await assemble(asm, data);
-    debugger;
-    writeFileEmu(uxnWindow, "/roms/new.rom", rom);
-    loadRom(uxnWindow, "new");
+let assembleAndLoad = async (data) => {
+    let rom = await assemble(data);
+    writeFileEmu("/roms/new.rom", rom);
+    loadRom("new");
 }
 
 
@@ -203,18 +202,19 @@ let assembleAndLoad = async (uxnWindow, asm, data) => {
     loadRomButtons();
 
     uxnIframe = gebi('uxnemu-iframe');
+    window.uxn = uxnIframe.contentWindow
 
-    uxnWindow = uxnIframe.contentWindow
-    // uxnModule = uxnWindow.Module;
-    // FS = uxnModule.FS;
+    window.uxn.onload = () => {
+        loadTal("piano");
+    }
 
     var talContents = gebi('tal-contents');
 
     // uxnasm is a global loaded from emscripten
-    asm = await uxnasm({ noInitialRun: true });
+    window.asm = await uxnasm({ noInitialRun: true });
         
     window.addEventListener('resize', () => { 
-        resizeIframe(uxnemuIframe);
+        resizeIframe(uxnIframe);
     });
 
 })();

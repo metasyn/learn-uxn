@@ -60,8 +60,13 @@ function setup_emsdk() {
 function setup_uxn() {
     blue "Setting up uxn..."
     if [[ ! -d "uxn" ]]; then
-        git clone https://git.sr.ht/~metasyn/uxn
+        git clone https://git.sr.ht/~rabbits/uxn
     fi;
+
+    if ! grep -q 'emscripten_sleep' uxn/src/uxnemu.c; then
+        sed -i -e '1s/^/#include <emscripten.h>\n/;/SDL_Delay/s/^/emscripten_sleep(10);\n/' uxn/src/uxnemu.c
+        sed -i -e '/__asm__/d' uxn/src/uxn-fast.c
+    fi
 
     if [[  ! -f "uxn/bin/piano.rom" ]]; then
         pushd uxn
@@ -93,19 +98,18 @@ function build_uxn_emscripten() {
         -s USE_SDL=2 \
         -s USE_SDL_MIXER=2 \
         -s FORCE_FILESYSTEM=1 \
-        -s EXPORTED_FUNCTIONS='["_main", "_quit"]' \
-        -s EXPORTED_RUNTIME_METHODS='["ccall", "callMain", "FS"]' \
+        -s EXPORTED_FUNCTIONS='["_main"]' \
+        -s EXPORTED_RUNTIME_METHODS='["callMain", "FS"]' \
         -s EXIT_RUNTIME=1 \
         --shell-file=shell.html \
         --extern-pre-js=pre.js \
         -O3 \
         --preload-file roms \
         -o site/uxnemu.html \
-            uxn/src/uxn.c \
+            uxn/src/uxn-fast.c \
             uxn/src/devices/ppu.c \
             uxn/src/devices/apu.c \
-            uxn/src/uxnemu.c \
-            uxnemscripten.c
+            uxn/src/uxnemu.c
 
     EMCC_DEBUG=1 emcc \
         -s WASM=1 \
