@@ -4,131 +4,8 @@
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
   </head>
+  <link rel="stylesheet" href="styles.css">
   <style>
-
-    :root {
-      --color-0: #585858;
-      --color-1: #ab4642;
-      --color-2: #dc9656;
-      --color-3: #f7ca88;
-      --color-4: #a1b56c;
-      --color-5: #86c1b9;
-      --color-6: #7cafc2;
-      --color-7: #ba8baf;
-
-      --uxn-max-width: 1000px;
-      --uxn-max-height: 640px;
-
-      --border: #444
-    }
-
-    body {
-      background-color: black;
-    }
-
-    button {
-      margin: 2px;
-      background-color: black;
-      border: none;
-      color: white;
-      padding: 15px 32px;
-      text-align: center;
-      text-decoration: none;
-      display: inline-block;
-      font-size: 16px;
-    }
-
-    a {
-      text-decoration: none;
-      color: black;
-    }
-
-    #title {
-      margin-left: auto;
-      margin-right: auto;
-      width: max-content;
-      color: #72dec2;
-    }
-
-    #uxnemu {
-      width: min(100%, var(--uxn-max-width));
-      height: min(100%, var(--uxn-max-height));
-      border: 1px solid var(--border);
-    }
-
-    #uxnemu-iframe {
-      width: min(100%, var(--uxn-max-width));
-      height: min(100%, var(--uxn-max-height));
-    }
-
-    #textarea {
-      float: left;
-      border: 1px solid var(--border);
-      width: 50%;
-      overflow: scroll;
-    }
-
-    #tal-contents {
-      margin: 40px;
-      color: white;
-      font-size: 18px;
-      white-space: pre;
-    }
-
-    #textarea pre {
-      margin: 20px;
-    }
-
-    #title {
-      margin-left: auto;
-      margin-right: auto;
-      width: max-content;
-      color: #72dec2;
-      font-size: 8px;
-    }
-
-    .flex {
-      display: flex;
-      width: 100%;
-      height: 75vh;
-    }
-
-    .hidden {
-      display: none;
-    }
-
-    .comment {
-      color: var(--color-0);
-    }
-
-    .stack-opcode {
-      color: var(--color-1);
-    }
-
-    .logic-opcode {
-      color: var(--color-2);
-    }
-
-    .memory-opcode {
-      color: var(--color-3);
-    }
-
-    .arithmetic-opcode {
-      color: var(--color-4);
-    }
-
-    .rune-label {
-      color: var(--color-7);
-    }
-
-    .rune-sublabel {
-      color: var(--color-6);
-    }
-
-    .rune-hexliteral {
-      color: var(--color-5);
-    }
-
     /** Stupid navigation thing **/
 
     .nav {
@@ -194,7 +71,7 @@
       width: 100%;
     }
 
-    .nav-toggle .nav-toggle-bar { margin-top: 0; }
+    .nav-toggle .nav-toggle-bar { margin-top: 60px; }
 
     .nav-toggle .nav-toggle-bar::after { margin-top: 0.8rem; }
 
@@ -219,8 +96,39 @@
       transform: rotate(-45deg);
     }
 
-
   </style>
+
+  <div id='controls-wrap'>
+    <div id='controls'>
+      <div id='reload' class='control'>
+        <p>
+          reload
+        </p>
+      </div>
+      <div id='assemble' class='control'>
+        <p>
+         assemble
+        </p>
+      </div>
+      <div id='save' class='control'>
+        <p>
+          save
+        </p>
+      </div>
+      <div id='share' class='control'>
+        <p>
+          share
+        </p>
+      </div>
+      <div id='syntax' class='control'>
+        <p>
+          roms
+        </p>
+      </div>
+      </div>
+    </div>
+  </div>
+
   <body>
 
     <div class="nav-toggle">
@@ -256,30 +164,28 @@
       </div>
     </nav>
 
-    <div id='title'>
-      <pre>
-        <code>
- ▄█          ▄████████    ▄████████    ▄████████ ███▄▄▄▄         ▄██████▄     ▄████████  ▄████████    ▄████████
-███         ███    ███   ███    ███   ███    ███ ███▀▀▀██▄      ███    ███   ███    ███ ███    ███   ███    ███
-███         ███    █▀    ███    ███   ███    ███ ███   ███      ███    ███   ███    ███ ███    █▀    ███    ███
-███        ▄███▄▄▄       ███    ███  ▄███▄▄▄▄██▀ ███   ███      ███    ███  ▄███▄▄▄▄██▀ ███          ███    ███
-███       ▀▀███▀▀▀     ▀███████████ ▀▀███▀▀▀▀▀   ███   ███      ███    ███ ▀▀███▀▀▀▀▀   ███        ▀███████████
-███         ███    █▄    ███    ███ ▀███████████ ███   ███      ███    ███ ▀███████████ ███    █▄    ███    ███
-███▌    ▄   ███    ███   ███    ███   ███    ███ ███   ███      ███    ███   ███    ███ ███    ███   ███    ███
-█████▄▄██   ██████████   ███    █▀    ███    ███  ▀█   █▀        ▀██████▀    ███    ███ ████████▀    ███    █▀
-▀                                     ███    ███                             ███    ███
-        </code>
-      </pre>
-    </div>
 
 
     <div class='flex'>
 
-      <div id='textarea'>
-        <pre>
-          <code id='tal-contents'>
-          </code>
-        </pre>
+      <div id='editor-wrapper'>
+        <div id='title'>
+          <pre>
+            <code>
+     ▄█          ▄████████    ▄████████    ▄████████ ███▄▄▄▄        ███    █▄  ▀████    ▐████▀ ███▄▄▄▄
+    ███         ███    ███   ███    ███   ███    ███ ███▀▀▀██▄      ███    ███   ███▌   ████▀  ███▀▀▀██▄
+    ███         ███    █▀    ███    ███   ███    ███ ███   ███      ███    ███    ███  ▐███    ███   ███
+    ███        ▄███▄▄▄       ███    ███  ▄███▄▄▄▄██▀ ███   ███      ███    ███    ▀███▄███▀    ███   ███
+    ███       ▀▀███▀▀▀     ▀███████████ ▀▀███▀▀▀▀▀   ███   ███      ███    ███    ████▀██▄     ███   ███
+    ███         ███    █▄    ███    ███ ▀███████████ ███   ███      ███    ███   ▐███  ▀███    ███   ███
+    ███▌    ▄   ███    ███   ███    ███   ███    ███ ███   ███      ███    ███  ▄███     ███▄  ███   ███
+    █████▄▄██   ██████████   ███    █▀    ███    ███  ▀█   █▀       ████████▀  ████       ███▄  ▀█   █▀
+    ▀                                     ███    ███
+            </code>
+          </pre>
+        </div>
+        <div id='editor'>
+        </div>
       </div>
 
       <div id='uxnemu'>
@@ -288,9 +194,15 @@
 
     </div>
 
+
+    <!-- this has no display -->
+    <div id='uxnasm'>
+      <iframe id='uxnasm-iframe' src='uxnasm.html'></iframe>
+    </div>
+
   </body>
 
-  <script type='text/javascript' src='uxnasm.js'></script>
+  <script src="editor.bundle.js"></script>
   <script type="text/javascript" src="lean.js"></script>
 
   </script>

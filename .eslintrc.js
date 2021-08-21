@@ -3,9 +3,7 @@ module.exports = {
     browser: true,
     es6: true,
   },
-  extends: [
-    'airbnb-base',
-  ],
+  extends: ['airbnb-base'],
   globals: {
     Atomics: 'readonly',
     SharedArrayBuffer: 'readonly',
@@ -15,6 +13,9 @@ module.exports = {
     sourceType: 'module',
   },
   rules: {
-    "no-console": "off",
+    'no-console': 'off',
+    'no-alert': 'off',
+    'no-param-reassign': 'off',
+    'spaced-comment': 'off',
   },
 };

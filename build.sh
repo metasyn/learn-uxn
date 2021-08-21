@@ -63,27 +63,31 @@ function setup_uxn() {
         git clone https://git.sr.ht/~rabbits/uxn
     fi;
 
-    if ! grep -q 'emscripten_sleep' uxn/src/uxnemu.c; then
-        sed -i -e '1s/^/#include <emscripten.h>\n/;/SDL_Delay/s/^/emscripten_sleep(10);\n/' uxn/src/uxnemu.c
-        sed -i -e '/__asm__/d' uxn/src/uxn-fast.c
-    fi
-
     if [[  ! -f "uxn/bin/piano.rom" ]]; then
         pushd uxn
         ./build.sh
         popd
     fi;
+
+    if ! grep -q 'emscripten_sleep' uxn/src/uxnemu.c; then
+        sed -i -e '1s/^/#include <emscripten.h>\n/;/SDL_Delay/s/^/emscripten_sleep(10);\n/' uxn/src/uxnemu.c
+    fi
+
     green "\tDone!"
 }
 
 function build_uxn_emscripten() {
     rm -rf roms
     mkdir -p roms
+
+    rm -rf tals
+    mkdir -p tals
+
     for file in $(ls uxn/projects/examples/demos/*.tal); do
         blue "Compiling $file..."
         name=$(basename $file .tal)
         ./uxn/bin/uxnasm $file roms/$name.rom
-        cp $file roms
+        cp $file tals
     done;
 
 
@@ -100,9 +104,9 @@ function build_uxn_emscripten() {
         -s FORCE_FILESYSTEM=1 \
         -s EXPORTED_FUNCTIONS='["_main"]' \
         -s EXPORTED_RUNTIME_METHODS='["callMain", "FS"]' \
-        -s EXIT_RUNTIME=1 \
-        --shell-file=shell.html \
-        --extern-pre-js=pre.js \
+        -s NO_EXIT_RUNTIME=1 \
+        --shell-file=shell-uxnemu.html \
+        --extern-pre-js=pre-uxnemu.js \
         -O3 \
         --preload-file roms \
         -o site/uxnemu.html \
@@ -115,11 +119,13 @@ function build_uxn_emscripten() {
         -s WASM=1 \
         -s ASSERTIONS=1 \
         -s ENVIRONMENT=web \
-        -s MODULARIZE=1 \
         -s FORCE_FILESYSTEM=1 \
-        -s EXPORT_NAME=uxnasm \
+        -s EXPORTED_FUNCTIONS='["_main"]' \
         -s EXPORTED_RUNTIME_METHODS='["callMain", "FS"]' \
-        -o site/uxnasm.js \
+        --preload-file tals \
+        --shell-file=shell-uxnasm.html \
+        --extern-pre-js=pre-uxnasm.js \
+        -o site/uxnasm.html \
             uxn/src/uxnasm.c
 }
 
