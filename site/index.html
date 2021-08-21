@@ -1,109 +1,49 @@
+<!--
 
+
+     ▄█          ▄████████    ▄████████    ▄████████ ███▄▄▄▄        ███    █▄  ▀████    ▐████▀ ███▄▄▄▄
+    ███         ███    ███   ███    ███   ███    ███ ███▀▀▀██▄      ███    ███   ███▌   ████▀  ███▀▀▀██▄
+    ███         ███    █▀    ███    ███   ███    ███ ███   ███      ███    ███    ███  ▐███    ███   ███
+    ███        ▄███▄▄▄       ███    ███  ▄███▄▄▄▄██▀ ███   ███      ███    ███    ▀███▄███▀    ███   ███
+    ███       ▀▀███▀▀▀     ▀███████████ ▀▀███▀▀▀▀▀   ███   ███      ███    ███    ████▀██▄     ███   ███
+    ███         ███    █▄    ███    ███ ▀███████████ ███   ███      ███    ███   ▐███  ▀███    ███   ███
+    ███▌    ▄   ███    ███   ███    ███   ███    ███ ███   ███      ███    ███  ▄███     ███▄  ███   ███
+    █████▄▄██   ██████████   ███    █▀    ███    ███  ▀█   █▀       ████████▀  ████       ███▄  ▀█   █▀
+    ▀                                     ███    ███
+
+
+    Welcome digital traveler
+
+-->
 <html lang="en-us">
   <head>
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
   </head>
+  <link rel="stylesheet" href="https://code.cdn.mozilla.net/fonts/fira.css">
   <link rel="stylesheet" href="styles.css">
-  <style>
-    /** Stupid navigation thing **/
-
-    .nav {
-      -webkit-transition: left 0.5s ease;
-      -moz-transition: left 0.5s ease;
-      -ms-transition: left 0.5s ease;
-      -o-transition: left 0.5s ease;
-      transition: left 0.5s ease;
-      background: #76dec2;
-      color: white;
-      cursor: pointer;
-      font-size: 2rem;
-      height: 100vh;
-      left: -40rem;
-      padding: 6rem 2rem 2rem 2rem;
-      position: fixed;
-      top: 0;
-      width: 20rem;
-      z-index: 1;
-    }
-
-    .nav.expanded { left: 0; }
-
-    .nav ul {
-      top: 50%;
-      -webkit-transform: translateY(-50%);
-      -ms-transform: translateY(-50%);
-      list-style: none;
-      margin: 0;
-      padding: 0;
-      display: contents;
-    }
-
-    .nav-toggle {
-      -webkit-user-select: none;
-      -moz-user-select: none;
-      user-select: none;
-      cursor: pointer;
-      height: 2rem;
-      left: 2rem;
-      position: fixed;
-      top: 2rem;
-      width: 3.6rem;
-      z-index: 2;
-    }
-
-    .nav-toggle:hover { opacity: 0.8; }
-
-    .nav-toggle .nav-toggle-bar,  .nav-toggle .nav-toggle-bar::after,  .nav-toggle .nav-toggle-bar::before {
-      position: absolute;
-      top: 50%;
-      -webkit-transform: translateY(-50%);
-      -ms-transform: translateY(-50%);
-      transform: translateY(-50%);
-      -webkit-transition: all 0.5s ease;
-      -moz-transition: all 0.5s ease;
-      -ms-transition: all 0.5s ease;
-      -o-transition: all 0.5s ease;
-      transition: all 0.5s ease;
-      background: white;
-      content: '';
-      height: 0.4rem;
-      width: 100%;
-    }
-
-    .nav-toggle .nav-toggle-bar { margin-top: 60px; }
-
-    .nav-toggle .nav-toggle-bar::after { margin-top: 0.8rem; }
-
-    .nav-toggle .nav-toggle-bar::before { margin-top: -0.8rem; }
-
-    .nav-toggle.expanded .nav-toggle-bar { background: transparent; }
-
-    .nav-toggle.expanded .nav-toggle-bar::after, .nav-toggle.expanded .nav-toggle-bar::before {
-      background: white;
-      margin-top: 0;
-    }
-
-    .nav-toggle.expanded .nav-toggle-bar::after {
-      -ms-transform: rotate(45deg);
-      -webkit-transform: rotate(45deg);
-      transform: rotate(45deg);
-    }
-
-    .nav-toggle.expanded .nav-toggle-bar::before {
-      -ms-transform: rotate(-45deg);
-      -webkit-transform: rotate(-45deg);
-      transform: rotate(-45deg);
-    }
-
-  </style>
-
   <div id='controls-wrap'>
     <div id='controls'>
-      <div id='reload' class='control'>
+      <div id='roms' class='control dropdown'>
         <p>
-          reload
+         roms
         </p>
+        <div class='dropdown-content'>
+          <a href="javascript:loadRomByName('automata')">automata</a>
+          <a href="javascript:loadRomByName('darena')">darena</a>
+          <a href="javascript:loadRomByName('drum-rack')">drum-rack</a>
+          <a href="javascript:loadRomByName('font')">font</a>
+          <a href="javascript:loadRomByName('life')">life</a>
+          <a href="javascript:loadRomByName('move')">move</a>
+          <a href="javascript:loadRomByName('musictracker')">musictracker</a>
+          <a href="javascript:loadRomByName('neralie')">neralie</a>
+          <a href="javascript:loadRomByName('piano')">piano</a>
+          <a href="javascript:loadRomByName('polycat')">polycat</a>
+          <a href="javascript:loadRomByName('theme')">theme</a>
+          <div class='pulse'>
+            <a href="https://github.com/metasyn/learn-uxn/issues/new">submit yours!</a>
+          </div>
+        </div>
       </div>
       <div id='assemble' class='control'>
         <p>
@@ -112,17 +52,17 @@
       </div>
       <div id='save' class='control'>
         <p>
-          save
+          export
         </p>
       </div>
-      <div id='share' class='control'>
+      <div id='load' class='control'>
         <p>
-          share
+          load
         </p>
       </div>
-      <div id='syntax' class='control'>
+      <div id='about' class='control'>
         <p>
-          roms
+          about
         </p>
       </div>
       </div>
@@ -139,17 +79,6 @@
       <div>
         <h2>roms</h2>
         <br/>
-        <button data-rom="automata">automata</button>
-        <button data-rom="darena">darena</button>
-        <button data-rom="drum-rack">drum-rack</button>
-        <button data-rom="font">font</button>
-        <button data-rom="life">life</button>
-        <button data-rom="move">move</button>
-        <button data-rom="musictracker">musictracker</button>
-        <button data-rom="neralie">neralie</button>
-        <button data-rom="piano">piano</button>
-        <button data-rom="polycat">polycat</button>
-        <button data-rom="theme">theme</button>
       </div>
 
       <div>
@@ -158,6 +87,7 @@
           <li><a href="https://wiki.xxiivv.com/site/uxn.html">uxn</a></li>
           <li><a href="https://wiki.xxiivv.com/site/uxntal.html">unxtal</a></li>
           <li><a href="https://wiki.xxiivv.com/site/varvara.html">varvara</a></li>
+          <li><a href="https://compudanzas.net/uxn_tutorial.html">uxn tutorial</a></li>
           <li>uxn is created by <a href="https://100r.co">hundred rabbits</a></li>
           <li>learn-uxn site made by <a href="https://metasyn.pw">metasyn</a></li>
         </ul>
@@ -165,34 +95,41 @@
     </nav>
 
 
-
     <div class='flex'>
 
       <div id='editor-wrapper'>
-        <div id='title'>
-          <pre>
-            <code>
-     ▄█          ▄████████    ▄████████    ▄████████ ███▄▄▄▄        ███    █▄  ▀████    ▐████▀ ███▄▄▄▄
-    ███         ███    ███   ███    ███   ███    ███ ███▀▀▀██▄      ███    ███   ███▌   ████▀  ███▀▀▀██▄
-    ███         ███    █▀    ███    ███   ███    ███ ███   ███      ███    ███    ███  ▐███    ███   ███
-    ███        ▄███▄▄▄       ███    ███  ▄███▄▄▄▄██▀ ███   ███      ███    ███    ▀███▄███▀    ███   ███
-    ███       ▀▀███▀▀▀     ▀███████████ ▀▀███▀▀▀▀▀   ███   ███      ███    ███    ████▀██▄     ███   ███
-    ███         ███    █▄    ███    ███ ▀███████████ ███   ███      ███    ███   ▐███  ▀███    ███   ███
-    ███▌    ▄   ███    ███   ███    ███   ███    ███ ███   ███      ███    ███  ▄███     ███▄  ███   ███
-    █████▄▄██   ██████████   ███    █▀    ███    ███  ▀█   █▀       ████████▀  ████       ███▄  ▀█   █▀
-    ▀                                     ███    ███
-            </code>
-          </pre>
-        </div>
+
         <div id='editor'>
+          <div id="noscript">
+            <noscript>
+              Hello!
+
+              It looks like you are accessing this site without support for javascript. This site
+              is a javascript port of the uxn emulator and assembler that are written in C, and it
+              is ported using emscripten. Meaning, this site is useless for you.
+
+              <ul>
+                <li><a href="https://wiki.xxiivv.com/site/uxn.html">uxn</a></li>
+                <li><a href="https://wiki.xxiivv.com/site/uxntal.html">unxtal</a></li>
+                <li><a href="https://wiki.xxiivv.com/site/varvara.html">varvara</a></li>
+                <li><a href="https://compudanzas.net/uxn_tutorial.html">uxn tutorial</a></li>
+                <li>uxn is created by <a href="https://100r.co">hundred rabbits</a></li>
+                <li>learn-uxn site made by <a href="https://metasyn.pw">metasyn</a></li>
+              </ul>
+            </noscript>
+          </div>
         </div>
       </div>
 
       <div id='uxnemu'>
         <iframe id='uxnemu-iframe' src='uxnemu.html'></iframe>
+        <div id='console-wrap'>
+          <pre id='console'></pre>
+        </div>
       </div>
-
     </div>
+    </div>
+
 
 
     <!-- this has no display -->

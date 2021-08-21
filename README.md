@@ -8,15 +8,10 @@ build.sh
 
 ## TODO
 
-* handle escaping
 * finish setting up code mirror
 * add code mirror mode
-* pass rom data as b64 encoded bytes to iframe.
-    * if rom data is passed, use module to save it to a new file before starting
-    * then load up with that file name
-* allow drag/drop rom
-* alow save rom
-* share via link with b64 tal on main window, which needs to get assembled and passed to emulator
+* allow drag/drop rom?
+* allow save rom?
 
 # LICENSE
 

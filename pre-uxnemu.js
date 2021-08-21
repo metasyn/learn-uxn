@@ -26,20 +26,32 @@ let rom;
 
 if (b64 && b64.length) {
   const decoded = atob(b64);
+  // console.log(decoded);
 
   // parse the bytes
   const arr = decoded.split(',').map((s) => parseInt(s, 10));
+  // console.log(arr);
 
   // make them a nice array for emscripten
   rom = new Uint8Array(arr);
+  // console.log(rom);
 }
 
 // write them here
-const ROM_PATH = '/roms/input.rom';
+const ROM_PATH = '/input.rom';
 
+const dispatch = (text, exit, err) => {
+  const data = {
+    module: 'emu', message: text, exit, err,
+  };
+  const event = new CustomEvent('uxn', { detail: data });
+  window.parent.document.dispatchEvent(event);
+};
 // absolute minimum definition
 // eslint-disable-next-line
 var Module = {
+  print: (x) => dispatch(x, Module.EXITSTATUS, false),
+  printErr: (x) => dispatch(x, Module.EXITSTATUS, true),
   canvas: (() => {
     const canvas = document.getElementById('canvas');
 

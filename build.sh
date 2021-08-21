@@ -77,16 +77,10 @@ function setup_uxn() {
 }
 
 function build_uxn_emscripten() {
-    rm -rf roms
-    mkdir -p roms
-
     rm -rf tals
     mkdir -p tals
 
     for file in $(ls uxn/projects/examples/demos/*.tal); do
-        blue "Compiling $file..."
-        name=$(basename $file .tal)
-        ./uxn/bin/uxnasm $file roms/$name.rom
         cp $file tals
     done;
 
@@ -108,7 +102,6 @@ function build_uxn_emscripten() {
         --shell-file=shell-uxnemu.html \
         --extern-pre-js=pre-uxnemu.js \
         -O3 \
-        --preload-file roms \
         -o site/uxnemu.html \
             uxn/src/uxn-fast.c \
             uxn/src/devices/ppu.c \
@@ -125,6 +118,7 @@ function build_uxn_emscripten() {
         --preload-file tals \
         --shell-file=shell-uxnasm.html \
         --extern-pre-js=pre-uxnasm.js \
+        -O3 \
         -o site/uxnasm.html \
             uxn/src/uxnasm.c
 }

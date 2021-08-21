@@ -11,15 +11,78 @@ var uxnasm;
 ////////
 // IO //
 ////////
+//
+const dateFmt = () => {
+  function toString(number, padLength) {
+    return number.toString().padStart(padLength, '0');
+  }
+
+  const date = new Date();
+
+  const fmt = `${toString(date.getHours(), 2)}:${toString(
+    date.getMinutes(),
+    2,
+  )}:${toString(date.getSeconds(), 2)}.${toString(date.getMilliseconds(), 3)}`;
+  return fmt;
+};
+
+const log = (text, success, location) => {
+  let color;
+
+  if (success === true) {
+    color = 4;
+  } else if (success === false) {
+    color = 1;
+  }
+
+  if (color) {
+    text = `<span style="color: var(--color-${color})">${text}</span>`;
+  }
+
+  let prefixColor;
+  if (location === 'emu') {
+    prefixColor = 6;
+  } else if (location === 'asm') {
+    prefixColor = 7;
+  } else {
+    prefixColor = 3;
+  }
+
+  location = location || 'web';
+
+  const prefix = `<span style="color: var(--color-${prefixColor}">[${location}]</span>`;
+
+  const el = document.getElementById('console');
+
+  el.innerHTML += `${prefix} ${dateFmt()} ${text}\n`;
+};
+
+const errFmt = (e) => {
+  const err = `${e.message || '(no msg)'} : ${e.code || '(no code)'} ${
+    e.errno || '(no errno)'
+  }`;
+  return err;
+};
+
 const readFile = (w, path, encoding) => {
   const fs = w.Module.FS;
-  const contents = fs.readFile(path, { encoding });
-  return contents;
+  try {
+    const contents = fs.readFile(path, { encoding });
+    return contents;
+  } catch (e) {
+    log(errFmt(e), false);
+    throw e;
+  }
 };
 
 const writeFile = (w, path, data) => {
-  const fs = w.Module.FS;
-  return fs.writeFile(path, data);
+  try {
+    const fs = w.Module.FS;
+    return fs.writeFile(path, data);
+  } catch (e) {
+    log(errFmt(e), false);
+    throw e;
+  }
 };
 
 ///////////////
@@ -27,31 +90,59 @@ const writeFile = (w, path, data) => {
 ///////////////
 
 const readFileAsm = (path, encoding) => {
-  console.log(`Reading path from assembler: ${path}`);
+  log(`Reading path from assembler: ${path}`);
   return readFile(window.asm, path, encoding);
 };
 
 const writeFileAsm = (path, data) => {
-  console.log(`Writing to path from assembler: ${path}`);
+  log(`Writing to path from assembler: ${path}`);
   return writeFile(window.asm, path, data);
 };
 
 const assemble = (data) => {
-  console.log('Assembling...');
-  console.log(data);
+  log('Assembling...');
   writeFileAsm('temp.tal', data);
 
   window.asm.callMain(['temp.tal', 'output.rom']);
   const b64 = btoa(readFileAsm('output.rom', 'binary'));
 
   // reload to clear global state
+  log('Reloading assembler...');
   window.asm.location.reload();
   return b64;
 };
 
 const assembleEditor = () => {
-  const content = window.editor.getValue();
-  assemble(content);
+  // chunk are just big groups of text
+  const { children } = window.editor.state.doc;
+  if (!children) {
+    log('No uxntal to assemble!', false);
+    return;
+  }
+  const chunks = children.map((x) => x.text);
+  const lines = chunks.map((x) => x.join('\n'));
+  const text = lines.join('\n');
+  assemble(text);
+};
+
+/////////
+// URL //
+/////////
+
+const setURLParam = (param, value) => {
+  // Construct URLSearchParams object instance from current URL querystring.
+  const queryParams = new URLSearchParams(window.location.search);
+
+  // Set new or modify existing parameter value.
+  queryParams.set(param, value);
+
+  // Replace current querystring with the new one.
+  history.replaceState(null, null, `?${queryParams.toString()}`);
+};
+
+const getURLParam = (param) => {
+  const queryParams = new URLSearchParams(window.location.search);
+  return queryParams.get(param);
 };
 
 //////////////
@@ -59,101 +150,10 @@ const assembleEditor = () => {
 //////////////
 
 const loadRom = (rom) => {
-  console.log('Loading rom...');
+  log('Loading rom...');
   const original = window.uxn.location.href.split('?')[0];
   const url = `${original}?rom=${rom}`;
-  // file doesn't exist yet to load...
   window.uxn.location.replace(url);
-};
-
-////////////
-// EDITOR //
-////////////
-
-const syntaxHighlightTal = (contents) => {
-  const commentRegex = /\((.+?)\)/gms;
-  let parsed = contents.replace(
-    commentRegex,
-    '<span class="comment">($1)</span>',
-  );
-
-  const labelRegex = /(@.+?)(\s)/g;
-  parsed = parsed.replace(labelRegex, '<span class="rune-label">$1</span>$2');
-
-  const sublabelRegex = /(&.+?)(\s)/g;
-  parsed = parsed.replace(
-    sublabelRegex,
-    '<span class="rune-sublabel">$1</span>$2',
-  );
-
-  const hexLiteral = /(#.+?)(\s)/g;
-  parsed = parsed.replace(
-    hexLiteral,
-    '<span class="rune-hexliteral">$1</span>$2',
-  );
-
-  const makeOpCodeRegex = (ops) => {
-    let regex = '(';
-    const temp = [];
-    ops.forEach((x) => {
-      temp.push(`${x}2kr`);
-      temp.push(`${x}2r`);
-      temp.push(`${x}2k`);
-      temp.push(`${x}2`);
-      temp.push(`${x}k`);
-      temp.push(`${x}r`);
-      temp.push(x);
-    });
-    regex += temp.join('|');
-    regex += ')';
-    return new RegExp(regex, 'g');
-  };
-
-  const stackOpCodes = ['BRK', 'LIT', 'POP', 'DUP', 'NIP', 'SWP', 'OVR', 'ROT'];
-  parsed = parsed.replaceAll(
-    makeOpCodeRegex(stackOpCodes),
-    '<span class="stack-opcode" data-opcode="$1">$1</span>',
-  );
-
-  const logicOpCodes = ['EQU', 'NEQ', 'GTH', 'LTH', 'JMP', 'JCN', 'JSR', 'STH'];
-  parsed = parsed.replaceAll(
-    makeOpCodeRegex(logicOpCodes),
-    '<span class="logic-opcode" data-opcode="$1">$1</span>',
-  );
-
-  const memoryOpCodes = [
-    'LDZ',
-    'STZ',
-    'LDR',
-    'STR',
-    'LDA',
-    'STA',
-    'DEI',
-    'DEO',
-  ];
-
-  parsed = parsed.replaceAll(
-    makeOpCodeRegex(memoryOpCodes),
-    '<span class="memory-opcode" data-opcode="$1">$1</span>',
-  );
-
-  const arithmeticOpCodes = [
-    'ADD',
-    'SUB',
-    'MUL',
-    'DIV',
-    'AND',
-    'ORA',
-    'EOR',
-    'SFT',
-  ];
-
-  parsed = parsed.replaceAll(
-    makeOpCodeRegex(arithmeticOpCodes),
-    '<span class="arithmetic-opcode" data-opcode="$1">$1</span>',
-  );
-
-  return parsed;
 };
 
 ////////////
@@ -176,11 +176,13 @@ const populateEditor = (insert) => {
 
 const load = (tal) => {
   populateEditor(tal);
+  setURLParam('tal', btoa(tal));
   const rom = assemble(tal);
   loadRom(rom);
 };
 
-const loadRomButton = (romName) => {
+// eslint-disable-next-line
+const loadRomByName = (romName) => {
   const tal = readFileAsm(`/tals/${romName}.tal`, 'utf8');
   load(tal);
 };
@@ -190,55 +192,62 @@ const reload = () => {
   window.uxn.location.reload();
 };
 
+const addListeners = () => {
+  document.getElementById('assemble').addEventListener('click', () => {
+    assembleEditor();
+  });
+
+  document.getElementById('save').addEventListener('click', () => {
+    log('todo', true);
+  });
+
+  window.document.addEventListener(
+    'uxn',
+    (e) => {
+      const { module, message, err } = e.detail;
+      log(message, err, module);
+    },
+    false,
+  );
+};
+
 //////////////
 // DOM UTIL //
 //////////////
 
-const resizeIframe = (el) => {
-  el.style.height = el.contentWindow.document.getElementById('canvas').clientHeight + 25;
-};
-
-// listener related
-const addNavListeners = () => {
-  const hamburger = {
-    navToggle: document.querySelector('.nav-toggle'),
-    nav: document.querySelector('nav'),
-    doToggle(e) {
-      e.preventDefault();
-      this.navToggle.classList.toggle('expanded');
-      this.nav.classList.toggle('expanded');
-    },
-  };
-
-  hamburger.navToggle.addEventListener('click', (e) => {
-    hamburger.doToggle(e);
-  });
-};
-
-const addRomButtonListeners = () => {
-  document.querySelectorAll('button').forEach((button) => button.addEventListener('click', () => {
-    const romName = button.getAttribute('data-rom');
-    loadRomButton(romName);
-  }));
+const resize = (el) => {
+  // get the emulator height
+  const height = el.contentWindow.document.getElementById('canvas').clientHeight;
+  const newHeight = height + 25;
+  el.style.height = `${newHeight}px`;
 };
 
 (async () => {
-  addNavListeners();
-  addRomButtonListeners();
-
   const uxnIframe = document.getElementById('uxnemu-iframe');
   window.uxn = uxnIframe.contentWindow;
 
   const asmIframe = document.getElementById('uxnasm-iframe');
   window.asm = asmIframe.contentWindow;
 
+  addListeners();
+
   // on the iframe load
-  window.asm.onload = (w) => {
+  window.onload = () => {
     // check the flat promise
-    w.currentTarget.allReady.then(() => {});
+    Promise.all([window.uxn.allReady, window.asm.allReady]).then(() => {
+      resize(uxnIframe);
+
+      const initTal = getURLParam('tal');
+      if (initTal) {
+        load(atob(initTal));
+      } else {
+        loadRomByName('piano');
+      }
+    });
+    resize(uxnIframe);
   };
 
   window.addEventListener('resize', () => {
-    resizeIframe(uxnIframe);
+    resize(uxnIframe);
   });
 })();
