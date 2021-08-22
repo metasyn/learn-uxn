@@ -5,22 +5,22 @@
   --control-margin: 60px;
   --top-margin: calc(var(--control-margin));
 
-  --color-0: #585858;
-  --color-1: #ab4642;
-  --color-2: #dc9656;
-  --color-3: #f7ca88;
-  --color-4: #a1b56c;
-  --color-5: #86c1b9;
-  --color-6: #7cafc2;
-  --color-7: #ba8baf;
+  --color-grey: #585858;
+  --color-red: #ab4642;
+  --color-orange: #dc9656;
+  --color-yellow: #f7ca88;
+  --color-green: #a1b56c;
+  --color-blue: #86c1b9;
+  --color-teal: #7cafc2;
+  --color-purple: #ba8baf;
 
   --color-merveilles: #72dec2;
-  --color-grey: #151515;
+  --color-dark: #151515;
 
   --uxn-max-width: 1000px;
   --uxn-max-height: 640px;
 
-  --border: #444;
+  --border: var(--color-grey);
   --border-px: 1px;
 }
 
@@ -94,7 +94,7 @@ a {
 }
 
 #console {
-  color: #252525;
+  color: var(--color-grey);
   font-size: 16px;
 }
 
@@ -123,36 +123,36 @@ a {
 }
 
 .comment {
-  color: var(--color-0);
+  color: var(--color-grey);
 }
 
 .stack-opcode {
-  color: var(--color-1);
+  color: var(--color-red);
 }
 
 .logic-opcode {
-  color: var(--color-2);
+  color: var(--color-orange);
 }
 
 .memory-opcode {
-  color: var(--color-3);
+  color: var(--color-yellow);
 }
 
 .arithmetic-opcode {
-  color: var(--color-4);
+  color: var(--color-green);
 }
 
 
 .rune-sublabel {
-  color: var(--color-6);
+  color: var(--color-teal);
 }
 
 .rune-hexliteral {
-  color: var(--color-5);
+  color: var(--color-blue);
 }
 
 .rune-label {
-  color: var(--color-7);
+  color: var(--color-purple);
 }
 
 /** Controls **/
@@ -170,23 +170,23 @@ a {
 }
 
 #roms {
-  background-color: var(--color-1);
+  background-color: var(--color-red);
 }
 
 #assemble {
-  background-color: var(--color-2);
+  background-color: var(--color-orange);
 }
 
 #save {
-  background-color: var(--color-3);
+  background-color: var(--color-yellow);
 }
 
 #load {
-  background-color: var(--color-4);
+  background-color: var(--color-green);
 }
 
 #about {
-  background-color: var(--color-5);
+  background-color: var(--color-blue);
 }
 
 /* The dropdown container */

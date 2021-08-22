@@ -17,32 +17,18 @@ function flatPromise() {
 const { resolve, promise } = flatPromise();
 window.allReady = promise;
 
-// get url params
-const urlParams = new URLSearchParams(window.location.search);
-
+// const urlParams = new URLSearchParams(window.location.search);
 // get the base64 encoded rom
-const b64 = urlParams.get('rom');
-let rom;
+// const b64 = urlParams.get('rom');
 
-if (b64 && b64.length) {
-  const decoded = atob(b64);
-  // console.log(decoded);
-
-  // parse the bytes
-  const arr = decoded.split(',').map((s) => parseInt(s, 10));
-  // console.log(arr);
-
-  // make them a nice array for emscripten
-  rom = new Uint8Array(arr);
-  // console.log(rom);
-}
-
-// write them here
 const ROM_PATH = '/input.rom';
 
-const dispatch = (text, exit, err) => {
+const dispatch = (text, exit, err, module) => {
   const data = {
-    module: 'emu', message: text, exit, err,
+    module: module || 'emu',
+    message: text,
+    exit,
+    err,
   };
   const event = new CustomEvent('uxn', { detail: data });
   window.parent.document.dispatchEvent(event);
@@ -70,15 +56,36 @@ var Module = {
     return canvas;
   })(),
   onRuntimeInitialized: () => {
+    // get the base64 encoded rom
+
+    const b64 = window.rom;
+    let rom;
+
+    if (b64 && b64.length) {
+      dispatch('Decoding rom from base64...', 0, null, 'web');
+      const decoded = atob(b64);
+
+      dispatch('Parsing rom to binary...', 0, null, 'web');
+      const arr = decoded.split(',').map((s) => parseInt(s, 10));
+      rom = new Uint8Array(arr);
+    }
+
     // write out the rom from global now that FS is initialized
     if (rom !== undefined) {
+      dispatch(
+        'Writing rom to emulator virtual file system...',
+        0,
+        null,
+        'web',
+      );
       Module.FS.writeFile(ROM_PATH, rom);
+    } else {
+      dispatch('Rom not loaded yet...', 0, null, 'web');
     }
 
     // any info to pass back to main window if needed from promise
     resolve({});
   },
-  noInitialRun: rom === undefined,
   arguments: [ROM_PATH],
 };
 

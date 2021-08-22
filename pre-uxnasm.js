@@ -25,7 +25,7 @@ const dispatch = (text, exit, err) => {
 // eslint-disable-next-line
 var Module = {
   print: (x) => dispatch(x, Module.EXITSTATUS, false),
-  printErr: (x) => dispatch(x, true),
+  printErr: (x) => dispatch(x, Module.EXITSTATUS, true),
   noInitialRun: true,
   onRuntimeInitialized: () => {
     resolve();
