@@ -131,20 +131,16 @@ const writeFile = (w, path, data) => {
   }
 };
 
-let download = (filename, text, binary) => {
-  var element = document.createElement('a');
-  let encoding = binary ? 'application/octet-stream' : 'text/plain;charset=utf-8';
-  element.setAttribute('href', `data:${encoding}` + encodeURIComponent(text));
-  element.setAttribute('download', filename);
-  element.style.display = 'none';
-  document.body.appendChild(element);
-  element.click();
-  document.body.removeChild(element);
-}
+const deleteFile = (w, path) => {
+  try {
+    const fs = w.Module.FS;
+    return fs.unlink(path);
+  } catch (e) {
+    log(errFmt(e));
+    throw e;
+  }
+};
 
-let = downloadUxntal => {
-  download("learn-uxn." + Date.now() + ".tal", readEditor(), false);
-}
 
 ///////////////
 // ASSEMBLER //
@@ -160,11 +156,17 @@ const writeFileAsm = (path, data) => {
   return writeFile(window.asm, path, data);
 };
 
+const deleteFileAsm = (path ) => {
+  log(`Deleting path from assembler: ${path}`);
+  return deleteFile(window.asm, path);
+};
+
 const assemble = (data) => {
   log('Assembling...');
   writeFileAsm('temp.tal', data);
 
   window.asm.callMain(['temp.tal', 'output.rom']);
+  deleteFileAsm("temp.tal");
   const b64 = btoa(readFileAsm('output.rom', 'binary'));
 
   // reload to clear global state
@@ -179,9 +181,17 @@ const readEditor = () => {
   if (!children && !texts) {
     return null;
   }
-  const chunks = children ? children.map((x) => x.text) : texts;
-  const lines = chunks.map((x) => x.join('\n'));
+  const chunks = children ? children.map((x) => { return x.text }) : texts;
+
+  const lines = chunks.map((x) => {
+    if (x) {
+      return x.join('\n')
+    } else {
+      return ''
+    }
+  });
   const text = lines.join('\n');
+  return text;
 }
 
 const assembleEditor = () => {
@@ -189,6 +199,7 @@ const assembleEditor = () => {
   if (!text) {
     log(fmtErr("No unxtal to assemble!"))
   }
+  log(`Read ${text.length} bytes from editor...`);
   assemble(text);
 };
 
@@ -302,6 +313,26 @@ const reload = () => {
   window.uxn.location.reload();
 };
 
+
+let download = (filename, text, binary) => {
+  var element = document.createElement('a');
+  let encoding = binary ? 'application/octet-stream,' : 'text/plain;charset=utf-8,';
+  element.setAttribute('href', `data:${encoding}${encodeURIComponent(text)}`);
+  element.setAttribute('download', filename);
+  element.style.display = 'none';
+  document.body.appendChild(element);
+  element.click();
+  document.body.removeChild(element);
+}
+
+let downloadUxntal = () => {
+  download("learn-uxn." + Date.now() + ".tal", readEditor(), false);
+}
+
+let downloadRom = () => {
+  download("learn-uxn." + Date.now() + ".rom", readFile(window.uxn, "/input.rom", 'binary'), true);
+}
+
 const addListeners = () => {
   // control listeners
   document.querySelector('#assemble').addEventListener('click', () => {
@@ -309,20 +340,20 @@ const addListeners = () => {
     assembleEditor();
   });
 
-  document.querySelector('#save').addEventListener('click', () => {
-    log('todo');
+  document.querySelector('#export').addEventListener('click', () => {
+    log('🅴🆇🅿🅾🆁🆃');
   });
 
-  document.querySelector('#save').addEventListener('click', () => {
-    log('todo');
+  document.querySelector('#debug').addEventListener('click', () => {
+    log(fmtErr('debug is broken at the moment :('));
   });
 
-  document.querySelector('#load').addEventListener('click', () => {
-    log('todo');
-  });
-
-  document.querySelector('#about').addEventListener('click', () => {
-    log('todo');
+  const about = document.querySelector('#about');
+  const aboutContents = about.innerHTML;
+  const aboutHide = "<p>hide</p>"
+  about.addEventListener('click', () => {
+    about.innerText = about.innerHTML === aboutHide ? aboutContents : aboutHide;
+    document.querySelector("#about-modal").classList.toggle("hidden");
   });
 
   // console scroller
@@ -349,15 +380,30 @@ const addListeners = () => {
     false,
   );
 
-  // reset focus anytime there is a click on the uxniframe
   [
     document.querySelector('#uxnemu'),
     document.querySelector('#uxnemu-iframe'),
   ].forEach((x) => {
+    // reset focus anytime there is a click on the uxniframe
     x.addEventListener('click', () => {
       window.uxn.document.getElementById('canvas').focus();
     });
+    // or if it gets moused over
+    x.addEventListener('mouseover', () => {
+      window.uxn.document.getElementById('canvas').focus();
+    });
   });
+
+  let anchors = document.querySelectorAll('#roms > div > a')
+  anchors.forEach((x) => {
+    x.addEventListener('click', (e) => {
+      loadRomByName(e.srcElement.innerHTML);
+    });
+  });
+
+  // TODO: figure out whats different
+  // document.querySelector("#download-rom").addEventListener('click', downloadRom);
+  document.querySelector("#download-uxntal").addEventListener('click', downloadUxntal);
 
   document.querySelector('#editor').addEventListener('click', () => {
     window.editor.focus();
@@ -390,6 +436,7 @@ const addListeners = () => {
       loadRomByName(rom);
     });
     resize();
+    setInterval(resize, 1000);
   };
 
   log('🅻🅴🅰🆁🅽 🆄🆇🅽');

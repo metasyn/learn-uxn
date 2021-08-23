@@ -29,16 +29,16 @@
          roms
         </p>
         <div class='dropdown-content'>
-          <a href="javascript:loadRomByName('automata')">automata</a>
-          <a href="javascript:loadRomByName('darena')">darena</a>
-          <a href="javascript:loadRomByName('drum-rack')">drum-rack</a>
-          <a href="javascript:loadRomByName('life')">life</a>
-          <a href="javascript:loadRomByName('move')">move</a>
-          <a href="javascript:loadRomByName('musictracker')">musictracker</a>
-          <a href="javascript:loadRomByName('neralie')">neralie</a>
-          <a href="javascript:loadRomByName('piano')">piano</a>
-          <a href="javascript:loadRomByName('polycat')">polycat</a>
-          <a href="javascript:loadRomByName('theme')">theme</a>
+          <a href="#">automata</a>
+          <a href="#">darena</a>
+          <a href="#">drum-rack</a>
+          <a href="#">life</a>
+          <a href="#">move</a>
+          <a href="#">musictracker</a>
+          <a href="#">neralie</a>
+          <a href="#">piano</a>
+          <a href="#">polycat</a>
+          <a href="#">theme</a>
           <div class='pulse'>
             <a href="https://github.com/metasyn/learn-uxn/issues/new">submit yours!</a>
           </div>
@@ -49,19 +49,26 @@
          assemble
         </p>
       </div>
-      <div id='save' class='control'>
+      <div id='export' class='control dropdown'>
         <p>
-          save
+          <a>
+            export
+          </a>
         </p>
+        <div class='dropdown-content'>
+          <a id='download-uxntal'>download uxntal</a>
+        </div>
       </div>
-      <div id='load' class='control'>
+      <div id='debug' class='control'>
         <p>
-          load
+          debug
         </p>
       </div>
       <div id='about' class='control'>
         <p>
-          about
+          <a href="#about-modal">
+            about
+          </a>
         </p>
       </div>
       </div>
@@ -129,7 +136,11 @@
     </div>
     </div>
 
-
+    <div id="about-modal" class="hidden">
+      <div>
+        <h1>Voilà!</h1>
+      </div>
+    </div>
 
     <!-- this has no display -->
     <div id='uxnasm'>

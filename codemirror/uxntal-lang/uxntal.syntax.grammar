@@ -50,12 +50,15 @@ expression {
     }
 
     stackOp {
-        ("BRK"|"LIT"|"POP"|"DUP"|"NIP"|"SWP"|"OVR"|"ROT")
+        ("BRK"|"LIT"|"INC"|"POP"|"DUP"|"NIP"|"SWP"|"OVR"|"ROT"|"RTN")
     }
 
     logicOp {
         ("EQU"|"NEQ"|"GTH"|"LTH"|"JMP"|"JCN"|"JSR"|"STH")
     }
+
+
+
 
     // main op
     OpCode {

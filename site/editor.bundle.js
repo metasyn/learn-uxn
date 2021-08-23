@@ -1,4 +1,4 @@
-(function () {
+(function (exports) {
     'use strict';
 
     // Compressed representation of the Grapheme_Cluster_Break=Extend
@@ -20894,16 +20894,13 @@
       maxTerm: 20,
       skippedNodes: [0,1],
       repeatNodeCount: 1,
-      tokenData: "2X~RnXY#PYZ#P]^#Ppq#Prs#bst$Stu%Puv%qvw&cwx'Txy'u|}(W!O!P(x![!])j!]!^*[!b!c*|!c!d+n!d!e,u!f!g-R!g!h-t!i!j.Z!l!m.g!n!o.y!o!p/i!p!q/u!q!r0U!r!s0e!t!u0k!u!v0q#p#q1g~#USc~XY#PYZ#P]^#Ppq#P~#eSOX#qZ]#q^p#qq~#q~#vSY~OX#qZ]#q^p#qq~#q~$VQ!Q![$]#T#Z$]~$`Q!Q![$f#T#Z$f~$kQV~!Q![$q#T#Z$q~$tQ!Q![$z#T#Z$z~%POV~~%SSOX%`Z]%`^p%`q~%`~%eS^~OX%`Z]%`^p%`q~%`~%tSOX&QZ]&Q^p&Qq~&Q~&VSS~OX&QZ]&Q^p&Qq~&Q~&fSOX&rZ]&r^p&rq~&r~&wSU~OX&rZ]&r^p&rq~&r~'WSOX'dZ]'d^p'dq~'d~'iSW~OX'dZ]'d^p'dq~'d~'xROy'uyz(Rz~'u~(WOP~~(ZSOX(gZ](g^p(gq~(g~(lS[~OX(gZ](g^p(gq~(g~({SOX)XZ])X^p)Xq~)X~)^S]~OX)XZ])X^p)Xq~)X~)mSOX)yZ])y^p)yq~)y~*OSX~OX)yZ])y^p)yq~)y~*_SOX*kZ]*k^p*kq~*k~*pSZ~OX*kZ]*k^p*kq~*k~+PSOX+]Z]+]^p+]q~+]~+bST~OX+]Z]+]^p+]q~+]~+qQ!f!g+w!p!q+w~+zP!f!g+}~,SRR~!S!T,]#_#`,h#f#g,p~,bQR~#_#`,h#f#g,p~,mPR~#f#g,p~,uOR~~,xP!t!u,{~-OP!m!n+}~-UR!g!h-_!k!l-h!w!x-n~-bQ!k!l+}!q!r+}~-kP!x!y+}~-qP!r!s+}~-wQ!q!r-}!s!t.T~.QP!t!u+}~.WP!w!x+}~.^P!v!w.a~.dP!j!k+}~.jR!e!f.s!o!p-n!u!v-}~.vP!p!q+}~.|R!f!g/V!k!l/c!v!w.a~/YR!c!d+}!t!u+}!|!}+}~/fP!v!w+}~/lP!w!x/o~/rP!n!o+}~/xQ!g!h0O!k!l-n~0RP!s!t+}~0XQ!t!u0_!x!y-}~0bP!c!d+}~0hP!q!r-n~0nP!q!r/c~0tS!h!i/c!v!w1Q!w!x1a!y!z-n~1TS!c!d+}!j!k+}!t!u+}!|!}+}~1dP!d!e+}~1jSOX1vZ]1v^p1vq~1v~1{S_~OX1vZ]1v^p1vq~1v",
+      tokenData: "2k~RoXY#SYZ#S]^#Spq#Srs#est$Vtu%Suv%tvw&fwx'Wxy'x|}(Z!O!P({![!])m!]!^*_!b!c+P!c!d+q!d!e,x!f!g-U!g!h-w!i!j.^!k!l.j!l!m.v!n!o/Y!o!p/x!p!q0U!q!r0e!r!s0t!t!u0z!u!v1T#p#q1y~#XSc~XY#SYZ#S]^#Spq#S~#hSOX#tZ]#t^p#tq~#t~#ySY~OX#tZ]#t^p#tq~#t~$YQ!Q![$`#T#Z$`~$cQ!Q![$i#T#Z$i~$nQV~!Q![$t#T#Z$t~$wQ!Q![$}#T#Z$}~%SOV~~%VSOX%cZ]%c^p%cq~%c~%hS^~OX%cZ]%c^p%cq~%c~%wSOX&TZ]&T^p&Tq~&T~&YSS~OX&TZ]&T^p&Tq~&T~&iSOX&uZ]&u^p&uq~&u~&zSU~OX&uZ]&u^p&uq~&u~'ZSOX'gZ]'g^p'gq~'g~'lSW~OX'gZ]'g^p'gq~'g~'{ROy'xyz(Uz~'x~(ZOP~~(^SOX(jZ](j^p(jq~(j~(oS[~OX(jZ](j^p(jq~(j~)OSOX)[Z])[^p)[q~)[~)aS]~OX)[Z])[^p)[q~)[~)pSOX)|Z])|^p)|q~)|~*RSX~OX)|Z])|^p)|q~)|~*bSOX*nZ]*n^p*nq~*n~*sSZ~OX*nZ]*n^p*nq~*n~+SSOX+`Z]+`^p+`q~+`~+eST~OX+`Z]+`^p+`q~+`~+tQ!f!g+z!p!q+z~+}P!f!g,Q~,VRR~!S!T,`#_#`,k#f#g,s~,eQR~#_#`,k#f#g,s~,pPR~#f#g,s~,xOR~~,{P!t!u-O~-RP!m!n,Q~-XR!g!h-b!k!l-k!w!x-q~-eQ!k!l,Q!q!r,Q~-nP!x!y,Q~-tP!r!s,Q~-zQ!q!r.Q!s!t.W~.TP!t!u,Q~.ZP!w!x,Q~.aP!v!w.d~.gP!j!k,Q~.mP!p!q.p~.sP!e!f,Q~.yR!e!f/S!o!p-q!u!v.Q~/VP!p!q,Q~/]R!f!g/f!k!l/r!v!w.d~/iR!c!d,Q!t!u,Q!|!},Q~/uP!v!w,Q~/{P!w!x0O~0RP!n!o,Q~0XQ!g!h0_!k!l-q~0bP!s!t,Q~0hQ!t!u0n!x!y.Q~0qP!c!d,Q~0wP!q!r-q~0}Q!q!r/r!v!w/S~1WS!h!i/r!v!w1d!w!x1s!y!z-q~1gS!c!d,Q!j!k,Q!t!u,Q!|!},Q~1vP!d!e,Q~1|SOX2YZ]2Y^p2Yq~2Y~2_S_~OX2YZ]2Y^p2Yq~2Y",
       tokenizers: [0],
       topRules: {"Program":[0,2]},
       tokenPrec: 0
     });
 
     var UxnTags = {
-        // overriding other languages constructs for now
-        // because the code mirror tag creation process
-        // is undocumented and fucking obtuse
         OpCode: Tag.define(),
         Macro: Tag.define(),
         Label: Tag.define(),
@@ -20934,8 +20931,101 @@
         return new LanguageSupport(UxntalLanguage);
     }
 
+    // taken from https://codemirror.net/6/examples/tooltip/
+    // however we're looking for space boundaries
+    const wordHover = hoverTooltip((view, pos, side) => {
+      let {from, to, text} = view.state.doc.lineAt(pos);
+      let start = pos, end = pos;
+      while (start > from && /[^ ]/.test(text[start - from - 1])) start--;
+      while (end < to && /[^ ]/.test(text[end - from])) end++;
+      if (start == pos && side < 0 || end == pos && side > 0)
+        return null
+      return {
+        pos: start,
+        end,
+        above: true,
+        class: 'cm-tooltip-hover',
+        strictSide: true,
+        create(view) {
+          let dom = document.createElement("div");
+          // in the example, this had a bug in it
+          // where they slice the text, rather,
+          // we need a slice of the doc object
+          let word = view.state.doc.slice(start, end);
+
+          if (word.length >= 3) {
+            let three = word.slice(0, 3);
+            let desc = tooltipData[three];
+
+            if (desc) {
+              dom.textContent = `${three} - ${desc}`;
+            }
+          }
+
+          let one = word.slice(0, 1);
+          let desc = tooltipData[one];
+          if (desc) {
+              dom.textContent = `${one} - ${desc}`;
+          }
+          return {dom};
+        }
+      }
+    });
+
+    let tooltipData = {
+      'BRK': 'OpCode - Break',
+      'LIT': 'OpCode - Break',
+      'INC': 'OpCode - Increment: a → a',
+      'DUP': 'OpCode - Duplicate: a → a a',
+      'NIP': 'OpCode - Nip: a b → b',
+      'OVR': 'OpCode - Over: a b → a b a ',
+      'ROT': 'OpCode - Rotate: a b c → b c a',
+
+      'EQU': 'OpCode - Equal: a b → flag',
+      'NEQ': 'OpCode - NotEqual: a b → flag',
+      'GTH': 'OpCode - GreatherThan: a b → flag',
+      'LTH': 'OpCode - LessThan: a b → flag',
+      'JMP': 'OpCode - Jump: a',
+      'JCM': 'OpCode - Jump Condition: flag a',
+      'JSR': 'OpCode - Jump Stash: a → rs',
+      'STH': 'OpCode - Stash: a → rs',
+
+      'LDZ': 'OpCode - Load Zeropage: a → val',
+      'STZ': 'OpCode - Store Zeropage: val a',
+      'LDR': 'OpCode - Load Relative: a → val',
+      'STR': 'OpCode - Store Relative: val a',
+      'LDA': 'OpCode - Load Absolute: a* → val',
+      'STA': 'OpCode - Store Absolute: val a*',
+      'DEI': 'OpCode - Device In: a → val',
+      'DEO': 'OpCode - Device Out: val a',
+
+      'ADD': 'OpCode - Add: a b → res',
+      'SUB': 'OpCode - Subtract: a b → res',
+      'MUL': 'OpCode - Multiply: a b → res',
+      'DIV': 'OpCode - Divide: a b → res',
+      'AND': 'OpCode - And: a b → res',
+      'ORA': 'OpCode - Or: a b → res',
+      'EOR': 'OpCode - Exclusive Or: a b → res',
+      'SFT': 'OpCode - Shift : a b → res',
+
+      '|': 'Rune - Pad (Absolute)',
+      '$': 'Rune - Pad (Relative)',
+      '%': 'Rune - Macro (Definition)',
+      '@': 'Rune - Label (Definition)',
+      '&': 'Rune - Sublabel (Definition)',
+      '/': 'Rune - Sublabel spacer',
+      '.': 'Rune - Literal Address (Zero-page)',
+      ',': 'Rune - Literal Address (Relative)',
+      ';': 'Rune - Literal Address (Absolute)',
+      ':': 'Rune - Raw Address',
+      '\'': 'Rune - Raw Character',
+      '"': 'Rune - Raw Word',
+      '#': 'Rune - Literal Hex',
+    };
+
+
     const tagsToClass = Object.keys(UxnTags).map((item) => {
-      return { tag: UxnTags[item], class: `highlight-${item.toLowerCase()}`, color: 'pink'}
+      return { tag: UxnTags[item], class: `highlight-${item.toLowerCase()}`}
     });
 
     const style = HighlightStyle.define(tagsToClass);
@@ -20948,9 +21038,16 @@
           UXNTAL(),
           classHighlightStyle,
           style,
+          wordHover,
         ],
       }),
       parent: document.getElementById('editor'),
     });
 
-}());
+    exports.wordHover = wordHover;
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    return exports;
+
+}({}));

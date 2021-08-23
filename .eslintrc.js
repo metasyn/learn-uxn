@@ -18,14 +18,13 @@ module.exports = {
     'no-param-reassign': 'off',
     'spaced-comment': 'off',
   },
-  // typescript
-//  root: true,
-//  parser: '@typescript-eslint/parser',
-//  plugins: [
-//    '@typescript-eslint',
-//  ],
-//  extends: [
-//    'eslint:recommended',
-//    'plugin:@typescript-eslint/recommended',
-//  ],
+  root: true,
+  parser: '@typescript-eslint/parser',
+  plugins: [
+    '@typescript-eslint',
+  ],
+  extends: [
+    'eslint:recommended',
+    'plugin:@typescript-eslint/recommended',
+  ],
 };

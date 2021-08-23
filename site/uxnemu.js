@@ -1,15 +1,3 @@
-// if in an iframe, the focus gets lost somehow
-// and this was needed to ensure the keyboard works with the SDL
-window.doFocus = false;
-
-setInterval(() => {
-  if (window.doFocus) {
-    window.focus();
-  } else {
-    window.blur();
-  }
-}, 500);
-
 function flatPromise() {
   let resolve;
   let reject;

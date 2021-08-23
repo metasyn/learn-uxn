@@ -115,6 +115,7 @@ function build_uxn_emscripten() {
         -s FORCE_FILESYSTEM=1 \
         -s EXPORTED_FUNCTIONS='["_main"]' \
         -s EXPORTED_RUNTIME_METHODS='["callMain", "FS"]' \
+        -s EXIT_RUNTIME=1 \
         --preload-file tals \
         --shell-file=shell-uxnasm.html \
         --extern-pre-js=pre-uxnasm.js \
@@ -153,9 +154,6 @@ if [[ -n ${CLEAN} ]]; then
     rm -rf emsdk
     rm -rf uxn
 fi;
-
-rm -rf build
-mkdir -p build
 
 setup_emsdk
 setup_uxn
