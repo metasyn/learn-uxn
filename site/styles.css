@@ -409,4 +409,6 @@ a:hover {
   height: calc(100vh - var(--top-margin));
   right: 0px;
   z-index: 11;
+  overflow-y: scroll;
+  font-size: 14px;
 }

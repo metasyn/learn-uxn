@@ -178,6 +178,7 @@ const assemble = (data) => {
 
 
 const readEditor = () => {
+  return window.editor.state.doc.toString();
   const { children, texts } = window.editor.state.doc;
   if (!children && !texts) {
     return null;
@@ -197,9 +198,9 @@ const readEditor = () => {
 
 const assembleEditor = () => {
   let text = readEditor();
-  console.log(text);
   if (!text) {
     log(errWrap("No unxtal to assemble!"))
+    return;
   }
   log(`Read ${text.length} bytes from editor...`);
   let rom = assemble(text);
@@ -232,12 +233,18 @@ const getURLParam = (param) => {
 // EMULATOR //
 //////////////
 
+const reloadEmu = () => {
+  window.uxn.rom = null;
+  window.uxn.location.reload();
+}
+
+
 const loadRom = (rom) => {
   log('Loading rom...');
   // force reload to get a clean slate
   // otherwise SDL has all these issues
   // with teardown
-  window.uxn.location.reload();
+  reloadEmu();
 
   // grab the iframe again to get a new reference to the window
   // stash the rom we have here in the window so it can load it
@@ -413,22 +420,10 @@ const addListeners = () => {
 
 const reload = () => {
   log("Restarting...")
-  window.uxn.rom = null;
-  window.uxn.location.reload();
-  reloadAsm()
-
+  reloadAsm();
+  reloadEmu();
   document.querySelector('#console').innerHTML = '';
-
-  window.onload = () => {
-    // check the flat promise
-    Promise.all([window.uxn.allReady, window.asm.allReady]).then(() => {
-      clearEditor();
-      let contents = "( hello world )";
-      populateEditor(contents);
-      assembleEditor();
-      window.uxn.rom = null;
-    });
-  };
+  populateEditor("( L E A R N  U X N )");
 }
 
 //////////
@@ -456,9 +451,9 @@ const reload = () => {
       const rom = getURLParam('rom') || 'piano';
       loadRomByName(rom);
     });
-    resize();
-    setInterval(resize, 1000);
   };
 
   log('🅻🅴🅰🆁🅽 🆄🆇🅽');
+  resize();
+  setInterval(resize, 1000);
 })();
