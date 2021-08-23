@@ -131,6 +131,21 @@ const writeFile = (w, path, data) => {
   }
 };
 
+let download = (filename, text, binary) => {
+  var element = document.createElement('a');
+  let encoding = binary ? 'application/octet-stream' : 'text/plain;charset=utf-8';
+  element.setAttribute('href', `data:${encoding}` + encodeURIComponent(text));
+  element.setAttribute('download', filename);
+  element.style.display = 'none';
+  document.body.appendChild(element);
+  element.click();
+  document.body.removeChild(element);
+}
+
+let = downloadUxntal => {
+  download("learn-uxn." + Date.now() + ".tal", readEditor(), false);
+}
+
 ///////////////
 // ASSEMBLER //
 ///////////////
@@ -158,15 +173,22 @@ const assemble = (data) => {
   return b64;
 };
 
-const assembleEditor = () => {
+
+const readEditor = () => {
   const { children, texts } = window.editor.state.doc;
   if (!children && !texts) {
-    log(errWrap('No uxntal to assemble!'));
-    return;
+    return null;
   }
   const chunks = children ? children.map((x) => x.text) : texts;
   const lines = chunks.map((x) => x.join('\n'));
   const text = lines.join('\n');
+}
+
+const assembleEditor = () => {
+  let text = readEditor();
+  if (!text) {
+    log(fmtErr("No unxtal to assemble!"))
+  }
   assemble(text);
 };
 
