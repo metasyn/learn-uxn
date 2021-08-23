@@ -1,0 +1,122 @@
+@top Program { expression* }
+
+@skip { space | Comment }
+
+expression {
+    OpCode | Macro |
+    Label | Sublabel |
+    Hexadecimal
+    RawCharacter| RawAddress | RawWord |
+    LiteralAddressAbsolute | LiteralAddressRelative | LiteralAddressZeroPage |
+    PadRelative | PadAbsolute
+}
+
+@tokens {
+
+    // white space
+    Comment { "(" ![)]* ")" }
+    space { $[ \t\n\r]+ }
+    notSpace { ![ \t\n\r]+ }
+
+
+    // op codes
+
+    // suffix goes here
+    short {
+        "2"
+    }
+
+    keep {
+        "k"
+    }
+
+    return {
+        "r"
+    }
+
+    suffix {
+        ( short keep return ) | ( keep return ) |
+        ( short keep ) | ( short return ) |
+        ( short ) | ( keep ) | ( return)
+    }
+
+    // code types
+    arithmeticOp {
+        ("ADD"|"SUB"|"MUL"|"DIV"|"AND"|"ORA"|"EOR"|"SFT")
+    }
+
+    memoryOp {
+        ("LDZ"|"STZ"|"LDR"|"STR"|"LDA"|"STA"|"DEI"|"DEO")
+    }
+
+    stackOp {
+        ("BRK"|"LIT"|"POP"|"DUP"|"NIP"|"SWP"|"OVR"|"ROT")
+    }
+
+    logicOp {
+        ("EQU"|"NEQ"|"GTH"|"LTH"|"JMP"|"JCN"|"JSR"|"STH")
+    }
+
+    // main op
+    OpCode {
+        (arithmeticOp | memoryOp | stackOp | logicOp) suffix?
+    }
+
+    Macro {
+        "%" notSpace
+    }
+
+    Label {
+        "@" notSpace
+    }
+
+    Sublabel {
+        "&" notSpace
+    }
+
+    PadRelative {
+        "$" notSpace
+    }
+
+    PadAbsolute {
+        "|" notSpace
+    }
+
+
+    LiteralAddressZeroPage {
+        "." notSpace
+    }
+
+    LiteralAddressRelative {
+        "," notSpace
+    }
+
+    LiteralAddressAbsolute {
+        ";" notSpace
+    }
+
+    RawAddress {
+        ":" notSpace
+    }
+
+    RawCharacter {
+        "'" notSpace
+    }
+
+    RawWord {
+        "\"" notSpace
+    }
+
+    hex {
+        $[0-9a-f]
+    }
+
+    Hexadecimal {
+        "#" (( hex hex hex hex ) | ( hex hex ))
+    }
+
+
+}
+
+
+@detectDelim

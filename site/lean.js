@@ -98,7 +98,7 @@ const log = (text, module) => {
     text = cleanupWrap(text);
   }
 
-  const el = document.getElementById('console');
+  const el = document.querySelector('#console');
 
   el.innerHTML += `${prefix} ${dateFmt()} ${text}\n`;
 };
@@ -206,7 +206,7 @@ const loadRom = (rom) => {
   // grab the iframe again to get a new reference to the window
   // stash the rom we have here in the window so it can load it
   // after it is done initializing
-  const iframe = document.getElementById('uxnemu-iframe');
+  const iframe = document.querySelector('#uxnemu-iframe');
   iframe.onload = (e) => {
     e.target.contentWindow.rom = rom;
   };
@@ -220,6 +220,38 @@ const populateEditor = (insert) => {
   window.editor.dispatch({
     changes: { from: 0, insert },
   });
+};
+
+//////////////
+// DOM UTIL //
+//////////////
+
+const resize = () => {
+  // get the emulator height
+  const el = document.querySelector('#uxnemu-iframe');
+  const style = getComputedStyle(el.contentWindow.document.body);
+
+  if (style.height) {
+    el.style.height = style.height;
+
+    const consoleEl = document.querySelector('#console-wrap');
+    const topMarginPx = getComputedStyle(
+      document.documentElement,
+    ).getPropertyValue('--top-margin');
+
+    const topMargin = parseInt(topMarginPx.slice(0, -2), 10);
+    const height = parseInt(style.height.slice(0, -2), 10);
+
+    consoleEl.style.height = window.innerHeight - topMargin - height - 20;
+  }
+};
+
+const hideNoScript = () => {
+  document.querySelector('#noscript').innerHTML = '';
+};
+
+const scrollToBottom = (el) => {
+  el.scrollTop = el.scrollHeight;
 };
 
 //////////////
@@ -238,6 +270,7 @@ const load = (tal) => {
 
 // eslint-disable-next-line
 const loadRomByName = (romName) => {
+  log(`🅻🅾🅰🅳🅸🅽🅶 ${romName}`);
   const tal = readFileAsm(`/tals/${romName}.tal`, 'utf8');
   load(tal);
 };
@@ -248,14 +281,36 @@ const reload = () => {
 };
 
 const addListeners = () => {
-  document.getElementById('assemble').addEventListener('click', () => {
+  // control listeners
+  document.querySelector('#assemble').addEventListener('click', () => {
+    log('🅰🆂🆂🅴🅼🅱🅻🅴');
     assembleEditor();
   });
 
-  document.getElementById('save').addEventListener('click', () => {
+  document.querySelector('#save').addEventListener('click', () => {
     log('todo');
   });
 
+  document.querySelector('#save').addEventListener('click', () => {
+    log('todo');
+  });
+
+  document.querySelector('#load').addEventListener('click', () => {
+    log('todo');
+  });
+
+  document.querySelector('#about').addEventListener('click', () => {
+    log('todo');
+  });
+
+  // console scroller
+  const consoleEl = document.querySelector('#console'); // Create an observer and pass it a callback.
+  const observer = new MutationObserver(() => {
+    scrollToBottom(consoleEl); // Tell it to look for new children that will change the height.
+  });
+  observer.observe(consoleEl, { childList: true });
+
+  // uxn iframe event dispatches for logging
   window.document.addEventListener(
     'uxn',
     (e) => {
@@ -271,21 +326,20 @@ const addListeners = () => {
     },
     false,
   );
-};
 
-//////////////
-// DOM UTIL //
-//////////////
+  // reset focus anytime there is a click on the uxniframe
+  [
+    document.querySelector('#uxnemu'),
+    document.querySelector('#uxnemu-iframe'),
+  ].forEach((x) => {
+    x.addEventListener('click', () => {
+      window.uxn.document.getElementById('canvas').focus();
+    });
+  });
 
-const resize = (el) => {
-  // get the emulator height
-  const height = el.contentWindow.document.getElementById('canvas').clientHeight;
-  const newHeight = height + 25;
-  el.style.height = `${newHeight}px`;
-};
-
-const hideNoScript = () => {
-  document.getElementById('noscript').innerHTML = '';
+  document.querySelector('#editor').addEventListener('click', () => {
+    window.editor.focus();
+  });
 };
 
 //////////
@@ -295,27 +349,26 @@ const hideNoScript = () => {
 (async () => {
   hideNoScript();
 
-  const uxnIframe = document.getElementById('uxnemu-iframe');
+  const uxnIframe = document.querySelector('#uxnemu-iframe');
   window.uxn = uxnIframe.contentWindow;
 
-  const asmIframe = document.getElementById('uxnasm-iframe');
+  const asmIframe = document.querySelector('#uxnasm-iframe');
   window.asm = asmIframe.contentWindow;
 
   addListeners();
+  window.addEventListener('resize', resize);
 
   // on the iframe load
   window.onload = () => {
     // check the flat promise
     Promise.all([window.uxn.allReady, window.asm.allReady]).then(() => {
-      resize(uxnIframe);
+      resize();
 
       const rom = getURLParam('rom') || 'piano';
       loadRomByName(rom);
     });
-    resize(uxnIframe);
+    resize();
   };
 
-  window.addEventListener('resize', () => {
-    resize(uxnIframe);
-  });
+  log('🅻🅴🅰🆁🅽 🆄🆇🅽');
 })();

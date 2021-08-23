@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -e
+set -euo pipefail
 
 end="\033[0m"
 green="\033[0;32m"
@@ -123,13 +123,8 @@ function build_uxn_emscripten() {
             uxn/src/uxnasm.c
 }
 
-
-function copy_static () {
-    cp learn-uxn.js build
-}
-
-
 PARAMS=""
+CLEAN=
 while (( "$#" )); do
   case "$1" in
     -c|--clean)
@@ -165,6 +160,5 @@ mkdir -p build
 setup_emsdk
 setup_uxn
 build_uxn_emscripten
-copy_static
 
 green "Finished!"

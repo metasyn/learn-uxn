@@ -3,7 +3,7 @@
 
 
   --control-margin: 60px;
-  --top-margin: calc(var(--control-margin));
+  --top-margin: var(--control-margin);
 
   --color-grey: #585858;
   --color-red: #ab4642;
@@ -70,7 +70,6 @@ a {
 }
 
 #uxnemu-iframe {
-  height: calc(50vh - var(--top-margin));
   width: 50%;
   border: var(--border-px) dotted var(--border);
   position: fixed;
@@ -81,9 +80,8 @@ a {
 }
 
 #console-wrap {
-  margin: 10px;
+  margin-left: 10px;
   position: fixed;
-  height: calc(50% - var(--top-margin));
   width: 100%;
   z-index: 10;
   color: white;
@@ -96,6 +94,7 @@ a {
 #console {
   color: var(--color-grey);
   font-size: 16px;
+  margin-bottom: 0px;
 }
 
 #controls-wrap {
@@ -307,8 +306,56 @@ a {
 .cm-editor .cm-gutters {
   background-color: black;
   color: grey;
-,
+}
 
 .cm-editor .cm-activeLineGutter {
   background-color: #707070;
+}
+
+.highlight-opcode {
+  color: var(--color-blue);
+}
+
+.highlight-macro {
+  color: var(--color-green);
+}
+
+.highlight-label {
+  color: var(--color-orange);
+}
+
+.highlight-sublabel {
+  color: var(--color-yellow);
+}
+
+.highlight-padrelative {
+}
+
+.highlight-padabsolute {
+}
+
+.highlight-rawcharacter {
+}
+
+.highlight-rawaddress {
+}
+
+.highlight-rawword {
+}
+
+.highlight-literaladdresszeropage {
+}
+
+.highlight-literaladdressrelative {
+}
+
+.highlight-literaladdressabsolute {
+}
+
+.highlight-hexadecimal {
+  color: var(--color-purple)
+}
+
+.highlight-comment {
+  color: var(--color-grey);
 }

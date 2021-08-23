@@ -13,7 +13,10 @@ install:
 	npm install
 
 rollup:
-	node_modules/.bin/rollup site/editor.js -f iife -o site/editor.bundle.js -p @rollup/plugin-node-resolve
+	node_modules/.bin/rollup -c
+
+watch:
+	node_modules/.bin/rollup -c -w --watch.include codemirror
 
 build:
 	./build.sh

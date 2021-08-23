@@ -1,7 +1,3 @@
-// if in an iframe, the focus gets lost somehow
-// and this was needed to ensure the keyboard works with the SDL
-// setInterval(() => window.focus(), 500);
-
 function flatPromise() {
   let resolve;
   let reject;
@@ -16,10 +12,6 @@ function flatPromise() {
 
 const { resolve, promise } = flatPromise();
 window.allReady = promise;
-
-// const urlParams = new URLSearchParams(window.location.search);
-// get the base64 encoded rom
-// const b64 = urlParams.get('rom');
 
 const ROM_PATH = '/input.rom';
 
