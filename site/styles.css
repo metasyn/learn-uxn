@@ -49,7 +49,12 @@ button:hover {
 
 a {
   text-decoration: none;
+  font-weight: bold;
   color: black;
+}
+
+a:hover {
+  filter: invert(100);
 }
 
 #noscript {
@@ -172,6 +177,10 @@ a {
   background-color: var(--color-red);
 }
 
+#roms a {
+  padding: 8px 8px;
+}
+
 #assemble {
   background-color: var(--color-orange);
 }
@@ -180,7 +189,7 @@ a {
   background-color: var(--color-yellow);
 }
 
-#debug {
+#new {
   background-color: var(--color-green);
 }
 
@@ -396,11 +405,8 @@ a {
   position: fixed;
   background-color: var(--color-blue);
   top: var(--top-margin);
-  width: 100px;
-  height: 50%;
+  padding-left: 10px;
+  height: calc(100vh - var(--top-margin));
   right: 0px;
-  filter: brightness(0.85);
-  z-index: 999;
-  pointer-events: none;
-  transition: all 0.3s;
+  z-index: 11;
 }

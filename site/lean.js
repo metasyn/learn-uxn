@@ -117,7 +117,6 @@ const readFile = (w, path, encoding) => {
     return contents;
   } catch (e) {
     log(errFmt(e));
-    throw e;
   }
 };
 
@@ -127,7 +126,6 @@ const writeFile = (w, path, data) => {
     return fs.writeFile(path, data);
   } catch (e) {
     log(errFmt(e));
-    throw e;
   }
 };
 
@@ -137,7 +135,6 @@ const deleteFile = (w, path) => {
     return fs.unlink(path);
   } catch (e) {
     log(errFmt(e));
-    throw e;
   }
 };
 
@@ -145,6 +142,10 @@ const deleteFile = (w, path) => {
 ///////////////
 // ASSEMBLER //
 ///////////////
+
+const reloadAsm = () => {
+  window.asm.location.reload();
+}
 
 const readFileAsm = (path, encoding) => {
   log(`Reading path from assembler: ${path}`);
@@ -171,7 +172,7 @@ const assemble = (data) => {
 
   // reload to clear global state
   log('Reloading assembler...');
-  window.asm.location.reload();
+  reloadAsm()
   return b64;
 };
 
@@ -196,11 +197,13 @@ const readEditor = () => {
 
 const assembleEditor = () => {
   let text = readEditor();
+  console.log(text);
   if (!text) {
-    log(fmtErr("No unxtal to assemble!"))
+    log(errWrap("No unxtal to assemble!"))
   }
   log(`Read ${text.length} bytes from editor...`);
-  assemble(text);
+  let rom = assemble(text);
+  loadRom(rom);
 };
 
 /////////
@@ -248,8 +251,15 @@ const loadRom = (rom) => {
 ////////////
 // EDITOR //
 ////////////
+const clearEditor = () => {
+  let text = window.editor.state.doc.toString()
+  window.editor.dispatch({
+    changes: { from: 0, to: text.length, insert: ""},
+  });
+}
 
 const populateEditor = (insert) => {
+  clearEditor()
   window.editor.dispatch({
     changes: { from: 0, insert },
   });
@@ -308,12 +318,6 @@ const loadRomByName = (romName) => {
   load(tal);
 };
 
-// eslint-disable-next-line
-const reload = () => {
-  window.uxn.location.reload();
-};
-
-
 let download = (filename, text, binary) => {
   var element = document.createElement('a');
   let encoding = binary ? 'application/octet-stream,' : 'text/plain;charset=utf-8,';
@@ -344,15 +348,12 @@ const addListeners = () => {
     log('🅴🆇🅿🅾🆁🆃');
   });
 
-  document.querySelector('#debug').addEventListener('click', () => {
-    log(fmtErr('debug is broken at the moment :('));
+  document.querySelector('#new').addEventListener('click', () => {
+    reload();
   });
 
   const about = document.querySelector('#about');
-  const aboutContents = about.innerHTML;
-  const aboutHide = "<p>hide</p>"
   about.addEventListener('click', () => {
-    about.innerText = about.innerHTML === aboutHide ? aboutContents : aboutHide;
     document.querySelector("#about-modal").classList.toggle("hidden");
   });
 
@@ -409,6 +410,26 @@ const addListeners = () => {
     window.editor.focus();
   });
 };
+
+const reload = () => {
+  log("Restarting...")
+  window.uxn.rom = null;
+  window.uxn.location.reload();
+  reloadAsm()
+
+  document.querySelector('#console').innerHTML = '';
+
+  window.onload = () => {
+    // check the flat promise
+    Promise.all([window.uxn.allReady, window.asm.allReady]).then(() => {
+      clearEditor();
+      let contents = "( hello world )";
+      populateEditor(contents);
+      assembleEditor();
+      window.uxn.rom = null;
+    });
+  };
+}
 
 //////////
 // MAIN //

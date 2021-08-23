@@ -84,6 +84,14 @@ function build_uxn_emscripten() {
         cp $file tals
     done;
 
+    for file in $(ls uxn/projects/examples/devices/*.tal); do
+        cp $file tals
+    done;
+
+    for file in $(ls uxn/projects/examples/gui/*.tal); do
+        cp $file tals
+    done;
+
 
     blue "Building UXN for emscripten..."
         # -s EXPORT_NAME=uxnemu \
@@ -115,7 +123,6 @@ function build_uxn_emscripten() {
         -s FORCE_FILESYSTEM=1 \
         -s EXPORTED_FUNCTIONS='["_main"]' \
         -s EXPORTED_RUNTIME_METHODS='["callMain", "FS"]' \
-        -s EXIT_RUNTIME=1 \
         --preload-file tals \
         --shell-file=shell-uxnasm.html \
         --extern-pre-js=pre-uxnasm.js \
