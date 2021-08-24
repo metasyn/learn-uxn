@@ -17,7 +17,7 @@ make build
 ```
 which is composed of:
 
-* build.sh - downloads [emscripten, builds uxn, builds emscripten port
+* build.sh - downloads/installs emscripten, builds uxn, builds emscripten port
 * npm install - ugh don't we all just adore javascript
 * rollup
 
@@ -29,8 +29,8 @@ which is composed of:
 
 ## TODO
 
-[ ] allow save rom?
-[ ] fix debug view?
+- [ ] allow save rom? - currently roms compiled in the web wont work on real uxnemu
+- [ ] fix debug view? - it is proper fucked right now
 
 # LICENSE
 
