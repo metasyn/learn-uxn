@@ -117,13 +117,14 @@ const readFile = (w, path, encoding) => {
     return contents;
   } catch (e) {
     log(errFmt(e));
+    return '';
   }
 };
 
 const writeFile = (w, path, data) => {
   try {
     const fs = w.Module.FS;
-    return fs.writeFile(path, data);
+    fs.writeFile(path, data);
   } catch (e) {
     log(errFmt(e));
   }
@@ -132,12 +133,11 @@ const writeFile = (w, path, data) => {
 const deleteFile = (w, path) => {
   try {
     const fs = w.Module.FS;
-    return fs.unlink(path);
+    fs.unlink(path);
   } catch (e) {
     log(errFmt(e));
   }
 };
-
 
 ///////////////
 // ASSEMBLER //
@@ -145,7 +145,7 @@ const deleteFile = (w, path) => {
 
 const reloadAsm = () => {
   window.asm.location.reload();
-}
+};
 
 const readFileAsm = (path, encoding) => {
   log(`Reading path from assembler: ${path}`);
@@ -157,7 +157,7 @@ const writeFileAsm = (path, data) => {
   return writeFile(window.asm, path, data);
 };
 
-const deleteFileAsm = (path ) => {
+const deleteFileAsm = (path) => {
   log(`Deleting path from assembler: ${path}`);
   return deleteFile(window.asm, path);
 };
@@ -167,45 +167,16 @@ const assemble = (data) => {
   writeFileAsm('temp.tal', data);
 
   window.asm.callMain(['temp.tal', 'output.rom']);
-  deleteFileAsm("temp.tal");
+  deleteFileAsm('temp.tal');
   const b64 = btoa(readFileAsm('output.rom', 'binary'));
 
   // reload to clear global state
   log('Reloading assembler...');
-  reloadAsm()
+  reloadAsm();
   return b64;
 };
 
-
-const readEditor = () => {
-  return window.editor.state.doc.toString();
-  const { children, texts } = window.editor.state.doc;
-  if (!children && !texts) {
-    return null;
-  }
-  const chunks = children ? children.map((x) => { return x.text }) : texts;
-
-  const lines = chunks.map((x) => {
-    if (x) {
-      return x.join('\n')
-    } else {
-      return ''
-    }
-  });
-  const text = lines.join('\n');
-  return text;
-}
-
-const assembleEditor = () => {
-  let text = readEditor();
-  if (!text) {
-    log(errWrap("No unxtal to assemble!"))
-    return;
-  }
-  log(`Read ${text.length} bytes from editor...`);
-  let rom = assemble(text);
-  loadRom(rom);
-};
+const readEditor = () => window.editor.state.doc.toString();
 
 /////////
 // URL //
@@ -236,8 +207,7 @@ const getURLParam = (param) => {
 const reloadEmu = () => {
   window.uxn.rom = null;
   window.uxn.location.reload();
-}
-
+};
 
 const loadRom = (rom) => {
   log('Loading rom...');
@@ -259,14 +229,14 @@ const loadRom = (rom) => {
 // EDITOR //
 ////////////
 const clearEditor = () => {
-  let text = window.editor.state.doc.toString()
+  const text = window.editor.state.doc.toString();
   window.editor.dispatch({
-    changes: { from: 0, to: text.length, insert: ""},
+    changes: { from: 0, to: text.length, insert: '' },
   });
-}
+};
 
 const populateEditor = (insert) => {
-  clearEditor()
+  clearEditor();
   window.editor.dispatch({
     changes: { from: 0, insert },
   });
@@ -325,24 +295,51 @@ const loadRomByName = (romName) => {
   load(tal);
 };
 
-let download = (filename, text, binary) => {
-  var element = document.createElement('a');
-  let encoding = binary ? 'application/octet-stream,' : 'text/plain;charset=utf-8,';
+const download = (filename, text, binary) => {
+  const element = document.createElement('a');
+  const encoding = binary
+    ? 'application/octet-stream,'
+    : 'text/plain;charset=utf-8,';
   element.setAttribute('href', `data:${encoding}${encodeURIComponent(text)}`);
   element.setAttribute('download', filename);
   element.style.display = 'none';
   document.body.appendChild(element);
   element.click();
   document.body.removeChild(element);
-}
+};
 
-let downloadUxntal = () => {
-  download("learn-uxn." + Date.now() + ".tal", readEditor(), false);
-}
+const downloadUxntal = () => {
+  download(`learn-uxn.${Date.now()}.tal`, readEditor(), false);
+};
 
-let downloadRom = () => {
-  download("learn-uxn." + Date.now() + ".rom", readFile(window.uxn, "/input.rom", 'binary'), true);
-}
+// TODO: broken; always underflow
+// eslint-disable-next-line
+const downloadRom = () => {
+  download(
+    `learn-uxn.${Date.now()}.rom`,
+    readFile(window.uxn, '/input.rom', 'binary'),
+    true,
+  );
+};
+
+const assembleEditor = () => {
+  const text = readEditor();
+  if (!text) {
+    log(errWrap('No unxtal to assemble!'));
+    return;
+  }
+  log(`Read ${text.length} bytes from editor...`);
+  const rom = assemble(text);
+  loadRom(rom);
+};
+
+const reload = () => {
+  log('Restarting...');
+  reloadAsm();
+  reloadEmu();
+  document.querySelector('#console').innerHTML = '';
+  load('( L E A R N  U X N )');
+};
 
 const addListeners = () => {
   // control listeners
@@ -361,7 +358,7 @@ const addListeners = () => {
 
   const about = document.querySelector('#about');
   about.addEventListener('click', () => {
-    document.querySelector("#about-modal").classList.toggle("hidden");
+    document.querySelector('#about-modal').classList.toggle('hidden');
   });
 
   // console scroller
@@ -402,29 +399,27 @@ const addListeners = () => {
     });
   });
 
-  let anchors = document.querySelectorAll('#roms > div > a')
+  const anchors = document.querySelectorAll('#roms > div > a');
   anchors.forEach((x) => {
     x.addEventListener('click', (e) => {
       loadRomByName(e.srcElement.innerHTML);
     });
   });
 
-  // TODO: figure out whats different
-  // document.querySelector("#download-rom").addEventListener('click', downloadRom);
-  document.querySelector("#download-uxntal").addEventListener('click', downloadUxntal);
+  // TODO: figure out whats different?
+  // always gives buffer underflow
+  // document
+  //  .querySelector('#download-rom')
+  //  .addEventListener('click', downloadRom);
+
+  document
+    .querySelector('#download-uxntal')
+    .addEventListener('click', downloadUxntal);
 
   document.querySelector('#editor').addEventListener('click', () => {
     window.editor.focus();
   });
 };
-
-const reload = () => {
-  log("Restarting...")
-  reloadAsm();
-  reloadEmu();
-  document.querySelector('#console').innerHTML = '';
-  populateEditor("( L E A R N  U X N )");
-}
 
 //////////
 // MAIN //

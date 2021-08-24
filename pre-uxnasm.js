@@ -15,7 +15,10 @@ window.allReady = promise;
 
 const dispatch = (text, exit, err) => {
   const data = {
-    module: 'asm', message: text, exit, err,
+    module: 'asm',
+    message: text,
+    exit,
+    err,
   };
   const event = new CustomEvent('uxn', { detail: data });
   window.parent.document.dispatchEvent(event);

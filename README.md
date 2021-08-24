@@ -1,17 +1,36 @@
 # learn-uxn
 
+learn you a uxn for great good!!!!!
+
+## uses
+
+* [uxn](https://git.sr.ht/~rabbits/uxn)
+* [codemirror 6](https://codemirror.net/6)
+* [lezer](https://lezer.codemirror.net)
+* [emscripten](https://emscripten.org)
+* cursed hackery
+
 ## building
 
 ```
-build.sh
+make build
 ```
+which is composed of:
+
+* build.sh - downloads [emscripten, builds uxn, builds emscripten port
+* npm install - ugh don't we all just adore javascript
+* rollup
+
+## Contributing
+
+* be reasonable
+* keep it cursed
+* `make format` before PR if you're adding/modifying js
 
 ## TODO
 
-* finish setting up code mirror
-* add code mirror mode
-* allow drag/drop rom?
-* allow save rom?
+[ ] allow save rom?
+[ ] fix debug view?
 
 # LICENSE
 

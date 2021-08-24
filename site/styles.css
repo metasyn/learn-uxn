@@ -1,7 +1,6 @@
 :root {
   --bg: black;
 
-
   --control-margin: 60px;
   --top-margin: var(--control-margin);
 
@@ -27,7 +26,7 @@
 body {
   margin-top: 0px;
   background-color: var(--bg);
-  font-family: 'Fira Mono';
+  font-family: "Fira Mono";
 }
 
 button {
@@ -67,7 +66,6 @@ a:hover {
 #noscript a {
   text-decoration: underline;
 }
-
 
 #uxnemu {
   width: 50vw;
@@ -111,7 +109,7 @@ a:hover {
   position: fixed;
   width: 100%;
   display: flex;
-  z-index:10
+  z-index: 10;
 }
 
 .flex {
@@ -145,7 +143,6 @@ a:hover {
 .arithmetic-opcode {
   color: var(--color-green);
 }
-
 
 .rune-sublabel {
   color: var(--color-teal);
@@ -208,55 +205,56 @@ a:hover {
 
 /* Dropdown button */
 .dropdown .dropbtn {
-	font-size: 16px;
-	border: none;
-	outline: none;
-	color: black;
-	padding: 14px 16px;
-	background-color: inherit;
-	font-family: inherit; /* Important for vertical align on mobile phones */
-	margin: 0; /* Important for vertical align on mobile phones */
-  }
+  font-size: 16px;
+  border: none;
+  outline: none;
+  color: black;
+  padding: 14px 16px;
+  background-color: inherit;
+  font-family: inherit; /* Important for vertical align on mobile phones */
+  margin: 0; /* Important for vertical align on mobile phones */
+}
 
 /* Add a background color to .navbar links on hover */
-.navbar a:hover, .dropdown:hover .dropbtn {
-	background-color: var(--color-low);
+.navbar a:hover,
+.dropdown:hover .dropbtn {
+  background-color: var(--color-low);
 }
 
 /* Dropdown content (hidden by default) */
 .dropdown-content {
-	display: none;
-	position: absolute;
-	background-color: inherit;
+  display: none;
+  position: absolute;
+  background-color: inherit;
   filter: brightness(0.85);
 }
 
-  /* Links inside the dropdown */
+/* Links inside the dropdown */
 .dropdown-content a {
-	color: black;
-	padding: 12px 16px;
-	text-decoration: none;
-	display: block;
-	text-align: left;
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+  text-align: left;
 }
 
-  /* Add a grey background color to dropdown links on hover */
+/* Add a grey background color to dropdown links on hover */
 .dropdown-content a:hover {
-	background-color: #ddd;
+  background-color: #ddd;
 }
 
-  /* Show the dropdown menu on hover */
+/* Show the dropdown menu on hover */
 .dropdown:hover .dropdown-content {
-	display: block;
+  display: block;
 }
 
 .dropdown:active.dropdown-content {
-	display: block;
+  display: block;
 }
 
 /* keyframe bullshit */
 .pulse {
-	animation: pulse 5s infinite;
+  animation: pulse 5s infinite;
   background-color: white;
   animation-direction: alternate;
   transform-origin: 30% 5%;
@@ -264,19 +262,16 @@ a:hover {
 }
 
 @keyframes pulse {
-	0% {
-    transform: translateY(0px);
+  0% {
     animation-timing-function: ease-in;
-    filter: invert(0)
-	}
+    filter: invert(0);
+  }
 
-	50% {
-    transform: translateY(5px);
+  50% {
     animation-timing-function: ease-out;
     filter: invert(100);
-	}
+  }
 }
-
 
 /* Works on Firefox */
 * {
@@ -325,7 +320,9 @@ a:hover {
   border-left-color: white;
 }
 
-.cm-editor .cm-focused .cm-selectionBackground, .cm-selectionBackground, ::selection {
+.cm-editor .cm-focused .cm-selectionBackground,
+.cm-selectionBackground,
+::selection {
   background-color: #151515;
 }
 
@@ -368,7 +365,7 @@ a:hover {
 }
 
 .highlight-hexadecimal {
-  color: var(--color-purple)
+  color: var(--color-purple);
 }
 
 .highlight-comment {

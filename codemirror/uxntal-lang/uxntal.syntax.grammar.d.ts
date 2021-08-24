@@ -1,3 +1,3 @@
-import {Parser} from "lezer"
+import { Parser } from "lezer";
 
-export declare const parser: Parser
+export declare const parser: Parser;

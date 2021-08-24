@@ -17,18 +17,16 @@
 -->
 <html lang="en-us">
   <head>
-    <meta charset="utf-8">
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   </head>
-  <link rel="stylesheet" href="https://code.cdn.mozilla.net/fonts/fira.css">
-  <link rel="stylesheet" href="styles.css">
-  <div id='controls-wrap'>
-    <div id='controls'>
-      <div id='roms' class='control dropdown'>
-        <p>
-         roms
-        </p>
-        <div class='dropdown-content'>
+  <link rel="stylesheet" href="https://code.cdn.mozilla.net/fonts/fira.css" />
+  <link rel="stylesheet" href="styles.css" />
+  <div id="controls-wrap">
+    <div id="controls">
+      <div id="roms" class="control dropdown">
+        <p>roms</p>
+        <div class="dropdown-content">
           <a href="#">automata</a>
           <a href="#">bifurcan</a>
           <a href="#">controller</a>
@@ -42,51 +40,44 @@
           <a href="#">move</a>
           <a href="#">neralie</a>
           <a href="#">piano</a>
-          <a href="#">picture</a>
           <a href="#">polycat</a>
           <a href="#">proportional-font</a>
           <a href="#">screen</a>
           <a href="#">shapes</a>
           <a href="#">theme</a>
           <a href="#">wallpaper</a>
-          <div class='pulse'>
-            <a href="https://github.com/metasyn/learn-uxn/issues/new">submit yours!</a>
+          <div class="pulse">
+            <a
+              href="https://github.com/metasyn/learn-uxn/issues/new?title=NEW ROM REQUEST&body=Please add my rom!"
+              >submit yours!</a
+            >
           </div>
         </div>
       </div>
-      <div id='assemble' class='control'>
-        <p>
-         assemble
-        </p>
+      <div id="assemble" class="control">
+        <p>assemble</p>
       </div>
-      <div id='export' class='control dropdown'>
+      <div id="export" class="control dropdown">
         <p>
-          <a>
-            export
-          </a>
+          <a> export </a>
         </p>
-        <div class='dropdown-content'>
-          <a id='download-uxntal'>download uxntal</a>
+        <div class="dropdown-content">
+          <a id="download-uxntal">download uxntal</a>
+          <!-- <a id="download-rom">download rom</a> -->
         </div>
       </div>
-      <div id='new' class='control'>
-        <p>
-          new
-        </p>
+      <div id="new" class="control">
+        <p>new</p>
       </div>
-      <div id='about' class='control'>
+      <div id="about" class="control">
         <p>
-          <a href="#about-modal">
-            about
-          </a>
+          <a href="#about-modal"> about </a>
         </p>
-      </div>
       </div>
     </div>
   </div>
 
   <body>
-
     <div class="nav-toggle">
       <div class="nav-toggle-bar"></div>
     </div>
@@ -94,7 +85,7 @@
     <nav class="nav">
       <div>
         <h2>roms</h2>
-        <br/>
+        <br />
       </div>
 
       <div>
@@ -102,48 +93,67 @@
         <ul>
           <li><a href="https://wiki.xxiivv.com/site/uxn.html">uxn</a></li>
           <li><a href="https://wiki.xxiivv.com/site/uxntal.html">unxtal</a></li>
-          <li><a href="https://wiki.xxiivv.com/site/varvara.html">varvara</a></li>
-          <li><a href="https://compudanzas.net/uxn_tutorial.html">uxn tutorial</a></li>
-          <li>uxn is created by <a href="https://100r.co">hundred rabbits</a></li>
-          <li>learn-uxn site made by <a href="https://metasyn.pw">metasyn</a></li>
+          <li>
+            <a href="https://wiki.xxiivv.com/site/varvara.html">varvara</a>
+          </li>
+          <li>
+            <a href="https://compudanzas.net/uxn_tutorial.html">uxn tutorial</a>
+          </li>
+          <li>
+            uxn is created by <a href="https://100r.co">hundred rabbits</a>
+          </li>
+          <li>
+            learn-uxn site made by <a href="https://metasyn.pw">metasyn</a>
+          </li>
         </ul>
       </div>
     </nav>
 
-
-    <div class='flex'>
-
-      <div id='editor-wrapper'>
-
-        <div id='editor'>
+    <div class="flex">
+      <div id="editor-wrapper">
+        <div id="editor">
           <div id="noscript">
             <noscript>
-              Hello!
-
-              It looks like you are accessing this site without support for javascript. This site
-              is a javascript port of the uxn emulator and assembler that are written in C, and it
-              is ported using emscripten. Meaning, this site is useless for you.
+              Hello! It looks like you are accessing this site without support
+              for javascript. This site is a javascript port of the uxn emulator
+              and assembler that are written in C, and it is ported using
+              emscripten. Meaning, this site is useless for you.
 
               <ul>
                 <li><a href="https://wiki.xxiivv.com/site/uxn.html">uxn</a></li>
-                <li><a href="https://wiki.xxiivv.com/site/uxntal.html">unxtal</a></li>
-                <li><a href="https://wiki.xxiivv.com/site/varvara.html">varvara</a></li>
-                <li><a href="https://compudanzas.net/uxn_tutorial.html">uxn tutorial</a></li>
-                <li>uxn is created by <a href="https://100r.co">hundred rabbits</a></li>
-                <li>learn-uxn site made by <a href="https://metasyn.pw">metasyn</a></li>
+                <li>
+                  <a href="https://wiki.xxiivv.com/site/uxntal.html">unxtal</a>
+                </li>
+                <li>
+                  <a href="https://wiki.xxiivv.com/site/varvara.html"
+                    >varvara</a
+                  >
+                </li>
+                <li>
+                  <a href="https://compudanzas.net/uxn_tutorial.html"
+                    >uxn tutorial</a
+                  >
+                </li>
+                <li>
+                  uxn is created by
+                  <a href="https://100r.co">hundred rabbits</a>
+                </li>
+                <li>
+                  learn-uxn site made by
+                  <a href="https://metasyn.pw">metasyn</a>
+                </li>
               </ul>
             </noscript>
           </div>
         </div>
       </div>
 
-      <div id='uxnemu'>
-        <iframe id='uxnemu-iframe' src='uxnemu.html'></iframe>
-        <div id='console-wrap'>
-          <pre id='console'></pre>
+      <div id="uxnemu">
+        <iframe id="uxnemu-iframe" src="uxnemu.html"></iframe>
+        <div id="console-wrap">
+          <pre id="console"></pre>
         </div>
       </div>
-    </div>
     </div>
 
     <div id="about-modal" class="hidden">
@@ -155,10 +165,18 @@
         <ul>
           <li><a href="https://wiki.xxiivv.com/site/uxn.html">uxn</a></li>
           <li><a href="https://wiki.xxiivv.com/site/uxntal.html">unxtal</a></li>
-          <li><a href="https://wiki.xxiivv.com/site/varvara.html">varvara</a></li>
-          <li><a href="https://compudanzas.net/uxn_tutorial.html">uxn tutorial</a></li>
+          <li>
+            <a href="https://wiki.xxiivv.com/site/varvara.html">varvara</a>
+          </li>
+          <li>
+            <a href="https://compudanzas.net/uxn_tutorial.html">uxn tutorial</a>
+          </li>
           <li><a href="https://git.sr.ht/~rabbits/uxn/">uxn repo</a></li>
-          <li><a href="https://llllllll.co/t/uxn-virtual-computer/46103'">llllllll forum</a></li>
+          <li>
+            <a href="https://llllllll.co/t/uxn-virtual-computer/46103"
+              >llllllll forum</a
+            >
+          </li>
           <li>come chat at #uxn on irc.esper.net</li>
         </ul>
 
@@ -179,9 +197,18 @@
 
         <h2>how does it work</h2>
         <ul>
-          <li>this site uses <a href="https://emscripten.org/">emscripten</a> to port the C-based UXN emulator</li>
-          <li>it uses <a href="https://lezer.codemirror.net">lezer</a> for parsing syntax / grammer</li>
-          <li>it uses <a href="https://codemirror.net/6/">codemirror</a> for editing and highlighting and tooltips</li>
+          <li>
+            this site uses <a href="https://emscripten.org/">emscripten</a> to
+            port the C-based UXN emulator
+          </li>
+          <li>
+            it uses <a href="https://lezer.codemirror.net">lezer</a> for parsing
+            syntax / grammer
+          </li>
+          <li>
+            it uses <a href="https://codemirror.net/6/">codemirror</a> for
+            editing and highlighting and tooltips
+          </li>
         </ul>
 
         <h2>warnings</h2>
@@ -198,20 +225,21 @@
           <li>want to add your own rom or uxntal file?</li>
           <li>want to add better tooltips?</li>
           <li>want to fix the debug view?</li>
-          <li><a href="https://github.com/metasyn/learn-uxn/">please make a PR or issue here: learn-uxn repo</a>
+          <li>
+            <a href="https://github.com/metasyn/learn-uxn/"
+              >please make a PR or issue here</a
+            >
+          </li>
         </ul>
       </div>
     </div>
 
     <!-- this has no display -->
-    <div id='uxnasm'>
-      <iframe id='uxnasm-iframe' src='uxnasm.html'></iframe>
+    <div id="uxnasm">
+      <iframe id="uxnasm-iframe" src="uxnasm.html"></iframe>
     </div>
-
   </body>
 
   <script src="editor.bundle.js"></script>
   <script type="text/javascript" src="lean.js"></script>
-
-  </script>
 </html>

@@ -3,11 +3,8 @@
 .ONESHELL:
 
 format:
-	prettier --write pre.js site/lean.js
-	eslint_d --fix --quiet pre.js site/lean.js
-
-lint:
-	eslint pre.js site/lean.js
+	prettier --write site/*.html site/*.css site/lean.js pre-uxnemu.js pre-uxnasm.js codemirror/**/*js
+	eslint_d --fix site/lean.js pre-uxnemu.js pre-uxnasm.js codemirror/**/*.js
 
 install:
 	npm install
@@ -15,11 +12,11 @@ install:
 rollup:
 	node_modules/.bin/rollup -c
 
-watch:
-	node_modules/.bin/rollup -c -w --watch.include codemirror
-
-build:
+build: install rollup
 	./build.sh
+
+serve:
+	python -m http.server
 
 deploy:
 		sshopts="ssh -o StrictHostKeyChecking=no -p 23"
