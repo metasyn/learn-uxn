@@ -21,5 +21,5 @@ serve:
 	python -m http.server
 
 deploy:
-		sshopts="ssh -o StrictHostKeyChecking=no -p 23"
-		rsync --rsh="$$sshopts" -zavhrc ./site/* xander@metasyn.pw:/var/www/nginx/memex/uxn
+	git push origin master
+	git push github master
