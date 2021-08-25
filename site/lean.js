@@ -322,6 +322,31 @@ const downloadRom = () => {
   );
 };
 
+const importRomHandler = () => {
+  const fileList = document.querySelector('#import-rom-input').files;
+
+  if (!fileList) {
+    log(errWrap('No files in list to load...'));
+    return;
+  }
+
+  const file = fileList[0];
+  if (!file.size) {
+    log(errWrap('File is empty...'));
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = (t) => {
+    const uintArray = new Uint8Array(t.target.result);
+    const b64 = btoa(uintArray);
+    loadRom(b64);
+  };
+
+  log(`Loading "${file.name}"...`);
+  reader.readAsArrayBuffer(file);
+};
+
 const assembleEditor = () => {
   const text = readEditor();
   if (!text) {
@@ -348,9 +373,19 @@ const addListeners = () => {
     assembleEditor();
   });
 
-  document.querySelector('#export').addEventListener('click', () => {
-    log('🅴🆇🅿🅾🆁🆃');
+  document
+    .querySelector('#download-uxntal')
+    .addEventListener('click', downloadUxntal);
+
+  document.querySelector('#import-rom').addEventListener('click', () => {
+    document.querySelector('#import-rom-input').click();
   });
+
+  document
+    .querySelector('#import-rom-input')
+    .addEventListener('change', (e) => {
+      importRomHandler(e);
+    });
 
   document.querySelector('#new').addEventListener('click', () => {
     reload();
@@ -413,12 +448,8 @@ const addListeners = () => {
   //  .addEventListener('click', downloadRom);
 
   document
-    .querySelector('#download-uxntal')
-    .addEventListener('click', downloadUxntal);
-
-  document.querySelector('#editor').addEventListener('click', () => {
-    window.editor.focus();
-  });
+    .querySelector('#editor')
+    .addEventListener('click', window.editor.focus);
 };
 
 //////////

@@ -57,12 +57,13 @@
       <div id="assemble" class="control">
         <p>assemble</p>
       </div>
-      <div id="export" class="control dropdown">
+      <div id="io" class="control dropdown">
         <p>
-          <a> export </a>
+          <a> io</a>
         </p>
         <div class="dropdown-content">
-          <a id="download-uxntal">download uxntal</a>
+          <a id="download-uxntal">export uxntal</a>
+          <a id="import-rom">import rom</a>
           <!-- <a id="download-rom">download rom</a> -->
         </div>
       </div>
@@ -238,6 +239,14 @@
     <div id="uxnasm">
       <iframe id="uxnasm-iframe" src="uxnasm.html"></iframe>
     </div>
+
+    <input
+      type="file"
+      id="import-rom-input"
+      multiple
+      accept="*/*"
+      class="hidden"
+    />
   </body>
 
   <script src="editor.bundle.js"></script>
