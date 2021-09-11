@@ -17,11 +17,10 @@
 -->
 <html lang="en-us">
   <head>
-    <meta charset="utf-8" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="stylesheet" href="https://code.cdn.mozilla.net/fonts/fira.css" />
+    <link rel="stylesheet" href="styles.css" />
   </head>
-  <link rel="stylesheet" href="https://code.cdn.mozilla.net/fonts/fira.css" />
-  <link rel="stylesheet" href="styles.css" />
   <div id="controls-wrap">
     <div id="controls">
       <div id="roms" class="control dropdown">
@@ -61,7 +60,8 @@
         <p>
           <a> io</a>
         </p>
-        <div class="dropdown-content">
+        <div id="io-listing"çkj:w
+          class="dropdown-content">
           <a id="download-uxntal">export uxntal</a>
           <a id="import-rom">import rom</a>
           <!-- <a id="download-rom">download rom</a> -->
@@ -69,6 +69,9 @@
       </div>
       <div id="new" class="control">
         <p>new</p>
+      </div>
+      <div id="fullscreen" class="control">
+        <p>fullscreen</p>
       </div>
       <div id="about" class="control">
         <p>
@@ -151,7 +154,7 @@
 
       <div id="uxnemu">
         <iframe id="uxnemu-iframe" src="uxnemu.html"></iframe>
-        <div id="console-wrap">
+        <div id="console-wrapper">
           <pre id="console"></pre>
         </div>
       </div>

@@ -82,7 +82,7 @@ a:hover {
   display: none;
 }
 
-#console-wrap {
+#console-wrapper {
   margin-left: 10px;
   position: fixed;
   width: 100%;
@@ -121,7 +121,7 @@ a:hover {
 }
 
 .hidden {
-  display: none;
+  display: none !important;
 }
 
 .comment {
@@ -186,12 +186,16 @@ a:hover {
   background-color: var(--color-yellow);
 }
 
-#new {
+#fullscreen {
   background-color: var(--color-green);
 }
 
-#about {
+#new {
   background-color: var(--color-blue);
+}
+
+#about {
+  background-color: var(--color-purple);
 }
 
 /* The dropdown container */
