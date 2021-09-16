@@ -18,8 +18,11 @@ build: install rollup
 	cp -r site docs
 
 serve:
-	python -m http.server
+	python3 -m http.server &
 
 deploy:
 	git push origin master
 	git push github master
+
+test:
+	npx cypress run

@@ -588,7 +588,6 @@ RTN
 
 @last-note   $1
 @octave      $1
-@color       $1
 @pointer     [ &x $2 &y $2 ]
 @center      [ &x $2 &y $2 ]
 @adsr-view   [ &x1 $2 &y1 $2 &x2 $2 &y2 $2 ]

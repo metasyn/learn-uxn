@@ -3,3 +3,6 @@ emsdk
 roms
 node_modules
 tals
+
+.DS_Store
+cypress/videos
