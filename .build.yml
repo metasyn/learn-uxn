@@ -31,4 +31,5 @@ tasks:
       cd learn-uxn
       make build
   - test: |
+      cd learn-uxn
       make serve test
