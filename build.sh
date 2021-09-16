@@ -94,9 +94,7 @@ function build_uxn_emscripten() {
 
 
     blue "Building UXN for emscripten..."
-        # -s EXPORT_NAME=uxnemu \
-        # -s MODULARIZE=1 \
-    EMCC_DEBUG=1 emcc \
+    emcc \
         -s WASM=1 \
         -s ASSERTIONS=1 \
         -s ENVIRONMENT=web \
@@ -137,6 +135,10 @@ while (( "$#" )); do
   case "$1" in
     -c|--clean)
       CLEAN=1
+      shift
+      ;;
+    -d|--debug)
+      export EMCC_DEBUG=1
       shift
       ;;
     -*|--*=) # unsupported flags
