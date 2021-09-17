@@ -37,4 +37,7 @@ tasks:
       cd learn-uxn
       git remote add github git@github.com:metasyn/learn-uxn
       ssh-keyscan github.com >> ~/.ssh/known_hosts
+      git config user.name "builds.sr.ht"
+      git config user.email "xander@metasyn.pw"
+      git add docs && git commit -m ":robot: automatic build from builds.sr.ht"
       git push github master
