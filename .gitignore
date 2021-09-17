@@ -4,6 +4,7 @@ emsdk
 roms
 node_modules
 tals
+uxn
 
 .DS_Store
 cypress/videos
