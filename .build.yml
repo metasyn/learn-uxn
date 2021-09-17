@@ -33,3 +33,7 @@ tasks:
   - test: |
       cd learn-uxn
       make serve test
+  - deploy: |
+      cd learn-uxn
+      git remote add github git@github.com:metasyn/learn-uxn
+      git push github master

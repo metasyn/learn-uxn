@@ -1,6 +1,9 @@
 # learn-uxn
 
-learn you a uxn for great good!!!!!
+[![builds.sr.ht status](https://builds.sr.ht/~metasyn/learn-uxn.svg)](https://builds.sr.ht/~metasyn/learn-uxn?)
+
+* learn you a uxn for great good!!!!!
+* see it here: https://metasyn.github.io/learn-uxn
 
 ## uses
 
