@@ -14,8 +14,6 @@ rollup:
 
 build: install rollup
 	./build.sh
-	rm -rf docs
-	cp -r site docs
 
 serve:
 	python3 -m http.server &

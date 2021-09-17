@@ -76,20 +76,36 @@ function setup_uxn() {
     green "\tDone!"
 }
 
+function inject_uxn_commit() {
+    uxn_commit=$(cd uxn && git rev-parse HEAD);
+    blue "Setting commit to $uxn_commit";
+    sed -i -e "s/__UXN_COMMIT__/${uxn_commit}/g" docs/index.html
+}
+
+function inject_date() {
+    blue "Setting date to $(date)";
+    sed -i -e "s/__DATE__/$(date)/g" docs/index.html
+}
+
+function copy_docs() {
+	rm -rf docs
+	cp -r site docs
+}
+
 function build_uxn_emscripten() {
     rm -rf tals
     mkdir -p tals
 
     for file in $(ls uxn/projects/examples/demos/*.tal); do
-        cp $file tals
+        cp "$file" tals
     done;
 
     for file in $(ls uxn/projects/examples/devices/*.tal); do
-        cp $file tals
+        cp "$file" tals
     done;
 
     for file in $(ls uxn/projects/examples/gui/*.tal); do
-        cp $file tals
+        cp "$file" tals
     done;
 
 
@@ -141,7 +157,7 @@ while (( "$#" )); do
       export EMCC_DEBUG=1
       shift
       ;;
-    -*|--*=) # unsupported flags
+    -*) # unsupported flags
       echo "Error: Unsupported flag $1" >&2
       exit 1
       ;;
@@ -167,5 +183,8 @@ fi;
 setup_emsdk
 setup_uxn
 build_uxn_emscripten
+copy_docs
+inject_uxn_commit
+inject_date
 
 green "Finished!"

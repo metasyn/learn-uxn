@@ -12,90 +12,85 @@ var uxnasm;
 // IO //
 ////////
 
-var fullscreen = false;
+let fullscreen = false;
 
 const dateFmt = () => {
   function toString(number, padLength) {
-    return number.toString().padStart(padLength, "0");
+    return number.toString().padStart(padLength, '0');
   }
 
   const date = new Date();
 
   const fmt = `${toString(date.getHours(), 2)}:${toString(
     date.getMinutes(),
-    2
+    2,
   )}:${toString(date.getSeconds(), 2)}.${toString(date.getMilliseconds(), 3)}`;
   return fmt;
 };
 
-const colorWrap = (text, color) =>
-  `<span style="color: var(--color-${color})">${text}</span>`;
-const errWrap = (text) => colorWrap(text, "red");
-const successWrap = (text) => colorWrap(text, "green");
-const cleanupWrap = (text) => colorWrap(text, "orange");
+const colorWrap = (text, color) => `<span style="color: var(--color-${color})">${text}</span>`;
+const errWrap = (text) => colorWrap(text, 'red');
+const successWrap = (text) => colorWrap(text, 'green');
+const cleanupWrap = (text) => colorWrap(text, 'orange');
 
 const log = (text, module) => {
-  module = module || "web";
+  module = module || 'web';
   const prefixColorByLocation = {
-    emu: "blue",
-    asm: "purple",
-    web: "yellow",
+    emu: 'blue',
+    asm: 'purple',
+    web: 'yellow',
   };
   const prefixColor = prefixColorByLocation[module];
   const prefix = colorWrap(`[${module}]`, prefixColor);
 
   // check for error messages that we want to suppress
   const lower = text.toLowerCase();
-  const doSupress = ["sigaction: signal type not supported: this is a no-op."];
+  const doSupress = ['sigaction: signal type not supported: this is a no-op.'];
   if (doSupress.some((x) => lower.includes(x))) {
     return;
   }
 
   // check for common error words if uxn tools don't use exit status code
   const hasBadLookingMessage = [
-    "usage",
-    "failed to open source",
-    "failed to assemble rom",
+    'usage',
+    'failed to open source',
+    'failed to assemble rom',
     // macros
-    "macro duplicate",
-    "macro name is hex number",
-    "macro name is invalid",
-    "macro too large",
-    "word too long",
+    'macro duplicate',
+    'macro name is hex number',
+    'macro name is invalid',
+    'macro too large',
+    'word too long',
     // labels
-    "label duplicate",
-    "label name is hex number",
-    "label name is invalid",
+    'label duplicate',
+    'label name is hex number',
+    'label name is invalid',
     // token
-    "address is not in zero page",
-    "address is too far",
-    "invalid hexadecimal literal",
-    "invalid hexadecimal value",
-    "invalid macro",
-    "invalid token",
+    'address is not in zero page',
+    'address is too far',
+    'invalid hexadecimal literal',
+    'invalid hexadecimal value',
+    'invalid macro',
+    'invalid token',
     // pass 1
-    "invalid padding",
+    'invalid padding',
     // 'invalid macro',
-    "invalid label",
-    "invalid sublabel",
+    'invalid label',
+    'invalid sublabel',
     // pass 2
-    "memory overwrite",
-    "unknown label",
+    'memory overwrite',
+    'unknown label',
 
     // emu
-    "init failure",
-    "sdl_",
-    "failed to start uxn",
-    "failed to open rom",
-    "failed to initialize emulator",
+    'init failure',
+    'sdl_',
+    'failed to start uxn',
+    'failed to open rom',
+    'failed to initialize emulator',
   ].some((x) => lower.includes(x));
 
-  const hasCleanupLookingMessage = ["--- unused"].some((x) =>
-    lower.includes(x)
-  );
-  const hasGoodLookingMessage = ["assembled", "loaded"].some((x) =>
-    lower.includes(x)
-  );
+  const hasCleanupLookingMessage = ['--- unused'].some((x) => lower.includes(x));
+  const hasGoodLookingMessage = ['assembled', 'loaded'].some((x) => lower.includes(x));
 
   if (hasGoodLookingMessage) {
     text = successWrap(text);
@@ -105,14 +100,14 @@ const log = (text, module) => {
     text = cleanupWrap(text);
   }
 
-  const el = document.querySelector("#console");
+  const el = document.querySelector('#console');
 
   el.innerHTML += `${prefix} ${dateFmt()} ${text}\n`;
 };
 
 const errFmt = (e) => {
-  const err = `${e.message || "(no msg)"} : ${e.code || "(no code)"} ${
-    e.errno || "(no errno)"
+  const err = `${e.message || '(no msg)'} : ${e.code || '(no code)'} ${
+    e.errno || '(no errno)'
   }`;
   return errWrap(err);
 };
@@ -124,7 +119,7 @@ const readFile = (w, path, encoding) => {
     return contents;
   } catch (e) {
     log(errFmt(e));
-    return "";
+    return '';
   }
 };
 
@@ -170,15 +165,15 @@ const deleteFileAsm = (path) => {
 };
 
 const assemble = (data) => {
-  log("Assembling...");
-  writeFileAsm("temp.tal", data);
+  log('Assembling...');
+  writeFileAsm('temp.tal', data);
 
-  window.asm.callMain(["temp.tal", "output.rom"]);
-  deleteFileAsm("temp.tal");
-  const b64 = btoa(readFileAsm("output.rom", "binary"));
+  window.asm.callMain(['temp.tal', 'output.rom']);
+  deleteFileAsm('temp.tal');
+  const b64 = btoa(readFileAsm('output.rom', 'binary'));
 
   // reload to clear global state
-  log("Reloading assembler...");
+  log('Reloading assembler...');
   reloadAsm();
   return b64;
 };
@@ -217,7 +212,7 @@ const reloadEmu = () => {
 };
 
 const loadRom = (rom) => {
-  log("Loading rom...");
+  log('Loading rom...');
   // force reload to get a clean slate
   // otherwise SDL has all these issues
   // with teardown
@@ -226,7 +221,7 @@ const loadRom = (rom) => {
   // grab the iframe again to get a new reference to the window
   // stash the rom we have here in the window so it can load it
   // after it is done initializing
-  const iframe = document.querySelector("#uxnemu-iframe");
+  const iframe = document.querySelector('#uxnemu-iframe');
   iframe.onload = (e) => {
     e.target.contentWindow.rom = rom;
   };
@@ -238,7 +233,7 @@ const loadRom = (rom) => {
 const clearEditor = () => {
   const text = window.editor.state.doc.toString();
   window.editor.dispatch({
-    changes: { from: 0, to: text.length, insert: "" },
+    changes: { from: 0, to: text.length, insert: '' },
   });
 };
 
@@ -255,20 +250,20 @@ const populateEditor = (insert) => {
 
 const getTopMargin = () => {
   const topMarginPx = getComputedStyle(
-    document.documentElement
-  ).getPropertyValue("--top-margin");
+    document.documentElement,
+  ).getPropertyValue('--top-margin');
   return parseInt(topMarginPx.slice(0, -2), 10);
 };
 
 const resize = () => {
   // get the emulator height
-  const el = document.querySelector("#uxnemu-iframe");
-  const style = getComputedStyle(el.contentWindow.document.body);
+  const el = document.querySelector('#uxnemu-iframe');
+  const style = getComputedStyle(el.contentWindow.document.body) || undefined;
 
-  if (style.height) {
+  if (style && style.height) {
     el.style.height = style.height;
 
-    const consoleEl = document.querySelector("#console-wrapper");
+    const consoleEl = document.querySelector('#console-wrapper');
     const topMargin = getTopMargin();
     const height = parseInt(style.height.slice(0, -2), 10);
 
@@ -277,7 +272,7 @@ const resize = () => {
 };
 
 const hideNoScript = () => {
-  document.querySelector("#noscript").innerHTML = "";
+  document.querySelector('#noscript').innerHTML = '';
 };
 
 const scrollToBottom = (el) => {
@@ -301,18 +296,18 @@ const load = (tal) => {
 // eslint-disable-next-line
 const loadRomByName = (romName) => {
   log(`🅻🅾🅰🅳🅸🅽🅶 ${romName}`);
-  const tal = readFileAsm(`/tals/${romName}.tal`, "utf8");
+  const tal = readFileAsm(`/tals/${romName}.tal`, 'utf8');
   load(tal);
 };
 
 const download = (filename, text, binary) => {
-  const element = document.createElement("a");
+  const element = document.createElement('a');
   const encoding = binary
-    ? "application/octet-stream,"
-    : "text/plain;charset=utf-8,";
-  element.setAttribute("href", `data:${encoding}${encodeURIComponent(text)}`);
-  element.setAttribute("download", filename);
-  element.style.display = "none";
+    ? 'application/octet-stream,'
+    : 'text/plain;charset=utf-8,';
+  element.setAttribute('href', `data:${encoding}${encodeURIComponent(text)}`);
+  element.setAttribute('download', filename);
+  element.style.display = 'none';
   document.body.appendChild(element);
   element.click();
   document.body.removeChild(element);
@@ -327,22 +322,22 @@ const downloadUxntal = () => {
 const downloadRom = () => {
   download(
     `learn-uxn.${Date.now()}.rom`,
-    readFile(window.uxn, "/input.rom", "binary"),
-    true
+    readFile(window.uxn, '/input.rom', 'binary'),
+    true,
   );
 };
 
 const importRomHandler = () => {
-  const fileList = document.querySelector("#import-rom-input").files;
+  const fileList = document.querySelector('#import-rom-input').files;
 
   if (!fileList) {
-    log(errWrap("No files in list to load..."));
+    log(errWrap('No files in list to load...'));
     return;
   }
 
   const file = fileList[0];
   if (!file.size) {
-    log(errWrap("File is empty..."));
+    log(errWrap('File is empty...'));
     return;
   }
 
@@ -359,29 +354,29 @@ const importRomHandler = () => {
 
 const listFilesInEmulator = () => {
   const root = window.uxn.Module.FS.root.contents;
-  const toIgnore = ["tmp", "dev", "home", "proc", "input.rom"];
+  const toIgnore = ['tmp', 'dev', 'home', 'proc', 'input.rom'];
   return Object.keys(root).filter((x) => !toIgnore.includes(x));
 };
 
 const addFilesToIoListing = () => {
   const files = listFilesInEmulator();
   const existingListingIds = [
-    ...document.querySelectorAll("#io > .dropdown-content > a"),
+    ...document.querySelectorAll('#io > .dropdown-content > a'),
   ].map((x) => x.id);
 
-  const dropdown = document.querySelector("#io > .dropdown-content");
+  const dropdown = document.querySelector('#io > .dropdown-content');
 
   files.forEach((fname) => {
     if (!existingListingIds.includes(fname)) {
-      const a = document.createElement("a");
+      const a = document.createElement('a');
       const linkText = document.createTextNode(fname);
       a.appendChild(linkText);
       a.id = fname;
       dropdown.appendChild(a);
       debugger;
       // also add event listener
-      a.addEventListener("click", () => {
-        download(fname, readFile(window.uxn, "/" + fname, "binary"), true);
+      a.addEventListener('click', () => {
+        download(fname, readFile(window.uxn, `/${fname}`, 'binary'), true);
       });
     }
   });
@@ -390,7 +385,7 @@ const addFilesToIoListing = () => {
 const assembleEditor = () => {
   const text = readEditor();
   if (!text) {
-    log(errWrap("No unxtal to assemble!"));
+    log(errWrap('No unxtal to assemble!'));
     return;
   }
   log(`Read ${text.length} bytes from editor...`);
@@ -399,66 +394,66 @@ const assembleEditor = () => {
 };
 
 const reload = () => {
-  log("Restarting...");
+  log('Restarting...');
   reloadAsm();
   reloadEmu();
-  document.querySelector("#console").innerHTML = "";
-  load("( L E A R N  U X N )");
+  document.querySelector('#console').innerHTML = '';
+  load('( L E A R N  U X N )');
 };
 
 const addListeners = () => {
   // control listeners
-  document.querySelector("#assemble").addEventListener("click", () => {
-    log("🅰🆂🆂🅴🅼🅱🅻🅴");
+  document.querySelector('#assemble').addEventListener('click', () => {
+    log('🅰🆂🆂🅴🅼🅱🅻🅴');
     assembleEditor();
   });
 
   document
-    .querySelector("#download-uxntal")
-    .addEventListener("click", downloadUxntal);
+    .querySelector('#download-uxntal')
+    .addEventListener('click', downloadUxntal);
 
-  document.querySelector("#import-rom").addEventListener("click", () => {
-    document.querySelector("#import-rom-input").click();
+  document.querySelector('#import-rom').addEventListener('click', () => {
+    document.querySelector('#import-rom-input').click();
   });
 
   document
-    .querySelector("#import-rom-input")
-    .addEventListener("change", (e) => {
+    .querySelector('#import-rom-input')
+    .addEventListener('change', (e) => {
       importRomHandler(e);
     });
 
-  document.querySelector("#new").addEventListener("click", () => {
+  document.querySelector('#new').addEventListener('click', () => {
     reload();
   });
 
-  const about = document.querySelector("#about");
-  about.addEventListener("click", () => {
-    document.querySelector("#about-modal").classList.toggle("hidden");
+  const about = document.querySelector('#about');
+  about.addEventListener('click', () => {
+    document.querySelector('#about-modal').classList.toggle('hidden');
   });
 
-  document.querySelector("#fullscreen").addEventListener("click", () => {
-    document.querySelector("#editor-wrapper").classList.toggle("hidden");
-    document.querySelector("#console-wrapper").classList.toggle("hidden");
+  document.querySelector('#fullscreen').addEventListener('click', () => {
+    document.querySelector('#editor-wrapper').classList.toggle('hidden');
+    document.querySelector('#console-wrapper').classList.toggle('hidden');
 
     if (fullscreen) {
-      document.querySelector("#uxnemu").style.width = "50vw";
-      document.querySelector("#uxnemu-iframe").style.width = "50%";
+      document.querySelector('#uxnemu').style.width = '50vw';
+      document.querySelector('#uxnemu-iframe').style.width = '50%';
       fullscreen = false;
     } else {
-      document.querySelector("#uxnemu").style.width = "100%";
+      document.querySelector('#uxnemu').style.width = '100%';
 
       const topMargin = getTopMargin();
       const maxHeight = window.innerHeight - topMargin;
       const fullWidth = Math.min(maxHeight * 1.6, window.innerWidth);
-      const iframe = document.querySelector("#uxnemu-iframe");
-      iframe.style.width = fullWidth + "px";
+      const iframe = document.querySelector('#uxnemu-iframe');
+      iframe.style.width = `${fullWidth}px`;
 
       fullscreen = true;
     }
   });
 
   // console scroller
-  const consoleEl = document.querySelector("#console"); // Create an observer and pass it a callback.
+  const consoleEl = document.querySelector('#console'); // Create an observer and pass it a callback.
   const observer = new MutationObserver(() => {
     scrollToBottom(consoleEl); // Tell it to look for new children that will change the height.
   });
@@ -466,7 +461,7 @@ const addListeners = () => {
 
   // uxn iframe event dispatches for logging
   window.document.addEventListener(
-    "uxn",
+    'uxn',
     (e) => {
       const { module, message } = e.detail;
       // normally we'd try to use the err verus normal stream
@@ -478,26 +473,26 @@ const addListeners = () => {
 
       log(message, module);
     },
-    false
+    false,
   );
 
   [
-    document.querySelector("#uxnemu"),
-    document.querySelector("#uxnemu-iframe"),
+    document.querySelector('#uxnemu'),
+    document.querySelector('#uxnemu-iframe'),
   ].forEach((x) => {
     // reset focus anytime there is a click on the uxniframe
-    x.addEventListener("click", () => {
-      window.uxn.document.getElementById("canvas").focus();
+    x.addEventListener('click', () => {
+      window.uxn.document.getElementById('canvas').focus();
     });
     // or if it gets moused over
-    x.addEventListener("mouseover", () => {
-      window.uxn.document.getElementById("canvas").focus();
+    x.addEventListener('mouseover', () => {
+      window.uxn.document.getElementById('canvas').focus();
     });
   });
 
-  const anchors = document.querySelectorAll("#roms > div > a");
+  const anchors = document.querySelectorAll('#roms > div > a');
   anchors.forEach((x) => {
-    x.addEventListener("click", (e) => {
+    x.addEventListener('click', (e) => {
       loadRomByName(e.srcElement.innerHTML);
     });
   });
@@ -509,13 +504,13 @@ const addListeners = () => {
   //  .addEventListener('click', downloadRom);
 
   document
-    .querySelector("#editor")
-    .addEventListener("click", window.editor.focus);
+    .querySelector('#editor')
+    .addEventListener('click', window.editor.focus);
 
   // add files to the io listing
   document
-    .querySelector("#io")
-    .addEventListener("mouseover", addFilesToIoListing);
+    .querySelector('#io')
+    .addEventListener('mouseover', addFilesToIoListing);
 };
 
 //////////
@@ -525,14 +520,14 @@ const addListeners = () => {
 (async () => {
   hideNoScript();
 
-  const uxnIframe = document.querySelector("#uxnemu-iframe");
+  const uxnIframe = document.querySelector('#uxnemu-iframe');
   window.uxn = uxnIframe.contentWindow;
 
-  const asmIframe = document.querySelector("#uxnasm-iframe");
+  const asmIframe = document.querySelector('#uxnasm-iframe');
   window.asm = asmIframe.contentWindow;
 
   addListeners();
-  window.addEventListener("resize", resize);
+  window.addEventListener('resize', resize);
 
   // on the iframe load
   window.onload = () => {
@@ -540,12 +535,12 @@ const addListeners = () => {
     Promise.all([window.uxn.allReady, window.asm.allReady]).then(() => {
       resize();
 
-      const rom = getURLParam("rom") || "piano";
+      const rom = getURLParam('rom') || 'piano';
       loadRomByName(rom);
     });
   };
 
-  log("🅻🅴🅰🆁🅽 🆄🆇🅽");
+  log('🅻🅴🅰🆁🅽 🆄🆇🅽');
   resize();
   setInterval(resize, 1000);
 })();

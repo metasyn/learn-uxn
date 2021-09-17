@@ -167,8 +167,8 @@
         <p>last built: __DATE__</p>
         <p>running uxn commit:</p>
         <p>
-          <a href="https://git.sr.ht/~rabbits/uxn/commit/__UXN_COMMIT__">
-            __UXN_COMMIT__
+          <a href="https://git.sr.ht/~rabbits/uxn/commit/4406c2856c9d99eebc83263c53c74ecfd6fe11d5">
+            4406c2856c9d99eebc83263c53c74ecfd6fe11d5
           </a>
         </p>
 
