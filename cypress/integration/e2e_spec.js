@@ -38,6 +38,7 @@ describe('learn-uxn integration tests', () => {
 
     // force true to make get around the hover visibility
     cy.get('#roms').find('a').first().click({ force: true });
+    cy.wait(1000);
     cy.get('#assemble').click();
   });
 });
