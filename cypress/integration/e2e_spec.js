@@ -17,6 +17,9 @@ describe('learn-uxn integration tests', () => {
   it('page loads', () => {
     cy.visit('http://localhost:8000/site');
 
+    // wait a second for things to load
+    cy.wait(1000);
+
     // iframe should load for emu
     cy.get('#uxnemu-iframe')
       .its('0.contentDocument').should('exist');
@@ -30,6 +33,9 @@ describe('learn-uxn integration tests', () => {
 
   it('can load a rom, and assemble', () => {
     cy.visit('http://localhost:8000/site');
+    // wait a second for things to load
+    cy.wait(1000);
+
     // force true to make get around the hover visibility
     cy.get('#roms').find('a').first().click({ force: true });
     cy.get('#assemble').click();
