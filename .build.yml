@@ -36,4 +36,5 @@ tasks:
   - deploy: |
       cd learn-uxn
       git remote add github git@github.com:metasyn/learn-uxn
+      GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
       git push github master
