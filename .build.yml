@@ -20,8 +20,6 @@ packages:
   - xvfb
 sources:
   - https://git.sr.ht/~metasyn/learn-uxn
-secrets:
-  - b336eab6-3f41-4b59-99ba-9132cadc232f
 tasks:
   - node: |
       curl -sL https://deb.nodesource.com/setup_16.x -o nodesource_setup.sh
@@ -36,8 +34,9 @@ tasks:
   - deploy: |
       cd learn-uxn
       git remote add github git@github.com:metasyn/learn-uxn
-      ssh-keyscan github.com >> ~/.ssh/known_hosts
+      ssh-keyscan github.com
       git config user.name "builds.sr.ht"
       git config user.email "xander@metasyn.pw"
+      git checkout master
       git add docs && git commit -m ":robot: automatic build from builds.sr.ht"
       git push github master
