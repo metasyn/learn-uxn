@@ -41,5 +41,4 @@ tasks:
       git checkout master
       git add docs && git commit -m ":robot: automatic build from builds.sr.ht"
       git pull github master
-      git push origin master
       git push github master
