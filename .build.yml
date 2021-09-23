@@ -20,6 +20,8 @@ packages:
   - xvfb
 sources:
   - https://git.sr.ht/~metasyn/learn-uxn
+secrets:
+- 46f739e5-4538-45dd-a79f-bf173b7a2ed9
 tasks:
   - node: |
       curl -sL https://deb.nodesource.com/setup_16.x -o nodesource_setup.sh
