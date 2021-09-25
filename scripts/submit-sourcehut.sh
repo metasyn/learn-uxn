@@ -19,6 +19,9 @@ else
     exit 1;
 fi
 
+echo "Pulling latest..."
+git pull origin master
+
 curl \
     --request POST \
     -H Authorization:"token ${TOKEN}" \
