@@ -26,5 +26,5 @@ curl \
     --request POST \
     -H Authorization:"token ${TOKEN}" \
     --data-urlencode \
-    "manifest=${MANIFEST}&tags=learn-uxn&note=scheduled build" \
+    "manifest=${MANIFEST}&tags=learn-uxn&note=scheduled-build" \
     https://builds.sr.ht/api/jobs
