@@ -12,7 +12,7 @@ var uxnasm;
 // IO //
 ////////
 
-let fullscreen = false;
+const fullscreen = false;
 
 const dateFmt = () => {
   function toString(number, padLength) {
@@ -432,23 +432,14 @@ const addListeners = () => {
   });
 
   document.querySelector('#fullscreen').addEventListener('click', () => {
-    document.querySelector('#editor-wrapper').classList.toggle('hidden');
-    document.querySelector('#console-wrapper').classList.toggle('hidden');
-
-    if (fullscreen) {
-      document.querySelector('#uxnemu').style.width = '50vw';
-      document.querySelector('#uxnemu-iframe').style.width = '50%';
-      fullscreen = false;
+    const iframe = document.querySelector('#uxnemu-iframe');
+    const canvas = iframe.contentDocument.querySelector('#canvas');
+    if (!document.fullscreenElement) {
+      canvas.requestFullscreen().catch((err) => {
+        console.error(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+      });
     } else {
-      document.querySelector('#uxnemu').style.width = '100%';
-
-      const topMargin = getTopMargin();
-      const maxHeight = window.innerHeight - topMargin;
-      const fullWidth = Math.min(maxHeight * 1.6, window.innerWidth);
-      const iframe = document.querySelector('#uxnemu-iframe');
-      iframe.style.width = `${fullWidth}px`;
-
-      fullscreen = true;
+      document.exitFullscreen();
     }
   });
 
@@ -490,7 +481,7 @@ const addListeners = () => {
     });
   });
 
-  const anchors = document.querySelectorAll('#roms > div > a');
+  const anchors = document.querySelectorAll('#roms-list > a');
   anchors.forEach((x) => {
     x.addEventListener('click', (e) => {
       loadRomByName(e.srcElement.innerHTML);
@@ -505,7 +496,13 @@ const addListeners = () => {
 
   document
     .querySelector('#editor')
-    .addEventListener('click', window.editor.focus);
+    .addEventListener('click', () => {
+      try {
+        window.editor.focus();
+      } catch (err) {
+        console.info(`Error while focusing: ${err}`);
+      }
+    });
 
   // add files to the io listing
   document

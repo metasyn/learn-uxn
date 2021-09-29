@@ -102,6 +102,12 @@ function build_uxn_emscripten() {
         cp "$file" tals
     done;
 
+    cp uxn/projects/software/neralie.tal tals/neralie.tal
+
+    for file in $(ls submissions/*.tal); do
+        cp "$file" tals
+    done;
+
 
     blue "Building UXN for emscripten..."
     emcc \

@@ -178,6 +178,11 @@ a:hover {
   padding: 8px 8px;
 }
 
+#roms-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(150px, 200px));
+}
+
 #assemble {
   background-color: var(--color-orange);
 }

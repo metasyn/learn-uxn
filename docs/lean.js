@@ -490,7 +490,7 @@ const addListeners = () => {
     });
   });
 
-  const anchors = document.querySelectorAll('#roms > div > a');
+  const anchors = document.querySelectorAll('#roms-list > a');
   anchors.forEach((x) => {
     x.addEventListener('click', (e) => {
       loadRomByName(e.srcElement.innerHTML);
