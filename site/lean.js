@@ -262,7 +262,10 @@ const getTopMargin = () => {
 const resize = () => {
   // get the emulator height
   const el = document.querySelector('#uxnemu-iframe');
-  const style = getComputedStyle(el.contentWindow.document.body) || undefined;
+
+  const style = (el.contentWindow && el.contentWindow.document && el.contentWidnow.document.body)
+    ? getComputedStyle(el.contentWindow.document.body)
+    : undefined;
 
   if (style && style.height) {
     el.style.height = style.height;

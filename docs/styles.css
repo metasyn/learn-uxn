@@ -176,12 +176,11 @@ a:hover {
 
 #roms a {
   padding: 8px 8px;
-  width: 200px;
 }
 
 #roms-list {
   display: grid;
-  grid-template-columns: repeat(4, auto);
+  grid-template-columns: repeat(3, minmax(150px, 200px));
 }
 
 #assemble {
