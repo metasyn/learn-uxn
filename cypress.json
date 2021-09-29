@@ -1,1 +1,1 @@
-{ "chromeWebSecurity": false }
+{ "chromeWebSecurity": false, "retries": 3 }

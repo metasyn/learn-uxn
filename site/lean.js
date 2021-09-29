@@ -249,10 +249,14 @@ const populateEditor = (insert) => {
 //////////////
 
 const getTopMargin = () => {
-  const topMarginPx = getComputedStyle(
-    document.documentElement,
-  ).getPropertyValue('--top-margin');
-  return parseInt(topMarginPx.slice(0, -2), 10);
+  if (document.documentElement) {
+    const topMarginPx = getComputedStyle(
+      document.documentElement,
+    ).getPropertyValue('--top-margin');
+    return parseInt(topMarginPx.slice(0, -2), 10);
+  }
+  // return some value when its failing due to async
+  return 100;
 };
 
 const resize = () => {
