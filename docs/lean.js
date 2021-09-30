@@ -12,8 +12,6 @@ var uxnasm;
 // IO //
 ////////
 
-const fullscreen = false;
-
 const dateFmt = () => {
   function toString(number, padLength) {
     return number.toString().padStart(padLength, '0');
@@ -262,7 +260,12 @@ const getTopMargin = () => {
 const resize = () => {
   // get the emulator height
   const el = document.querySelector('#uxnemu-iframe');
-  const style = getComputedStyle(el.contentWindow.document.body) || undefined;
+
+  const style = el.contentWindow
+    && el.contentWindow.document
+    && el.contentWindow.document.body
+    ? getComputedStyle(el.contentWindow.document.body)
+    : undefined;
 
   if (style && style.height) {
     el.style.height = style.height;
@@ -440,7 +443,9 @@ const addListeners = () => {
     const canvas = iframe.contentDocument.querySelector('#canvas');
     if (!document.fullscreenElement) {
       canvas.requestFullscreen().catch((err) => {
-        console.error(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+        console.error(
+          `Error attempting to enable full-screen mode: ${err.message} (${err.name})`,
+        );
       });
     } else {
       document.exitFullscreen();
@@ -498,15 +503,13 @@ const addListeners = () => {
   //  .querySelector('#download-rom')
   //  .addEventListener('click', downloadRom);
 
-  document
-    .querySelector('#editor')
-    .addEventListener('click', () => {
-      try {
-        window.editor.focus();
-      } catch (err) {
-        console.info(`Error while focusing: ${err}`);
-      }
-    });
+  document.querySelector('#editor').addEventListener('click', () => {
+    try {
+      window.editor.focus();
+    } catch (err) {
+      console.info(`Error while focusing: ${err}`);
+    }
+  });
 
   // add files to the io listing
   document
