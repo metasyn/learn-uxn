@@ -45,11 +45,12 @@ describe('learn-uxn integration tests', () => {
       cy.get(`#roms-list > a:nth-child(${i})`).click({ force: true });
       cy.wait(DELAY);
 
-      // on the first load, we have a failed rom load
-      // but there should not be more than one
+      // on the first load, we have a failed rom load sometimes during the
+      // start up but on ci machines it doesn't always happen but there should
+      // not be more than one no matter what
       cy.get('#console')
         .get('span:contains(Failed to open rom)')
-        .should('have.length', 1);
+        .should('have.length.of.at.most', 1);
     }
   });
 });
