@@ -41,5 +41,6 @@ tasks:
       git config user.name "builds.sr.ht"
       git config user.email "xander@metasyn.pw"
       git checkout master
-      git add docs && git commit -m ":robot: automatic build from builds.sr.ht"
+      git add docs
+      git commit -m ":robot: automatic build from builds.sr.ht"
       git push github master --force
