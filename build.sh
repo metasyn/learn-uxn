@@ -121,6 +121,7 @@ function build_uxn_emscripten() {
         -s EXPORTED_FUNCTIONS='["_main"]' \
         -s EXPORTED_RUNTIME_METHODS='["callMain", "FS"]' \
         -s NO_EXIT_RUNTIME=1 \
+        -s ERROR_ON_UNDEFINED_SYMBOLS=0 \
         --shell-file=shell-uxnemu.html \
         --extern-pre-js=pre-uxnemu.js \
         -O3 \
