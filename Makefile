@@ -16,7 +16,8 @@ build: install rollup
 	./build.sh
 
 serve:
-	python3 -m http.server &
+	@python3 -m http.server &
+	@echo $$!
 
 deploy:
 	git push origin master
