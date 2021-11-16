@@ -31,9 +31,11 @@ tasks:
       cd learn-uxn
       make build
   - test: |
-      set -m
       cd learn-uxn
-      make serve test
+      pid=$(make serve)
+      make test
+      kill $pid
+      ps -aux
   - deploy: |
       cd learn-uxn
       git remote add github git@github.com:metasyn/learn-uxn.git
