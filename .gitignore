@@ -8,3 +8,4 @@ uxn
 
 .DS_Store
 cypress/videos
+nohup.out
