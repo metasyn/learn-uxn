@@ -110,6 +110,10 @@ function build_uxn_emscripten() {
 
 
     blue "Building UXN for emscripten..."
+
+    # Evidently these are needed for virtual file system operations
+    blue "Building UXN emulator for emscripten..."
+    EXPORTED_FUNCTIONS='[ "_main", "_file_delete", "_file_init", "_file_read", "_file_stat", "_file_write" ]'
     emcc \
         -s WASM=1 \
         -s ASSERTIONS=1 \
@@ -118,10 +122,9 @@ function build_uxn_emscripten() {
         -s USE_SDL=2 \
         -s USE_SDL_MIXER=2 \
         -s FORCE_FILESYSTEM=1 \
-        -s EXPORTED_FUNCTIONS='["_main"]' \
+        -s EXPORTED_FUNCTIONS="${EXPORTED_FUNCTIONS}" \
         -s EXPORTED_RUNTIME_METHODS='["callMain", "FS"]' \
         -s NO_EXIT_RUNTIME=1 \
-        -s ERROR_ON_UNDEFINED_SYMBOLS=0 \
         --shell-file=shell-uxnemu.html \
         --extern-pre-js=pre-uxnemu.js \
         -O3 \
@@ -129,8 +132,11 @@ function build_uxn_emscripten() {
             uxn/src/uxn-fast.c \
             uxn/src/devices/ppu.c \
             uxn/src/devices/apu.c \
+            uxn/src/devices/file.c \
             uxn/src/uxnemu.c
 
+    blue "Building UXN assembler for emscripten..."
+    blue "${EXPORTED_FUNCTIONS}"
     EMCC_DEBUG=1 emcc \
         -s WASM=1 \
         -s ASSERTIONS=1 \
