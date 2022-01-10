@@ -1,5 +1,3 @@
-(dvd.tal by @marzhall - https://github.com/marzhall/dvd_screen)
-
 ( devices )
 |00 @System  [ &vector $2 &pad      $6  &r      $2 &g     $2 &b      $2 ]
 |20 @Screen  [ &vector $2 &width $2 &height $2 &pad   $2 &x $2 &y  $2 &addr $2 &pixel $1 &sprite $1 ]
@@ -58,7 +56,7 @@ BRK
     .Screen/x DEO2
     .dvd-loc/y LDZ2
     .Screen/y DEO2
-
+    
     #00 ;draw-dvd JSR2
 
     ;handle-direction-change-x JSR2
