@@ -102,9 +102,11 @@ function build_uxn_emscripten() {
         cp "$file" tals
     done;
 
-    cp uxn/projects/software/neralie.tal tals/neralie.tal
-    cp uxn/projects/software/calc.tal tals/calc.tal
-    cp uxn/projects/software/hexes.tal tals/hexes.tal
+    for file in $(ls uxn/projects/software/*.tal); do
+        cp "$file" tals
+    done;
+
+    rm -f tals/asma.tal tals/launcher.tal
 
     cp uxn/projects/library/load-rom.tal tals/load-rom.tal
 
