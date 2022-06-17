@@ -30,6 +30,10 @@ which is composed of:
 * keep it cursed
 * `make format` before PR if you're adding/modifying js
 
+## Contributors
+
+* andrew alderwick
+
 ## TODO
 
 - [ ] allow save rom? - currently roms compiled in the web wont work on real uxnemu

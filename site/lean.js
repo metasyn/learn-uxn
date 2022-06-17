@@ -8,6 +8,51 @@ var CodeMirror;
 // eslint-disable-next-line
 var uxnasm;
 
+////////////
+// RESIZE //
+////////////
+
+const getTopMargin = () => {
+  if (document.documentElement) {
+    const topMarginPx = getComputedStyle(
+      document.documentElement,
+    ).getPropertyValue('--top-margin');
+    return parseInt(topMarginPx.slice(0, -2), 10);
+  }
+  // return some value when its failing due to async
+  return 100;
+};
+
+const resize = () => {
+  // get the emulator height
+  const el = document.querySelector('#uxnemu-iframe');
+
+  // Set the content window of the uxnemu iframe to have a max height
+  // at 80% of the potential of the main content window
+
+  const style = el.contentWindow
+    && el.contentWindow.document
+    && el.contentWindow.document.body
+    ? getComputedStyle(el.contentWindow.document.body)
+    : undefined;
+
+  const canvasEl = el.contentWindow.document.getElementById('canvas');
+
+  if (style && canvasEl) {
+    const consoleEl = document.querySelector('#console-wrapper');
+    const topMargin = getTopMargin();
+
+    const computedUxnEmuHeight = window.innerHeight * 0.8;
+
+    el.style.height = computedUxnEmuHeight;
+    canvasEl.style.maxHeight = computedUxnEmuHeight;
+    canvasEl.style.maxWidth = (canvasEl.width / canvasEl.height) * computedUxnEmuHeight;
+
+    const computedConsoleHeight = window.innerHeight - topMargin - computedUxnEmuHeight - 20;
+    consoleEl.style.height = Math.max(computedConsoleHeight, 0);
+  }
+};
+
 ////////
 // IO //
 ////////
@@ -222,7 +267,11 @@ const loadRom = (rom) => {
   const iframe = document.querySelector('#uxnemu-iframe');
   iframe.onload = (e) => {
     e.target.contentWindow.rom = rom;
+    // Give the rom 1 full second to load, and call resize
+    // for the roms like calc that are not the default dimensions
+    setTimeout(resize, 1000);
   };
+  resize();
 };
 
 ////////////
@@ -245,38 +294,6 @@ const populateEditor = (insert) => {
 //////////////
 // DOM UTIL //
 //////////////
-
-const getTopMargin = () => {
-  if (document.documentElement) {
-    const topMarginPx = getComputedStyle(
-      document.documentElement,
-    ).getPropertyValue('--top-margin');
-    return parseInt(topMarginPx.slice(0, -2), 10);
-  }
-  // return some value when its failing due to async
-  return 100;
-};
-
-const resize = () => {
-  // get the emulator height
-  const el = document.querySelector('#uxnemu-iframe');
-
-  const style = el.contentWindow
-    && el.contentWindow.document
-    && el.contentWindow.document.body
-    ? getComputedStyle(el.contentWindow.document.body)
-    : undefined;
-
-  if (style && style.height) {
-    el.style.height = style.height;
-
-    const consoleEl = document.querySelector('#console-wrapper');
-    const topMargin = getTopMargin();
-    const height = parseInt(style.height.slice(0, -2), 10);
-
-    consoleEl.style.height = window.innerHeight - topMargin - height - 20;
-  }
-};
 
 const hideNoScript = () => {
   document.querySelector('#noscript').innerHTML = '';
@@ -380,7 +397,6 @@ const addFilesToIoListing = () => {
       a.appendChild(linkText);
       a.id = fname;
       dropdown.appendChild(a);
-      debugger;
       // also add event listener
       a.addEventListener('click', () => {
         download(fname, readFile(window.uxn, `/${fname}`, 'binary'), true);
@@ -439,6 +455,7 @@ const addListeners = () => {
   });
 
   document.querySelector('#fullscreen').addEventListener('click', () => {
+    resize();
     const iframe = document.querySelector('#uxnemu-iframe');
     const canvas = iframe.contentDocument.querySelector('#canvas');
     if (!document.fullscreenElement) {
@@ -546,5 +563,4 @@ const addListeners = () => {
 
   log('🅻🅴🅰🆁🅽 🆄🆇🅽');
   resize();
-  setInterval(resize, 1000);
 })();
