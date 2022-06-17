@@ -2663,7 +2663,7 @@ JMP2r
 
 @do-push ( -- )
 
-	.input/value LDZ2 ADD #00 GTH JMP JMP2r
+	.input/value LDZ2 #0000 GTH2 JMP JMP2r
 	.stack/length LDZ #07 LTH JMP JMP2r
 	#40 .Audio0/pitch DEO
 	.input/value LDZ2 ;push JSR2
