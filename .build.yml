@@ -18,8 +18,6 @@ packages:
   - libxtst6
   - xauth
   - xvfb
-  # hut
-  - golang
 sources:
   - https://git.sr.ht/~metasyn/learn-uxn
 secrets:
@@ -38,9 +36,8 @@ tasks:
       cd learn-uxn
       ./scripts/test.sh
   - package: |
-      tar -cvz learn-orca > site.tar.gz
+      cd learn-uxn
+      cp -r docs learn-uxn
+      tar -cvz learn-uxn > ../site.tar.gz
   - deploy: |
-      git clone https://git.sr.ht/~emersion/hut
-      sudo make || true
-      sudo make install
-      hut pages publish -d $site site.tar.gz
+      acurl -Fcontent=@site.tar.gz https://pages.sr.ht/publish/$site
