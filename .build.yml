@@ -18,10 +18,14 @@ packages:
   - libxtst6
   - xauth
   - xvfb
+  # hut
+  - golang
 sources:
   - https://git.sr.ht/~metasyn/learn-uxn
 secrets:
   - b336eab6-3f41-4b59-99ba-9132cadc232f
+environment:
+  site: metasyn.srht.site
 tasks:
   - node: |
       curl -sL https://deb.nodesource.com/setup_16.x -o nodesource_setup.sh
@@ -33,14 +37,10 @@ tasks:
   - test: |
       cd learn-uxn
       ./scripts/test.sh
+  - package: |
+      tar -cvz learn-orca > site.tar.gz
   - deploy: |
-      cd learn-uxn
-      git remote add github git@github.com:metasyn/learn-uxn.git
-      mkdir -p ~/.ssh
-      ssh-keyscan github.com >> ~/.ssh/known_hosts
-      git config user.name "builds.sr.ht"
-      git config user.email "xander@metasyn.pw"
-      git checkout master
-      git add docs
-      git commit -m ":robot: automatic build from builds.sr.ht"
-      git push github master --force
+      git clone https://git.sr.ht/~emersion/hut
+      sudo make || true
+      sudo make install
+      hut pages publish -d $site site.tar.gz
