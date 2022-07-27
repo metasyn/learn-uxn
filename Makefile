@@ -20,6 +20,7 @@ serve:
 
 deploy:
 	git push origin master
+	git push origin github
 
 test:
 	./scripts/test.sh

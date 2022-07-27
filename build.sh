@@ -85,23 +85,27 @@ function copy_src() {
 	cp -r src dist
 }
 
+function copy_docs() {
+	cp -r dist docs
+}
+
 function build_uxn_emscripten() {
 	rm -rf tals
 	mkdir -p tals
 
-	for file in $(ls uxn/projects/examples/demos/*.tal); do
+	for file in uxn/projects/examples/demos/*.tal; do
 		cp "$file" tals
 	done
 
-	for file in $(ls uxn/projects/examples/devices/*.tal); do
+	for file in uxn/projects/examples/devices/*.tal; do
 		cp "$file" tals
 	done
 
-	for file in $(ls uxn/projects/examples/gui/*.tal); do
+	for file in uxn/projects/examples/gui/*.tal; do
 		cp "$file" tals
 	done
 
-	for file in $(ls uxn/projects/software/*.tal); do
+	for file in uxn/projects/software/*.tal; do
 		cp "$file" tals
 	done
 
@@ -109,7 +113,7 @@ function build_uxn_emscripten() {
 
 	cp uxn/projects/library/load-rom.tal tals/load-rom.tal
 
-	for file in $(ls submissions/*.tal); do
+	for file in submissions/*.tal; do
 		cp "$file" tals
 	done
 
@@ -195,5 +199,6 @@ build_uxn_emscripten
 copy_src
 inject_uxn_commit
 inject_date
+copy_docs
 
 green "Finished!"
