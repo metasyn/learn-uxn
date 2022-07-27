@@ -2,37 +2,39 @@
 
 [![builds.sr.ht status](https://builds.sr.ht/~metasyn/learn-uxn.svg)](https://builds.sr.ht/~metasyn/learn-uxn?)
 
-* learn you a uxn for great good!!!!!
-* see it here: https://metasyn.github.io/learn-uxn
+- learn you a uxn for great good!!!!!
+- see it here: https://metasyn.github.io/learn-uxn
 
 ## uses
 
-* [uxn](https://git.sr.ht/~rabbits/uxn)
-* [codemirror 6](https://codemirror.net/6)
-* [lezer](https://lezer.codemirror.net)
-* [emscripten](https://emscripten.org)
-* cursed hackery
+- [uxn](https://git.sr.ht/~rabbits/uxn)
+- [codemirror 6](https://codemirror.net/6)
+- [lezer](https://lezer.codemirror.net)
+- [emscripten](https://emscripten.org)
+- cursed hackery
 
 ## building
 
 ```
 make build
 ```
+
 which is composed of:
 
-* build.sh - downloads/installs emscripten, builds uxn, builds emscripten port
-* npm install - ugh don't we all just adore javascript
-* rollup
+- build.sh - downloads/installs emscripten, builds uxn, builds emscripten port
+- npm install - ugh don't we all just adore javascript
+- rollup
 
 ## Contributing
 
-* be reasonable
-* keep it cursed
-* `make format` before PR if you're adding/modifying js
+- be reasonable
+- keep it cursed
+- `make format`
+- submit a patch using [git-send-email](https://git-send-email.io) to ~metasyn/public-inbox@lists.sr.ht
 
 ## Contributors
 
-* andrew alderwick
+- andrew alderwick
 
 ## TODO
 
@@ -42,6 +44,7 @@ which is composed of:
 # LICENSE
 
 The [Unlicense](https://unlicense.org/):
+
 ```
 This is free and unencumbered software released into the public domain.
 

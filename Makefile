@@ -1,10 +1,10 @@
-.PHONY: deploy build
+.PHONY: format install rollup biuld serve deploy test
 
 .ONESHELL:
 
 format:
-	prettier --write site/*.html site/*.css site/lean.js pre-uxnemu.js pre-uxnasm.js codemirror/**/*js
-	eslint_d --fix site/lean.js pre-uxnemu.js pre-uxnasm.js codemirror/**/*.js
+	prettier --write src/*.html src/*.css src/lean.js pre-uxnemu.js pre-uxnasm.js codemirror/**/*js
+	eslint_d --fix src/lean.js pre-uxnemu.js pre-uxnasm.js codemirror/**/*.js
 
 install:
 	npm install
@@ -20,7 +20,6 @@ serve:
 
 deploy:
 	git push origin master
-	git push github master
 
 test:
 	./scripts/test.sh

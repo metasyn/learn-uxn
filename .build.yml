@@ -20,8 +20,6 @@ packages:
   - xvfb
 sources:
   - https://git.sr.ht/~metasyn/learn-uxn
-secrets:
-  - b336eab6-3f41-4b59-99ba-9132cadc232f
 environment:
   site: metasyn.srht.site
 tasks:
@@ -35,9 +33,3 @@ tasks:
   - test: |
       cd learn-uxn
       ./scripts/test.sh
-  - package: |
-      cd learn-uxn
-      cp -r docs learn-uxn
-      tar -cvz learn-uxn > ../site.tar.gz
-  - deploy: |
-      acurl -Fcontent=@site.tar.gz https://pages.sr.ht/publish/$site
