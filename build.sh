@@ -63,7 +63,7 @@ function setup_uxn() {
 	fi
 
 	if ! grep -q 'emscripten_sleep' uxn/src/uxnemu.c; then
-		sed -i -e '1s/^/#include <emscripten.h>\n/;/SDL_Delay/s/^/emscripten_sleep(10);\n/' uxn/src/uxnemu.c
+		sed -i -e '1s/^/#include <emscripten.h>\'$'\n''/;/SDL_Delay/s/^/emscripten_sleep(10);\'$'\n''/' uxn/src/uxnemu.c
 	fi
 
 	green "\tDone!"
