@@ -556,7 +556,7 @@ const addListeners = () => {
     Promise.all([window.uxn.allReady, window.asm.allReady]).then(() => {
       resize();
 
-      const rom = getURLParam('rom') || 'piano';
+      const rom = getURLParam('rom') || 'potato';
       loadRomByName(rom);
     });
   };
