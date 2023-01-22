@@ -117,6 +117,12 @@ function build_uxn_emscripten() {
 		cp "$file" tals
 	done
 
+	pushd potato/src
+	cat potato.tal desktop.tal apps.tal assembler.tal manifest.tal assets.tal >combined.tal
+	sed -i 's/\~src.*//' combined.tal
+	popd
+	cp potato/src/combined.tal tals/potato.tal
+
 	blue "Building UXN for emscripten..."
 	emcc \
 		-s WASM=1 \

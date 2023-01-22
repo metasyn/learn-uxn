@@ -1,0 +1,3 @@
+[submodule "potato"]
+	path = potato
+	url = https://git.sr.ht/~rabbits/potato
