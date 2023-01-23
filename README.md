@@ -34,7 +34,9 @@ which is composed of:
 
 ## Contributors
 
+- devine lu linvega (by virtue of making uxn)
 - andrew alderwick
+- bogmon
 
 ## TODO
 
