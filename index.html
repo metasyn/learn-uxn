@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>LEARN ORCΛ~</title>
+  </head>
+
+  <body>
+    <h1>learn-uxn has moved to sourcehut</h1>
+
+    <p>
+      you can read about
+      <a href="https://sfconservancy.org/GiveUpGitHub/"
+        >why we're giving up on github here</a
+      >.
+    </p>
+
+    <p>
+      the project can now be found at
+      <a href="https://metasyn.srht.site/learn-uxn/"
+        >https://metasyn.srht.site/learn-uxn/</a
+      >
+    </p>
+
+    <p>
+      if you have javascript enabled, you will be redirected in
+      <span id="countdown">10</span> seconds...
+    </p>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        console.log("countdown...");
+        let span = document.getElementById("countdown");
+        setInterval(() => {
+          span.innerHTML = parseInt(span.innerHTML, 10) - 1;
+          if (span.innerHTML <= 0) {
+            window.location = "https://metasyn.srht.site/learn-uxn/";
+          }
+        }, 1000);
+      });
+    </script>
+  </body>
+</html>
